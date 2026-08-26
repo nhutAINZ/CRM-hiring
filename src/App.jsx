@@ -29,13 +29,17 @@ import {
   fetchSheet2Data,
   fetchCtvSheetData,
   fetchJobSheetData,
+  fetchIntergreatSheetData,
   getStoredConfig,
   getSheet2ViewUrl,
   getCtvSheetViewUrl,
   getJobSheetViewUrl,
+  getIntergreatSheetViewUrl,
   CTV_SHEET_URL,
-  JOB_SHEET_URL
+  JOB_SHEET_URL,
+  INTERGREAT_SHEET_URL
 } from './services/sheetsService';
+
 import {
   calculateMetrics,
   isWithinDateRange,
@@ -59,9 +63,11 @@ export default function App() {
   const [sheet2Items, setSheet2Items] = useState([]);
   const [ctvItems, setCtvItems] = useState([]);
   const [jobItems, setJobItems] = useState([]);
+  const [intergreatItems, setIntergreatItems] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
 
   // Modals state
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -105,17 +111,19 @@ export default function App() {
     setErrorMsg('');
 
     try {
-      const [sheet1List, sheet2List, ctvList, jobList] = await Promise.all([
+      const [sheet1List, sheet2List, ctvList, jobList, intergreatList] = await Promise.all([
         fetchSheet1Data(config.sheet1Id, config.sheet1Gid),
         fetchSheet2Data(config.sheet2Id, config.sheet2Gid),
         fetchCtvSheetData(config.ctvSheetId, config.ctvSheetGid),
-        fetchJobSheetData(config.jobSheetId, config.jobSheetGid)
+        fetchJobSheetData(config.jobSheetId, config.jobSheetGid),
+        fetchIntergreatSheetData(config.intergreatSheetId || '1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4', config.intergreatSheetGid || '0')
       ]);
 
       setCandidates(sheet1List);
       setSheet2Items(sheet2List);
       setCtvItems(ctvList);
       setJobItems(jobList);
+      setIntergreatItems(intergreatList);
       setLastUpdated(new Date());
     } catch (err) {
       console.error('Error fetching data from Google Sheets', err);
@@ -131,8 +139,11 @@ export default function App() {
     config.ctvSheetId,
     config.ctvSheetGid,
     config.jobSheetId,
-    config.jobSheetGid
+    config.jobSheetGid,
+    config.intergreatSheetId,
+    config.intergreatSheetGid
   ]);
+
 
   // Initial Load
   useEffect(() => {
@@ -420,12 +431,15 @@ export default function App() {
               candidates={candidates}
               sheet2Items={sheet2Items}
               sheet2ViewUrl={sheet2ViewUrl}
+              intergreatItems={intergreatItems}
+              intergreatSheetUrl={getIntergreatSheetViewUrl(config.intergreatSheetId, config.intergreatSheetGid)}
               onNavigateToJob={(jobTitle) => {
                 setFilters((prev) => ({ ...prev, position: jobTitle }));
                 setActiveView('table');
               }}
             />
           )}
+
 
           {/* ── 8. Quản Lý & Hỗ Trợ Mã CTV View ── */}
           {activeView === 'ctv' && (

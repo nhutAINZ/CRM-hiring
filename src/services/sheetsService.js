@@ -9,11 +9,15 @@ export const DEFAULT_CONFIG = {
   ctvSheetGid: '497830992',
   jobSheetId: '1PJUSclHhVYLvoYTzmwkwpzsRfPOqODs0RDrvhW99Uko',
   jobSheetGid: '0',
+  intergreatSheetId: '1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4',
+  intergreatSheetGid: '0',
   autoRefreshInterval: 0, // 0 = disabled, or minutes: 1, 5, 15
 };
 
 export const CTV_SHEET_URL = 'https://docs.google.com/spreadsheets/d/11g-mvcukMTE0Bdjek5kIgbI_8WuxZshTlS0eCGw60Wk/edit?gid=497830992#gid=497830992';
 export const JOB_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1PJUSclHhVYLvoYTzmwkwpzsRfPOqODs0RDrvhW99Uko/edit?gid=0#gid=0';
+export const INTERGREAT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4/edit?gid=0#gid=0';
+
 
 export const getStoredConfig = () => {
   const saved = localStorage.getItem('recruitment_dashboard_config');
@@ -345,4 +349,86 @@ export const fetchJobSheetData = async (
     return [];
   }
 };
+
+// Helper to construct view URL for Intergreat Client Sheet
+export const getIntergreatSheetViewUrl = (
+  sheetId = DEFAULT_CONFIG.intergreatSheetId,
+  sheetGid = DEFAULT_CONFIG.intergreatSheetGid
+) => {
+
+  return `https://docs.google.com/spreadsheets/d/${sheetId}/edit?gid=${sheetGid}#gid=${sheetGid}`;
+};
+
+/**
+ * Parse Intergreat Client Sheet Data (Tư vấn tuyển sinh Intergreat)
+ */
+export const fetchIntergreatSheetData = async (
+  sheetId = DEFAULT_CONFIG.intergreatSheetId,
+  sheetGid = DEFAULT_CONFIG.intergreatSheetGid
+) => {
+  try {
+    const url = getCsvUrl(sheetId, sheetGid);
+    const response = await fetch(url, { cache: 'no-cache' });
+    if (!response.ok) return [];
+
+    const csvText = await response.text();
+    return new Promise((resolve) => {
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          if (!results.data || results.data.length === 0) {
+            resolve([]);
+            return;
+          }
+
+          const candidates = results.data
+            .map((row, idx) => {
+              const name = extractField(row, ['tên ứng viên', 'tên uv', 'ứng viên', 'name']);
+              const position = extractField(row, ['vị trí ứng tuyển', 'vị trí', 'position']) || 'Tư vấn Tuyển Sinh';
+              const salary = extractField(row, ['lương mong muốn', 'lương', 'salary']);
+              const startTime = extractField(row, ['thời gian bắt đầu làm việc', 'thời gian bắt đầu']);
+              const cvFile = extractField(row, ['sơ yếu lý lịch', 'cv', 'link cv']);
+              const cvResult = extractField(row, ['kết quả cv']);
+              const interviewDate = extractField(row, ['ngày phỏng vấn']);
+              const interviewTime = extractField(row, ['giờ phỏng vấn']);
+              const pvResult = extractField(row, ['kết quả phỏng vấn', 'kết quả pv']);
+              const onboardDate = extractField(row, ['ngày bắt đầu làm', 'ngày ob']);
+              const statusCandidate = extractField(row, ['tình trạng ứng viên', 'tình trạng']);
+              const notes = extractField(row, ['cột 1', 'ghi chú', 'đánh giá']);
+
+              if (!name && !position) return null;
+
+              return {
+                id: `intergreat_uv_${idx + 1}`,
+                rowIndex: idx + 2,
+                name: name || 'Ứng viên',
+                position: position || 'Tư vấn Tuyển Sinh',
+                company: 'Intergreat Education',
+                salary: salary || 'Trong khoảng đã đề xuất',
+                startTime: startTime || '',
+                cvFile: cvFile || '',
+                cvResult: cvResult || '',
+                interviewDate: interviewDate || '',
+                interviewTime: interviewTime || '',
+                pvResult: pvResult || '',
+                onboardDate: onboardDate || '',
+                statusCandidate: statusCandidate || '',
+                notes: notes || '',
+                rawRow: row
+              };
+            })
+            .filter(Boolean);
+
+          resolve(candidates);
+        },
+        error: () => resolve([])
+      });
+    });
+  } catch (err) {
+    console.warn('Could not fetch Intergreat Sheet, falling back safely', err);
+    return [];
+  }
+};
+
 

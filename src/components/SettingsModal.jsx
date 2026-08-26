@@ -192,6 +192,45 @@ export default function SettingsModal({ config, onSaveConfig, onClose, onRefresh
             </div>
           </div>
 
+          {/* Intergreat Client Sheet Settings */}
+          <div className="space-y-2.5 p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50">
+            <div className="flex items-center justify-between font-bold text-emerald-900 dark:text-emerald-200">
+              <span className="text-xs flex items-center gap-1.5">
+                <span>🎓 Google Sheet Khách Hàng (Intergreat - Tư Vấn Tuyển Sinh)</span>
+              </span>
+              <a
+                href={`https://docs.google.com/spreadsheets/d/${form.intergreatSheetId || '1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4'}/edit?gid=${form.intergreatSheetGid || '0'}#gid=${form.intergreatSheetGid || '0'}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 font-bold"
+              >
+                <span>Mở Sheet Intergreat</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+
+            <div>
+              <label className="block text-slate-500 mb-1 font-semibold">Spreadsheet ID Khách Hàng Intergreat</label>
+              <input
+                type="text"
+                value={form.intergreatSheetId || '1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4'}
+                onChange={(e) => setForm({ ...form, intergreatSheetId: e.target.value.trim() })}
+                className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono text-xs text-slate-900 dark:text-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-500 mb-1 font-semibold">Sheet GID (Mặc định 0)</label>
+              <input
+                type="text"
+                value={form.intergreatSheetGid || '0'}
+                onChange={(e) => setForm({ ...form, intergreatSheetGid: e.target.value.trim() })}
+                className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono text-xs text-slate-900 dark:text-white"
+              />
+            </div>
+          </div>
+
+
           {/* Auto Refresh Setting */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80">
             <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1 text-xs">
