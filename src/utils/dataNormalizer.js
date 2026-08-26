@@ -122,8 +122,9 @@ export const getCandidateStage = (c) => {
 export const parseVietnameseDate = (dateStr) => {
   if (!dateStr) return null;
   const clean = dateStr.trim().split(' ')[0];
-  const parts = clean.split(/[\/-]/);
+  const parts = clean.split(/[/-]/);
   if (parts.length >= 3) {
+
     const day = parseInt(parts[0], 10);
     const month = parseInt(parts[1], 10) - 1; // 0-indexed
     let year = parseInt(parts[2], 10);

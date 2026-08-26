@@ -6,9 +6,13 @@ import {
   getSheet2ViewUrl,
   getCtvSheetViewUrl,
   getJobSheetViewUrl,
+  getIntergreatSheetViewUrl,
   JOB_SHEET_URL,
-  CTV_SHEET_URL
+  CTV_SHEET_URL,
+  INTERGREAT_SHEET_URL
 } from '../../services/sheetsService.js';
+import { cleanPhoneNumber } from '../../services/zaloOaService.js';
+
 
 describe('Unit Tests: sheetsService', () => {
 
@@ -49,4 +53,26 @@ describe('Unit Tests: sheetsService', () => {
       'https://docs.google.com/spreadsheets/d/custom_job_id/edit?gid=999#gid=999'
     );
   });
+
+  it('should construct correct Intergreat Client Sheet View URL', () => {
+    const defaultUrl = getIntergreatSheetViewUrl();
+    assert.strictEqual(
+      defaultUrl,
+      'https://docs.google.com/spreadsheets/d/1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4/edit?gid=0#gid=0'
+    );
+
+    const customUrl = getIntergreatSheetViewUrl('custom_intergreat_id', '0');
+    assert.strictEqual(
+      customUrl,
+      'https://docs.google.com/spreadsheets/d/custom_intergreat_id/edit?gid=0#gid=0'
+    );
+  });
+
+  it('should verify cleanPhoneNumber utility for direct Zalo chats', () => {
+    assert.strictEqual(cleanPhoneNumber('0901234567'), '0901234567');
+    assert.strictEqual(cleanPhoneNumber('+84901234567'), '0901234567');
+    assert.strictEqual(cleanPhoneNumber('84901234567'), '0901234567');
+    assert.strictEqual(cleanPhoneNumber('090.123.4567'), '0901234567');
+  });
 });
+
