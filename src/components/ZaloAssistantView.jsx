@@ -1,9 +1,9 @@
 // ====================================================================
-// FASTHUNT RECRUITMENT AGENT - ZALO AI ASSISTANT EXECUTIVE VIEW
-// Realtime Webhook Logs, AI CV Match Studio, CTV Push Approval Queue
+// FASTHUNT RECRUITMENT AGENT - PERSONAL ZALO RECRUITER ASSISTANT
+// 100% Free Personal Zalo (Nick Thường) - Direct Chat, Templates & CV Studio
 // ====================================================================
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Bot,
   Sparkles,
@@ -29,17 +29,28 @@ import {
   Copy,
   TrendingUp,
   Layers,
-  FileCode
+  FileCode,
+  Phone,
+  UserCheck,
+  Share2,
+  Settings,
+  Smile,
+  QrCode
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
   getStoredZaloConfig,
+  saveZaloConfig,
   getStoredZaloMessages,
   getStoredBroadcastQueue,
   processZaloWebhookEvent,
   approveAndSendBroadcast,
   rejectBroadcast,
-  createJobBroadcastDraft
+  createJobBroadcastDraft,
+  PERSONAL_ZALO_TEMPLATES,
+  openPersonalZaloChat,
+  openZaloGroup,
+  cleanPhoneNumber
 } from '../services/zaloOaService.js';
 import { extractTextFromFile } from '../services/cvExtractor.js';
 import { analyzeAndMatchCv } from '../services/aiMatchingService.js';
@@ -52,14 +63,18 @@ export default function ZaloAssistantView({
   onOpenBroadcastModal,
   onOpenAnalysisModal
 }) {
-  const [activeSubTab, setActiveSubTab] = useState('messages'); // 'messages' | 'approval_queue' | 'cv_studio' | 'templates'
+  const [activeSubTab, setActiveSubTab] = useState('scripts'); // 'scripts' | 'cv_studio' | 'broadcast' | 'settings'
+  const [config, setConfig] = useState(getStoredZaloConfig);
   const [messages, setMessages] = useState(getStoredZaloMessages);
   const [broadcastQueue, setBroadcastQueue] = useState(getStoredBroadcastQueue);
-  const [oaConfig] = useState(getStoredZaloConfig);
 
-  // Search & Filter state for messages
-  const [msgFilterCategory, setMsgFilterCategory] = useState('ALL');
-  const [msgSearchQuery, setMsgSearchQuery] = useState('');
+  // Script Generator State
+  const [selectedCandidateId, setSelectedCandidateId] = useState(candidates[0]?.id || '');
+  const [selectedTemplateId, setSelectedTemplateId] = useState(PERSONAL_ZALO_TEMPLATES[0].id);
+  const [customPhone, setCustomPhone] = useState('');
+  const [customCandidateName, setCustomCandidateName] = useState('');
+  const [scriptContent, setScriptContent] = useState('');
+  const [isCopiedScript, setIsCopiedScript] = useState(false);
 
   // CV Studio state
   const [studioCvText, setStudioCvText] = useState('');
@@ -67,89 +82,71 @@ export default function ZaloAssistantView({
   const [isAnalyzingCv, setIsAnalyzingCv] = useState(false);
   const [studioAnalysisResult, setStudioAnalysisResult] = useState(null);
 
-  // Webhook Simulator state
-  const [simSenderName, setSimSenderName] = useState('Nguyễn Văn An (CTV 56718)');
-  const [simContent, setSimContent] = useState('Em gửi CV ứng viên Sales tư vấn bên New Space nhé.');
-  const [simAttachmentType, setSimAttachmentType] = useState('docx');
-  const [isSimulating, setIsSimulating] = useState(false);
+  // Settings State
+  const [settingsForm, setSettingsForm] = useState({ ...config });
+  const [isSavedSettings, setIsSavedSettings] = useState(false);
 
-  // Metrics summary
-  const pendingApprovals = useMemo(() => {
-    return broadcastQueue.filter(b => b.status === 'PENDING_APPROVAL');
-  }, [broadcastQueue]);
+  // Find active selected candidate & active job for script generator
+  const activeCandidate = useMemo(() => {
+    return candidates.find(c => String(c.id) === String(selectedCandidateId)) || candidates[0] || {};
+  }, [candidates, selectedCandidateId]);
 
-  const sentBroadcasts = useMemo(() => {
-    return broadcastQueue.filter(b => b.status === 'SENT');
-  }, [broadcastQueue]);
-
-  const cvMessagesCount = useMemo(() => {
-    return messages.filter(m => m.category === 'CV_NEW').length;
-  }, [messages]);
-
-  // Filtered Messages
-  const filteredMessages = useMemo(() => {
-    return messages.filter((m) => {
-      if (msgFilterCategory !== 'ALL' && m.category !== msgFilterCategory) return false;
-      if (msgSearchQuery) {
-        const q = msgSearchQuery.toLowerCase();
-        const matchSender = m.senderName && m.senderName.toLowerCase().includes(q);
-        const matchContent = m.content && m.content.toLowerCase().includes(q);
-        const matchSummary = m.aiSummary && m.aiSummary.toLowerCase().includes(q);
-        if (!matchSender && !matchContent && !matchSummary) return false;
-      }
-      return true;
-    });
-  }, [messages, msgFilterCategory, msgSearchQuery]);
-
-  // Handle Approve Broadcast Item (Human-in-the-Loop)
-  const handleApprove = (draftId) => {
-    try {
-      const updated = approveAndSendBroadcast(draftId, 'Admin FastHunt');
-      setBroadcastQueue(getStoredBroadcastQueue());
-      confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 } });
-      alert(`🚀 Đã duyệt và gửi thành công tin tuyển dụng "${updated.draftTitle}" qua Zalo OA!`);
-    } catch (err) {
-      alert('Lỗi phê duyệt: ' + err.message);
+  const activeJob = useMemo(() => {
+    if (activeCandidate?.position) {
+      const match = jobItems.find(j => j.title?.toLowerCase().includes(activeCandidate.position.toLowerCase()));
+      if (match) return match;
     }
+    return jobItems[0] || {};
+  }, [jobItems, activeCandidate]);
+
+  // Sync phone & name when candidate selection changes
+  useEffect(() => {
+    if (activeCandidate && activeCandidate.id) {
+      setCustomCandidateName(activeCandidate.name || '');
+      setCustomPhone(activeCandidate.phone || activeCandidate.sdt || '');
+    }
+  }, [activeCandidate]);
+
+  // Auto regenerate script when template or candidate changes
+  useEffect(() => {
+    const template = PERSONAL_ZALO_TEMPLATES.find(t => t.id === selectedTemplateId) || PERSONAL_ZALO_TEMPLATES[0];
+    const candidateData = {
+      ...activeCandidate,
+      name: customCandidateName || activeCandidate.name,
+      phone: customPhone || activeCandidate.phone
+    };
+    const generated = template.generate(candidateData, activeJob, config);
+    setScriptContent(generated);
+  }, [selectedTemplateId, activeCandidate, activeJob, config, customCandidateName, customPhone]);
+
+  // Handle 1-Click Copy & Open Zalo Chat
+  const handleCopyAndOpenZalo = () => {
+    const phoneToChat = customPhone || activeCandidate.phone || activeCandidate.sdt || '';
+    openPersonalZaloChat(phoneToChat, scriptContent);
+    setIsCopiedScript(true);
+    confetti({ particleCount: 35, spread: 60, origin: { y: 0.8 } });
+    setTimeout(() => setIsCopiedScript(false), 2500);
   };
 
-  // Handle Reject Broadcast Item
-  const handleReject = (draftId) => {
-    const reason = prompt('Nhập lý do từ chối bản tin:', 'Nội dung chưa tối ưu hoặc đã đủ ứng viên');
-    if (reason !== null) {
-      rejectBroadcast(draftId, reason);
-      setBroadcastQueue(getStoredBroadcastQueue());
-    }
+  // Handle Copy Only
+  const handleCopyOnly = () => {
+    navigator.clipboard.writeText(scriptContent);
+    setIsCopiedScript(true);
+    setTimeout(() => setIsCopiedScript(false), 2000);
   };
 
-  // Handle Webhook Simulation
-  const handleSimulateWebhook = async (e) => {
+  // Handle Save Settings
+  const handleSaveSettings = (e) => {
     e.preventDefault();
-    if (!simContent.trim()) return;
-
-    setIsSimulating(true);
-    try {
-      const eventPayload = {
-        senderId: `user_${Date.now()}`,
-        senderName: simSenderName,
-        groupName: 'Nhóm CTV FASTHUNT Toàn Quốc',
-        content: simContent,
-        attachmentType: simAttachmentType,
-        attachmentUrl: simAttachmentType !== 'none' ? 'https://docs.google.com/sample_cv_file' : null
-      };
-
-      const result = await processZaloWebhookEvent(eventPayload, jobItems);
-      setMessages(getStoredZaloMessages());
-      confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
-
-      if (result.candidateData && onOpenAnalysisModal) {
-        onOpenAnalysisModal(result.candidateData);
-      }
-    } catch (err) {
-      alert('Lỗi mô phỏng webhook: ' + err.message);
-    } finally {
-      setIsSimulating(false);
-    }
+    const updated = {
+      ...settingsForm,
+      zaloChatUrl: `https://zalo.me/${cleanPhoneNumber(settingsForm.zaloPhone)}`
+    };
+    saveZaloConfig(updated);
+    setConfig(updated);
+    setIsSavedSettings(true);
+    confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
+    setTimeout(() => setIsSavedSettings(false), 2500);
   };
 
   // Handle Studio CV Upload
@@ -168,7 +165,7 @@ export default function ZaloAssistantView({
   // Handle Execute AI Matching Studio
   const handleExecuteStudioAnalysis = async () => {
     if (!studioCvText.trim()) {
-      alert('Vui lòng nhập hoặc tải file CV để phân tích.');
+      alert('Vui lòng dán tin nhắn hoặc tải file CV để phân tích.');
       return;
     }
 
@@ -187,607 +184,648 @@ export default function ZaloAssistantView({
     }
   };
 
+  // Broadcast handlers
+  const handleApproveBroadcast = (draftId) => {
+    try {
+      const updated = approveAndSendBroadcast(draftId, config.recruiterName);
+      setBroadcastQueue(getStoredBroadcastQueue());
+      confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 } });
+      alert(`🚀 Đã lưu tin tuyển dụng "${updated.draftTitle}". Bạn có thể mở Nhóm Zalo CTV để dán ngay!`);
+    } catch (err) {
+      alert('Lỗi: ' + err.message);
+    }
+  };
+
+  const handleOpenGroupBroadcast = (draft) => {
+    openZaloGroup(config.ctvGroupUrl, draft.draftContent);
+  };
+
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in pb-12">
       
-      {/* ── 1. Top Zalo OA Connection Status Bar ── */}
-      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-blue-950 via-[#0c142b] to-slate-950 border border-blue-500/30 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 specular-highlight">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/30">
-              <Bot className="w-5 h-5" />
-            </span>
+      {/* ── 1. Top Personal Zalo Connection Status Bar ── */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-blue-900 via-[#0a3871] to-slate-950 border border-blue-400/30 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 specular-highlight">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-sky-400 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/40">
+                {config.recruiterName ? config.recruiterName.charAt(0).toUpperCase() : 'Z'}
+              </div>
+              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-slate-900" title="Sẵn sàng gửi tin Zalo" />
+            </div>
+
             <div>
-              <h2 className="text-base sm:text-lg font-black tracking-tight flex items-center gap-2">
-                <span>Zalo AI Assistant - Trợ Lý Tuyển Dụng Zalo OA</span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  OA API v3 Đã Kết Nối
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-base sm:text-lg font-black tracking-tight text-white">
+                  {config.recruiterName}
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-200 border border-blue-400/30 flex items-center gap-1">
+                  <Smile className="w-3 h-3 text-blue-300" />
+                  Nick Thường (Miễn Phí 100%)
                 </span>
-              </h2>
-              <p className="text-xs text-slate-300">
-                Official Account: <strong>{oaConfig.oaName}</strong> • App ID: <span className="font-mono text-blue-300">{oaConfig.appId}</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                  Online
+                </span>
+              </div>
+              <p className="text-xs text-blue-100/80 flex items-center gap-2 mt-0.5">
+                <span>Số Zalo: <strong className="text-white font-mono">{config.zaloPhone}</strong></span>
+                <span>•</span>
+                <a
+                  href={`https://zalo.me/${cleanPhoneNumber(config.zaloPhone)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sky-300 hover:underline flex items-center gap-1 font-semibold"
+                >
+                  <span>zalo.me/{cleanPhoneNumber(config.zaloPhone)}</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </p>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Shortcuts */}
         <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => onOpenBroadcastModal && onOpenBroadcastModal(jobItems[0])}
-            className="btn-shiny flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white rounded-xl text-xs font-bold shadow-md shadow-orange-500/20 cursor-pointer transition-all"
+          <a
+            href="https://chat.zalo.me"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/15 transition-colors"
           >
-            <Flame className="w-4 h-4" />
-            <span>Tạo Tin Đẩy Job Cho CTV</span>
+            <MessageSquare className="w-3.5 h-3.5 text-sky-300" />
+            <span>Mở Zalo Web</span>
+          </a>
+
+          <a
+            href={config.ctvGroupUrl || 'https://chat.zalo.me'}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 text-xs font-bold border border-sky-400/30 transition-colors"
+          >
+            <Users className="w-3.5 h-3.5 text-sky-300" />
+            <span>Mở Nhóm CTV</span>
+          </a>
+
+          <button
+            onClick={() => setActiveSubTab('settings')}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer"
+          >
+            <Settings className="w-3.5 h-3.5" />
+            <span>Đổi Nick / SĐT</span>
           </button>
         </div>
       </div>
 
-      {/* ── 2. 4 Core KPI Summary Cards ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        
-        {/* Card 1: Tổng tin nhắn nhận */}
-        <div className="mengto-card p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-bold uppercase tracking-wider">Tin Nhắn Nhận</span>
-            <MessageSquare className="w-4 h-4 text-blue-500" />
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">
-            {messages.length}
-          </p>
-          <span className="text-[11px] text-slate-500">Qua Webhook Zalo OA</span>
-        </div>
-
-        {/* Card 2: CV Đã Thẩm Định */}
-        <div className="mengto-card p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-bold uppercase tracking-wider">CV Đã Phân Tích</span>
-            <FileText className="w-4 h-4 text-emerald-500" />
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
-            {cvMessagesCount}
-          </p>
-          <span className="text-[11px] text-emerald-600/80 font-semibold">Tự động match điểm Job</span>
-        </div>
-
-        {/* Card 3: Chờ Phê Duyệt Đẩy Job */}
-        <div className="mengto-card mengto-card-amber p-4 space-y-1">
-          <div className="flex items-center justify-between text-amber-700 dark:text-amber-300">
-            <span className="text-xs font-bold uppercase tracking-wider">Chờ Duyệt Đẩy Job</span>
-            <Clock className="w-4 h-4 text-amber-500 animate-spin-slow" />
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-amber-800 dark:text-amber-300 font-mono">
-            {pendingApprovals.length}
-          </p>
-          <span className="text-[11px] text-amber-700/80 font-bold">Cần duyệt thủ công</span>
-        </div>
-
-        {/* Card 4: Tin Tuyển Dụng Đã Gửi */}
-        <div className="mengto-card p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-bold uppercase tracking-wider">Đã Phát Sóng CTV</span>
-            <Send className="w-4 h-4 text-indigo-500" />
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
-            {sentBroadcasts.length}
-          </p>
-          <span className="text-[11px] text-slate-500">Mạng lưới 450+ CTV</span>
-        </div>
-      </div>
-
-      {/* ── 3. Sub-Navigation Tabs ── */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-white/10 pb-3 overflow-x-auto">
+      {/* ── 2. Navigation Sub-Tabs ── */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto">
         <button
-          onClick={() => setActiveSubTab('messages')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeSubTab === 'messages'
+          onClick={() => setActiveSubTab('scripts')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+            activeSubTab === 'scripts'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/5'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <MessageSquare className="w-4 h-4" />
-          <span>Nhật Ký Webhook & Tin Nhắn ({messages.length})</span>
+          <span>Kịch Bản Nhắn Tin 1-Click</span>
         </button>
 
         <button
-          onClick={() => setActiveSubTab('approval_queue')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeSubTab === 'approval_queue'
+          onClick={() => setActiveSubTab('cv_studio')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+            activeSubTab === 'cv_studio'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/5'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Sparkles className="w-4 h-4 text-amber-400" />
+          <span>AI Bóc Tách CV từ Zalo</span>
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('broadcast')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+            activeSubTab === 'broadcast'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <Flame className="w-4 h-4 text-orange-500" />
-          <span>Hàng Đợi Duyệt Đẩy Job ({pendingApprovals.length})</span>
-          {pendingApprovals.length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-amber-400 text-slate-950">
-              {pendingApprovals.length}
+          <span>Đẩy Job Nhóm Zalo CTV</span>
+          {broadcastQueue.filter(b => b.status === 'PENDING_APPROVAL').length > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-orange-500 text-white font-black">
+              {broadcastQueue.filter(b => b.status === 'PENDING_APPROVAL').length}
             </span>
           )}
         </button>
 
         <button
-          onClick={() => setActiveSubTab('cv_studio')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeSubTab === 'cv_studio'
+          onClick={() => setActiveSubTab('settings')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+            activeSubTab === 'settings'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/5'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
-          <Sparkles className="w-4 h-4 text-indigo-400" />
-          <span>Studio Thẩm Định CV & Match Điểm</span>
+          <Settings className="w-4 h-4" />
+          <span>Cấu Hình Nick Zalo</span>
         </button>
       </div>
 
-      {/* ── 4. Tab 1: Nhật Ký Tin Nhắn & Webhook Feed ── */}
-      {activeSubTab === 'messages' && (
-        <div className="space-y-4 animate-fade-in">
+      {/* ── 3. Tab 1: Kịch Bản Nhắn Tin Zalo 1-Click ── */}
+      {activeSubTab === 'scripts' && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Controls Bar: Category Filter & Search */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {[
-                { id: 'ALL', label: 'Tất Cả Tin Nhắn' },
-                { id: 'CV_NEW', label: '📄 CV Mới' },
-                { id: 'STATUS_UPDATE', label: '⚡ Cập Nhật Trạng Thái' },
-                { id: 'SUPPORT_QUERY', label: '💬 Câu Hỏi Hỗ Trợ' },
-                { id: 'OTHER', label: 'Khác' }
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setMsgFilterCategory(tab.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                    msgFilterCategory === tab.id
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
-              <input
-                type="text"
-                value={msgSearchQuery}
-                onChange={(e) => setMsgSearchQuery(e.target.value)}
-                placeholder="Tìm người gửi, nội dung..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-          {/* Webhook Event Stream List */}
-          <div className="space-y-3">
-            {filteredMessages.length === 0 ? (
-              <div className="p-12 text-center text-slate-400 mengto-card rounded-2xl">
-                <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                <p className="font-bold text-sm">Chưa có tin nhắn nào trong danh mục này.</p>
-              </div>
-            ) : (
-              filteredMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className="mengto-card p-4 sm:p-5 rounded-2xl space-y-3 transition-all hover:border-blue-500/40"
-                >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-white/5 pb-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
-                        {msg.senderName.charAt(0)}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
-                            {msg.senderName}
-                          </span>
-                          {msg.groupName && (
-                            <span className="px-2 py-0.2 rounded-full text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-white/5">
-                              {msg.groupName}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[11px] text-slate-400 font-mono">
-                          {new Date(msg.receivedAt).toLocaleTimeString('vi-VN')} - {new Date(msg.receivedAt).toLocaleDateString('vi-VN')}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Category Tag */}
-                    <div className="flex items-center gap-2">
-                      {msg.category === 'CV_NEW' && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                          📄 CV Mới Đính Kèm
-                        </span>
-                      )}
-                      {msg.category === 'STATUS_UPDATE' && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-cyan-100 dark:bg-cyan-950/80 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">
-                          ⚡ Cập Nhật Kết Quả
-                        </span>
-                      )}
-                      {msg.category === 'SUPPORT_QUERY' && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                          💬 Câu Hỏi Hỗ Trợ
-                        </span>
-                      )}
-                      {msg.category === 'OTHER' && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                          Trao Đổi Chung
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Message Content */}
-                  <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
-                    "{msg.content}"
-                  </p>
-
-                  {/* Attachment File Box */}
-                  {msg.attachmentUrl && (
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/3 border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-blue-500" />
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">
-                          File CV đính kèm ({msg.attachmentType.toUpperCase()})
-                        </span>
-                      </div>
-                      <a
-                        href={msg.attachmentUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-bold text-[11px]"
-                      >
-                        <span>Mở Tệp</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  )}
-
-                  {/* AI Summary and Auto-Reply */}
-                  <div className="p-3 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/40 text-xs space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-indigo-900 dark:text-indigo-300 font-bold">
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-                      <span>AI Tóm Tắt & Phản Hồi:</span>
-                    </div>
-                    <p className="text-[11.5px] text-slate-700 dark:text-slate-300">
-                      {msg.aiSummary}
-                    </p>
-                    {msg.replyContent && (
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
-                        🤖 Đã trả lời: "{msg.replyContent}"
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Webhook Simulator Action Panel */}
-          <div className="mengto-card p-5 rounded-2xl space-y-3.5 mt-6 border-dashed border-2 border-blue-300 dark:border-blue-700/50">
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-blue-500 text-white shadow-xs">
-                <Play className="w-4 h-4" />
-              </span>
-              <div>
-                <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-                  Mô Phỏng Nhận Sự Kiện Webhook Zalo OA (Testing Console)
-                </h4>
-                <p className="text-[11.5px] text-slate-500 dark:text-slate-400">
-                  Gửi thử nghiệm một tin nhắn Zalo mô phỏng để kiểm tra luồng AI Phân loại & Đối soát CV.
-                </p>
-              </div>
-            </div>
-
-            <form onSubmit={handleSimulateWebhook} className="space-y-3 pt-1">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <input
-                  type="text"
-                  value={simSenderName}
-                  onChange={(e) => setSimSenderName(e.target.value)}
-                  placeholder="Tên CTV / Khách hàng gửi"
-                  className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-
-                <select
-                  value={simAttachmentType}
-                  onChange={(e) => setSimAttachmentType(e.target.value)}
-                  className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="none">Không có file (Tin nhắn văn bản)</option>
-                  <option value="docx">Đính kèm file CV (.DOCX)</option>
-                  <option value="pdf">Đính kèm file CV (.PDF)</option>
-                </select>
-
-                <button
-                  type="submit"
-                  disabled={isSimulating}
-                  className="btn-shiny px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>{isSimulating ? 'Đang Xử Lý AI...' : 'Bắn Webhook Thử Nghiệm'}</span>
-                </button>
-              </div>
-
-              <textarea
-                rows={2}
-                value={simContent}
-                onChange={(e) => setSimContent(e.target.value)}
-                placeholder="Nội dung tin nhắn nhận từ Zalo..."
-                className="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ── 5. Tab 2: Hàng Đợi Phê Duyệt Đẩy Job Cho CTV (Human-in-the-Loop) ── */}
-      {activeSubTab === 'approval_queue' && (
-        <div className="space-y-4 animate-fade-in">
-          
-          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="w-5 h-5 text-amber-600 flex-shrink-0" />
-              <div>
-                <h4 className="text-xs sm:text-sm font-extrabold text-amber-900 dark:text-amber-200">
-                  Quy Trình Kiểm Duyệt Trước Khi Phát Sóng Zalo (Human-in-the-Loop)
-                </h4>
-                <p className="text-[11.5px] text-amber-700 dark:text-amber-400">
-                  Mọi tin nhắn AI soạn để push job tới CTV bắt buộc phải được người dùng xác nhận và duyệt nội dung.
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => onOpenBroadcastModal && onOpenBroadcastModal(jobItems[0])}
-              className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold cursor-pointer whitespace-nowrap"
-            >
-              + Soạn Tin Mới
-            </button>
-          </div>
-
-          {/* Broadcast Queue List */}
-          <div className="space-y-3">
-            {broadcastQueue.length === 0 ? (
-              <div className="p-12 text-center text-slate-400 mengto-card rounded-2xl">
-                <Flame className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                <p className="font-bold text-sm">Hàng đợi trống. Chưa có tin đẩy job nào.</p>
-              </div>
-            ) : (
-              broadcastQueue.map((item) => (
-                <div
-                  key={item.id}
-                  className={`mengto-card p-5 rounded-2xl space-y-3.5 transition-all ${
-                    item.status === 'PENDING_APPROVAL'
-                      ? 'border-amber-400/60 dark:border-amber-500/40 bg-amber-500/5'
-                      : 'border-slate-200 dark:border-white/10'
-                  }`}
-                >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-white/5 pb-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-slate-900 dark:text-white text-xs sm:text-sm">
-                          {item.draftTitle}
-                        </span>
-                        {item.status === 'PENDING_APPROVAL' && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-500/40 animate-pulse">
-                            ⏳ CHỜ PHÊ DUYỆT
-                          </span>
-                        )}
-                        {item.status === 'SENT' && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-500/40">
-                            ✓ ĐÃ PHÁT SÓNG
-                          </span>
-                        )}
-                        {item.status === 'REJECTED' && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border border-rose-500/40">
-                            ✕ TỪ CHỐI
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Gửi tới: <strong>{item.targetGroupName}</strong> • Thưởng CTV: <span className="font-bold text-rose-600 dark:text-rose-400">{item.bonusHighlight}</span>
-                      </p>
-                    </div>
-
-                    <span className="text-[11px] font-mono text-slate-400">
-                      Tạo lúc: {new Date(item.createdAt).toLocaleTimeString('vi-VN')} {new Date(item.createdAt).toLocaleDateString('vi-VN')}
-                    </span>
-                  </div>
-
-                  {/* Pre-formatted Message Content */}
-                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-white/5 font-mono text-xs text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">
-                    {item.draftContent}
-                  </div>
-
-                  {/* Action Controls */}
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-[11px] text-slate-400">
-                      {item.status === 'SENT' ? `Đã gửi tới ${item.recipientsCount} CTV qua Zalo OA` : 'Kiểm tra nội dung trước khi duyệt phát sóng.'}
-                    </span>
-
-                    {item.status === 'PENDING_APPROVAL' && (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleReject(item.id)}
-                          className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 text-xs font-bold cursor-pointer transition-colors"
-                        >
-                          Từ Chối
-                        </button>
-
-                        <button
-                          onClick={() => onOpenBroadcastModal && onOpenBroadcastModal(jobItems.find(j => j.id === item.jobId), item)}
-                          className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold cursor-pointer transition-colors"
-                        >
-                          Chỉnh Sửa
-                        </button>
-
-                        <button
-                          onClick={() => handleApprove(item.id)}
-                          className="btn-shiny flex items-center gap-1 px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer transition-all"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Duyệt & Phát Sóng Zalo Ngay</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── 6. Tab 3: Studio Thẩm Định CV AI & Match Điểm ── */}
-      {activeSubTab === 'cv_studio' && (
-        <div className="space-y-4 animate-fade-in">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Left Column: Template Selection & Candidate Input (5 cols) */}
+          <div className="lg:col-span-5 space-y-4">
             
-            {/* Input Form Column (1/3) */}
-            <div className="mengto-card p-5 space-y-4 rounded-3xl">
-              <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-indigo-500 text-white shadow-xs">
-                  <Upload className="w-4 h-4" />
-                </span>
-                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                  Nạp Hồ Sơ CV Cần Thẩm Định
-                </h3>
-              </div>
+            {/* Candidate Selector */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                <UserCheck className="w-4 h-4 text-blue-600" />
+                <span>1. Chọn Ứng Viên Cần Nhắn</span>
+              </h3>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Tải Lên Tệp CV (PDF / DOCX / TXT)
-                </label>
-                <input
-                  type="file"
-                  accept=".pdf,.docx,.doc,.txt"
-                  onChange={handleFileUpload}
-                  className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 dark:file:bg-blue-950 dark:file:text-blue-300 hover:file:bg-blue-100 cursor-pointer"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Đối Soát Với Vị Trí Cụ Thể (Tùy Chọn)
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Hồ sơ ứng viên trong CRM
                 </label>
                 <select
-                  value={studioTargetJobId}
-                  onChange={(e) => setStudioTargetJobId(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={selectedCandidateId}
+                  onChange={(e) => setSelectedCandidateId(e.target.value)}
+                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">-- AI Tự Tìm Job Phù Hợp Nhất --</option>
-                  {jobItems.map((j) => (
-                    <option key={j.id} value={j.id}>
-                      [{j.company}] {j.title} (Bonus: {j.bonus})
+                  {candidates.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} - {c.position || 'UV'} ({c.phone || c.sdt || 'Chưa có SĐT'})
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Nội Dung Văn Bản CV (Trích Xuất Hoặc Dán Trực Tiếp)
-                </label>
-                <textarea
-                  rows={8}
-                  value={studioCvText}
-                  onChange={(e) => setStudioCvText(e.target.value)}
-                  placeholder="Dán nội dung tóm tắt kinh nghiệm, kỹ năng của ứng viên tại đây..."
-                  className="w-full p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              {/* Editable Name & Phone */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tên ứng viên</label>
+                  <input
+                    type="text"
+                    value={customCandidateName}
+                    onChange={(e) => setCustomCandidateName(e.target.value)}
+                    placeholder="Nguyễn Văn An"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Số điện thoại / Zalo</label>
+                  <input
+                    type="text"
+                    value={customPhone}
+                    onChange={(e) => setCustomPhone(e.target.value)}
+                    placeholder="0988123456"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono font-bold text-blue-600 dark:text-blue-400"
+                  />
+                </div>
               </div>
+            </div>
+
+            {/* Template Selector Cards */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-indigo-600" />
+                <span>2. Chọn Mẫu Kịch Bản Zalo</span>
+              </h3>
+
+              <div className="space-y-2">
+                {PERSONAL_ZALO_TEMPLATES.map((tmpl) => {
+                  const isSelected = tmpl.id === selectedTemplateId;
+                  return (
+                    <button
+                      key={tmpl.id}
+                      onClick={() => setSelectedTemplateId(tmpl.id)}
+                      className={`w-full p-3 rounded-xl text-left transition-all cursor-pointer border ${
+                        isSelected
+                          ? 'bg-blue-50/80 dark:bg-blue-950/50 border-blue-500/80 shadow-xs'
+                          : 'bg-slate-50/50 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-extrabold ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-slate-800 dark:text-slate-200'}`}>
+                          {tmpl.name}
+                        </span>
+                        {isSelected && <Check className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
+                        {tmpl.description}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Interactive Message Preview & 1-Click Dispatch (7 cols) */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4 flex flex-col justify-between h-full">
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                      <Edit3 className="w-4 h-4" />
+                    </span>
+                    <div>
+                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                        Nội Dung Tin Nhắn Gửi Zalo Cá Nhân
+                      </h3>
+                      <p className="text-[11px] text-slate-500">
+                        Có thể chỉnh sửa trực tiếp nội dung trước khi gửi
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleCopyOnly}
+                      className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      {isCopiedScript ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>Copy Text</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Textarea Editor */}
+                <textarea
+                  rows={13}
+                  value={scriptContent}
+                  onChange={(e) => setScriptContent(e.target.value)}
+                  className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
+                  placeholder="Nội dung kịch bản Zalo..."
+                />
+
+                {/* Target info tag */}
+                <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-800/60 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <span className="text-slate-700 dark:text-slate-300">
+                      Gửi tới: <strong>{customCandidateName || 'Ứng viên'}</strong> ({customPhone || 'Chưa nhập SĐT'})
+                    </span>
+                  </div>
+                  <span className="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-bold">
+                    zalo.me/{cleanPhoneNumber(customPhone)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Big Action Buttons */}
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center gap-3">
+                <button
+                  onClick={handleCopyAndOpenZalo}
+                  className="w-full btn-shiny flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-2xl text-xs sm:text-sm font-black shadow-lg shadow-blue-500/25 transition-all cursor-pointer"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>🚀 1-Click Copy & Mở Chat Zalo Ứng Viên Ngay</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* ── 4. Tab 2: AI Bóc Tách CV từ Tin Nhắn Zalo Cá Nhân ── */}
+      {activeSubTab === 'cv_studio' && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <div className="lg:col-span-6 space-y-4">
+            <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span className="p-2 rounded-xl bg-amber-500/10 text-amber-600">
+                    <Sparkles className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                      Dán Tin Nhắn Chat / Tải CV từ Zalo
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      AI tự động bóc tách Họ tên, SĐT, Kỹ năng và Đối soát độ phù hợp với Job
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Target Job Selector */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Vị trí muốn đối soát (Job Matching)
+                </label>
+                <select
+                  value={studioTargetJobId}
+                  onChange={(e) => setStudioTargetJobId(e.target.value)}
+                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200"
+                >
+                  {jobItems.map((j) => (
+                    <option key={j.id} value={j.id}>
+                      [{j.company}] {j.title} (Bonus: {j.bonus || '1.875.000 ₫'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Upload file trigger */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Tải file CV (.pdf, .docx, .txt) hoặc Paste nội dung chat
+                </label>
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold cursor-pointer transition-colors">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Chọn File CV</span>
+                    <input
+                      type="file"
+                      accept=".pdf,.docx,.txt"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  <span className="text-[11px] text-slate-400">hoặc dán trực tiếp vào ô dưới</span>
+                </div>
+              </div>
+
+              {/* Textarea */}
+              <textarea
+                rows={10}
+                value={studioCvText}
+                onChange={(e) => setStudioCvText(e.target.value)}
+                className="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed"
+                placeholder="Ví dụ: Ứng viên Nguyễn Văn An, SĐT: 0988123456, tốt nghiệp ĐH Kiến Trúc, có 3 năm kinh nghiệm làm Sales thiết kế nội thất tại VinHomes..."
+              />
 
               <button
                 onClick={handleExecuteStudioAnalysis}
                 disabled={isAnalyzingCv}
-                className="btn-shiny w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-500/20 cursor-pointer transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full btn-shiny flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-orange-500/20 cursor-pointer disabled:opacity-50"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>{isAnalyzingCv ? 'Đang Phân Tích & Match Điểm...' : 'Bắt Đầu Thẩm Định AI'}</span>
+                <Sparkles className={`w-4 h-4 ${isAnalyzingCv ? 'animate-spin' : ''}`} />
+                <span>{isAnalyzingCv ? 'Đang Phân Tích Bằng AI...' : 'Phân Tích & Đối Soát Điểm Phù Hợp'}</span>
               </button>
             </div>
+          </div>
 
-            {/* Results Column (2/3) */}
-            <div className="lg:col-span-2 space-y-4">
-              {studioAnalysisResult ? (
-                <div className="mengto-card p-6 rounded-3xl space-y-5">
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
+          {/* Right Column: AI Analysis Result */}
+          <div className="lg:col-span-6 space-y-4">
+            {studioAnalysisResult ? (
+              <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-emerald-500/40 shadow-xl space-y-4 animate-fade-in">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600">
+                      <CheckCircle2 className="w-5 h-5" />
+                    </span>
                     <div>
-                      <span className="text-xs font-bold text-indigo-500 uppercase tracking-wider">
-                        Kết Quả Thẩm Định Hoàn Tất
-                      </span>
-                      <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
-                        {studioAnalysisResult.candidate.name}
-                      </h3>
-                      <p className="text-xs text-slate-500">
-                        {studioAnalysisResult.candidate.phone || 'Chưa rõ SĐT'} • {studioAnalysisResult.candidate.email || 'Chưa rõ email'} • {studioAnalysisResult.candidate.experienceYears} năm KN
-                      </p>
-                    </div>
-
-                    <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 min-w-[90px]">
-                      <span className="text-3xl font-black font-mono">{studioAnalysisResult.matchScore}%</span>
-                      <span className="text-[10px] font-bold uppercase">Điểm Match</span>
-                    </div>
-                  </div>
-
-                  {/* Matched Job */}
-                  {studioAnalysisResult.matchedJob && (
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-teal-500/10 border border-indigo-500/20 space-y-1">
-                      <span className="text-[10px] font-bold uppercase text-slate-400">Vị Trí Đề Xuất Phù Hợp Nhất</span>
-                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-                        {studioAnalysisResult.matchedJob.title} - {studioAnalysisResult.matchedJob.company}
+                      <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                        Kết Quả Thẩm Định: {studioAnalysisResult.candidate.name}
                       </h4>
-                      <p className="text-xs text-slate-600 dark:text-slate-400">
-                        Mức lương: {studioAnalysisResult.matchedJob.salary} • 🎁 Bonus CTV: <strong className="text-rose-600 dark:text-rose-400">{studioAnalysisResult.matchedJob.bonus}</strong>
+                      <p className="text-xs text-slate-500">
+                        {studioAnalysisResult.candidate.phone} • {studioAnalysisResult.candidate.email}
                       </p>
                     </div>
-                  )}
-
-                  {/* AI Evaluation */}
-                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-white/5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                    {studioAnalysisResult.aiEvaluation}
                   </div>
 
-                  {/* Strengths & Weaknesses */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-slate-700 dark:text-slate-300 space-y-1">
-                      <span className="font-bold text-emerald-800 dark:text-emerald-300 block">✓ Điểm Mạnh:</span>
-                      <ul className="space-y-1 text-[11.5px]">
-                        {studioAnalysisResult.strengths.map((s, i) => (
-                          <li key={i}>• {s}</li>
+                  <div className="px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono font-black text-lg">
+                    {studioAnalysisResult.matchScore}% Match
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  <p className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 leading-relaxed text-slate-700 dark:text-slate-300">
+                    {studioAnalysisResult.aiEvaluation}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 space-y-1">
+                      <span className="font-bold text-emerald-800 dark:text-emerald-300">Điểm mạnh nổi bật</span>
+                      <ul className="list-disc list-inside space-y-0.5 text-slate-600 dark:text-slate-300">
+                        {studioAnalysisResult.strengths?.map((s, i) => (
+                          <li key={i}>{s}</li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-slate-700 dark:text-slate-300 space-y-1">
-                      <span className="font-bold text-amber-800 dark:text-amber-300 block">⚠ Điểm Cần Lưu Ý:</span>
-                      <ul className="space-y-1 text-[11.5px]">
-                        {studioAnalysisResult.weaknesses.map((w, i) => (
-                          <li key={i}>• {w}</li>
+                    <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 space-y-1">
+                      <span className="font-bold text-amber-800 dark:text-amber-300">Lưu ý khi phỏng vấn</span>
+                      <ul className="list-disc list-inside space-y-0.5 text-slate-600 dark:text-slate-300">
+                        {studioAnalysisResult.weaknesses?.map((w, i) => (
+                          <li key={i}>{w}</li>
                         ))}
                       </ul>
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div className="p-16 text-center text-slate-400 mengto-card rounded-3xl space-y-2">
-                  <Sparkles className="w-10 h-10 mx-auto text-indigo-400 opacity-60 animate-bounce-subtle" />
-                  <h4 className="text-sm font-extrabold text-slate-700 dark:text-slate-300">
-                    Sẵn Sàng Thẩm Định Hồ Sơ Ứng Viên
+
+                <div className="pt-2 flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setCustomCandidateName(studioAnalysisResult.candidate.name);
+                      setCustomPhone(studioAnalysisResult.candidate.phone);
+                      setActiveSubTab('scripts');
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Tạo Kịch Bản Nhắn Zalo Cho Ứng Viên Này</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-12 rounded-3xl bg-slate-50 dark:bg-slate-900/40 border border-dashed border-slate-300 dark:border-slate-800 flex flex-col items-center justify-center text-center space-y-3">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                  <Bot className="w-7 h-7" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                    Chưa Có Dữ Liệu Phân Tích
                   </h4>
-                  <p className="text-xs max-w-md mx-auto">
-                    Tải file CV hoặc dán nội dung ở cột bên trái và bấm "Bắt Đầu Thẩm Định AI" để chấm điểm tương thích với 37+ vị trí tuyển dụng.
+                  <p className="text-xs text-slate-500 max-w-sm mt-1">
+                    Hãy paste đoạn chat Zalo từ ứng viên hoặc tải file CV để AI bóc tách thông tin và chấm điểm tương thích.
                   </p>
                 </div>
-              )}
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
+
+      {/* ── 5. Tab 3: Đẩy Job Nhóm Zalo CTV (Broadcast Hub) ── */}
+      {activeSubTab === 'broadcast' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                Danh Sách Tin Đăng Tuyển Nhóm Zalo CTV
+              </h3>
+              <p className="text-xs text-slate-500">
+                Soạn sẵn nội dung tuyển dụng chuẩn emoji & hoa hồng CTV, 1-click mở nhóm Zalo để dán
+              </p>
             </div>
+
+            <button
+              onClick={() => onOpenBroadcastModal && onOpenBroadcastModal(jobItems[0])}
+              className="btn-shiny flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white rounded-xl text-xs font-bold cursor-pointer"
+            >
+              <Flame className="w-4 h-4" />
+              <span>+ Soạn Tin Đẩy Job Mới</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {broadcastQueue.map((item) => (
+              <div
+                key={item.id}
+                className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 flex flex-col justify-between"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                      {item.company}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 font-mono">
+                      🎁 Bonus: {item.bonusHighlight}
+                    </span>
+                  </div>
+
+                  <h4 className="text-xs font-extrabold text-slate-900 dark:text-white line-clamp-1">
+                    {item.draftTitle}
+                  </h4>
+
+                  <pre className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-700 dark:text-slate-300 whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed">
+                    {item.draftContent}
+                  </pre>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                  <button
+                    onClick={() => handleOpenGroupBroadcast(item)}
+                    className="flex-1 btn-shiny flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold cursor-pointer"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    <span>Copy & Mở Nhóm Zalo CTV</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(item.draftContent);
+                      alert('Đã copy tin nhắn!');
+                    }}
+                    className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                    title="Chỉ copy text"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
+
+      {/* ── 6. Tab 4: Cài Đặt Nick Zalo Cá Nhân ── */}
+      {activeSubTab === 'settings' && (
+        <div className="max-w-2xl mx-auto p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-5">
+          <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="p-2.5 rounded-2xl bg-blue-500/10 text-blue-600">
+              <Settings className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-black text-slate-900 dark:text-white">
+                Cài Đặt Nick Zalo Cá Nhân Tuyển Dụng
+              </h3>
+              <p className="text-xs text-slate-500">
+                Thông tin này sẽ tự động điền vào các kịch bản tin nhắn và tạo link chat 1-click
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSaveSettings} className="space-y-4 text-xs">
+            <div className="space-y-1.5">
+              <label className="font-bold text-slate-700 dark:text-slate-300">
+                Họ Tên Recruiter / Nick Zalo hiển thị
+              </label>
+              <input
+                type="text"
+                value={settingsForm.recruiterName}
+                onChange={(e) => setSettingsForm({ ...settingsForm, recruiterName: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-slate-900 dark:text-white"
+                placeholder="Huỳnh Minh Nhựt (HR FastHunt)"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="font-bold text-slate-700 dark:text-slate-300">
+                Số Điện Thoại Zalo Cá Nhân (Để ứng viên / CTV chat 1-click)
+              </label>
+              <input
+                type="text"
+                value={settingsForm.zaloPhone}
+                onChange={(e) => setSettingsForm({ ...settingsForm, zaloPhone: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-bold text-blue-600 dark:text-blue-400"
+                placeholder="0901234567"
+                required
+              />
+              <p className="text-[11px] text-slate-400">
+                Hệ thống tự động tạo link: <strong>https://zalo.me/{cleanPhoneNumber(settingsForm.zaloPhone)}</strong>
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="font-bold text-slate-700 dark:text-slate-300">
+                Link Nhóm Zalo CTV (Để 1-click mở nhóm khi đẩy Job)
+              </label>
+              <input
+                type="text"
+                value={settingsForm.ctvGroupUrl}
+                onChange={(e) => setSettingsForm({ ...settingsForm, ctvGroupUrl: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                placeholder="https://zalo.me/g/..."
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="font-bold text-slate-700 dark:text-slate-300">
+                Tên Doanh Nghiệp / Ban Tuyển Dụng
+              </label>
+              <input
+                type="text"
+                value={settingsForm.companyName}
+                onChange={(e) => setSettingsForm({ ...settingsForm, companyName: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                placeholder="FASTHUNT Tuyển Dụng & Nhân Tài"
+              />
+            </div>
+
+            {isSavedSettings && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
+                <Check className="w-4 h-4" />
+                <span>Đã lưu thành công cấu hình Nick Zalo Cá Nhân!</span>
+              </div>
+            )}
+
+            <div className="pt-3 flex justify-end">
+              <button
+                type="submit"
+                className="btn-shiny px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md cursor-pointer transition-all"
+              >
+                Lưu Cấu Hình Nick Zalo
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -19,6 +19,10 @@ import TemplateEditorModal from './components/TemplateEditorModal';
 import SettingsModal from './components/SettingsModal';
 import UpdatesModal from './components/UpdatesModal';
 import AiRecruiterBot from './components/AiRecruiterBot';
+import ZaloAssistantView from './components/ZaloAssistantView';
+import ZaloBroadcastModal from './components/ZaloBroadcastModal';
+import CvAnalysisDetailModal from './components/CvAnalysisDetailModal';
+
 
 import {
   fetchSheet1Data,
@@ -68,6 +72,11 @@ export default function App() {
   const [isTemplateEditorOpen, setIsTemplateEditorOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isUpdatesOpen, setIsUpdatesOpen] = useState(false);
+  const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
+  const [broadcastJob, setBroadcastJob] = useState(null);
+  const [isCvAnalysisOpen, setIsCvAnalysisOpen] = useState(false);
+  const [cvAnalysisData, setCvAnalysisData] = useState(null);
+
 
   // Filter state
   const [filters, setFilters] = useState({
@@ -430,6 +439,24 @@ export default function App() {
               }}
             />
           )}
+
+          {/* ── 9. Trợ Lý Tuyển Dụng Zalo Cá Nhân (Nick Thường) ── */}
+          {activeView === 'zalo' && (
+            <ZaloAssistantView
+              jobItems={jobItems}
+              candidates={candidates}
+              onOpenCandidateDetail={handleOpenDetail}
+              onOpenEmail={handleOpenEmail}
+              onOpenBroadcastModal={(job) => {
+                setBroadcastJob(job || jobItems[0]);
+                setIsBroadcastOpen(true);
+              }}
+              onOpenAnalysisModal={(analysis) => {
+                setCvAnalysisData(analysis);
+                setIsCvAnalysisOpen(true);
+              }}
+            />
+          )}
         </main>
       </div>
 
@@ -492,6 +519,28 @@ export default function App() {
         />
       )}
 
+      {/* ── Zalo Personal Broadcast & CTV Group Push Modal ── */}
+      {isBroadcastOpen && (
+        <ZaloBroadcastModal
+          job={broadcastJob || jobItems[0]}
+          jobsList={jobItems}
+          onClose={() => setIsBroadcastOpen(false)}
+          onApproveAndSend={() => {
+            setIsBroadcastOpen(false);
+          }}
+        />
+      )}
+
+      {/* ── CV Analysis Detail Modal ── */}
+      {isCvAnalysisOpen && (
+        <CvAnalysisDetailModal
+          analysisData={cvAnalysisData}
+          onClose={() => setIsCvAnalysisOpen(false)}
+          onOpenCandidateDetail={handleOpenDetail}
+          onOpenEmail={handleOpenEmail}
+        />
+      )}
+
       {/* ── FastHunt AI Recruitment Chatbot Assistant ── */}
       <AiRecruiterBot
         candidates={candidates}
@@ -505,3 +554,4 @@ export default function App() {
     </div>
   );
 }
+

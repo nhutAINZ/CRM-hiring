@@ -34,9 +34,15 @@ ${c.interviewDate ? `Ngày Hẹn PV: ${c.interviewDate} ${c.interviewTime || ''}
 Link CV: ${c.cvUrl || 'N/A'}`;
 
     navigator.clipboard.writeText(text);
+    const phone = c.phone || c.sdt || '';
+    if (phone) {
+      const cleanPhone = phone.replace(/[^\d+]/g, '');
+      window.open(`https://zalo.me/${cleanPhone}`, '_blank');
+    }
     setCopiedId(c.id);
     setTimeout(() => setCopiedId(null), 2000);
   };
+
 
   return (
     <div className="mengto-card mengto-card-amber overflow-hidden">

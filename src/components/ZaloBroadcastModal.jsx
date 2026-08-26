@@ -1,6 +1,6 @@
 // ====================================================================
-// FASTHUNT RECRUITMENT AGENT - ZALO CTV JOB BROADCAST MODAL
-// Human-in-the-Loop Job Push Creation, Review & Dispatch Modal
+// FASTHUNT RECRUITMENT AGENT - PERSONAL ZALO CTV JOB BROADCAST MODAL
+// 100% Free Personal Zalo / CTV Group - 1-Click Copy & Open Group
 // ====================================================================
 
 import React, { useState, useEffect } from 'react';
@@ -17,10 +17,13 @@ import {
   Edit3,
   Flame,
   ShieldCheck,
-  ExternalLink
+  ExternalLink,
+  MessageSquare,
+  Share2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { generateZaloJobBroadcastPitch } from '../services/aiMatchingService.js';
+import { getStoredZaloConfig, openZaloGroup } from '../services/zaloOaService.js';
 
 export default function ZaloBroadcastModal({
   job,
@@ -35,6 +38,7 @@ export default function ZaloBroadcastModal({
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isCopied, setIsCopied] = useState(false);
+  const config = getStoredZaloConfig();
 
   const activeJob = jobsList.find(j => j.id === selectedJobId) || job || jobsList[0];
 
@@ -46,7 +50,7 @@ export default function ZaloBroadcastModal({
       setTargetType(draftItem.targetType || 'ALL_CTV');
       if (draftItem.jobId) setSelectedJobId(draftItem.jobId);
     } else if (activeJob) {
-      setTitle(`🔥 [DUYỆT ĐẨY JOB] ${activeJob.title.toUpperCase()} (${activeJob.company})`);
+      setTitle(`🔥 [ĐẨY JOB ZALO] ${activeJob.title.toUpperCase()} (${activeJob.company})`);
       setContent(generateZaloJobBroadcastPitch(activeJob, targetType));
     }
   }, [activeJob, draftItem, targetType]);
@@ -64,12 +68,14 @@ export default function ZaloBroadcastModal({
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  const handleApprove = () => {
+  const handleCopyAndOpenGroup = () => {
     if (!content.trim()) {
-      alert('Vui lòng nhập nội dung tin nhắn trước khi duyệt.');
+      alert('Vui lòng nhập nội dung tin nhắn trước khi gửi.');
       return;
     }
-    confetti({ particleCount: 50, spread: 70, origin: { y: 0.7 } });
+    openZaloGroup(config.ctvGroupUrl, content);
+    setIsCopied(true);
+    confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 } });
     if (onApproveAndSend) {
       onApproveAndSend({
         draftId: draftItem?.id,
@@ -79,7 +85,10 @@ export default function ZaloBroadcastModal({
         targetType
       });
     }
-    onClose();
+    setTimeout(() => {
+      setIsCopied(false);
+      onClose();
+    }, 1000);
   };
 
   return (
@@ -94,14 +103,14 @@ export default function ZaloBroadcastModal({
                 <Flame className="w-4 h-4 text-orange-400" />
               </span>
               <span className="text-xs font-bold text-blue-200 uppercase tracking-wider">
-                Quy Trình Duyệt Đẩy Job Cho CTV (Human-in-the-Loop)
+                Đăng Tin Tuyển Dụng Nhóm Zalo CTV (Nick Thường)
               </span>
             </div>
             <h2 className="text-xl font-extrabold text-white">
-              Soạn & Duyệt Tin Tuyển Dụng Zalo OA
+              Soạn & Đẩy Job Qua Zalo Cá Nhân / Nhóm CTV
             </h2>
             <p className="text-xs text-slate-300">
-              Kiểm tra và chỉnh sửa nội dung tin nhắn trước khi phát sóng tới cộng tác viên qua Zalo Official Account.
+              Nội dung chuẩn emoji & hoa hồng CTV, 1-Click Copy và Mở nhóm Zalo để dán ngay lập tức.
             </p>
           </div>
 
@@ -120,7 +129,7 @@ export default function ZaloBroadcastModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                Vị Trí Cần Đẩy Job
+                Vị Trí Cần Đẩy Tuyển Dụng
               </label>
               <select
                 value={selectedJobId}
@@ -129,7 +138,7 @@ export default function ZaloBroadcastModal({
               >
                 {jobsList.map((j) => (
                   <option key={j.id} value={j.id}>
-                    [{j.company}] {j.title} (Bonus: {j.bonus})
+                    [{j.company}] {j.title} (Bonus: {j.bonus || '1.875.000 ₫'})
                   </option>
                 ))}
               </select>
@@ -144,8 +153,8 @@ export default function ZaloBroadcastModal({
                 onChange={(e) => setTargetType(e.target.value)}
                 className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="ALL_CTV">Toàn Bộ Mạng Lưới CTV (450 CTV)</option>
-                <option value="ACTIVE_CTV">Nhóm CTV Đang Hoạt Động Cao (120 CTV)</option>
+                <option value="ALL_CTV">Toàn Bộ Nhóm Zalo CTV (Mạng lưới CTV)</option>
+                <option value="ACTIVE_CTV">Nhóm CTV Top Hoạt Động</option>
                 <option value="HN_CTV">Nhóm CTV Khu Vực Hà Nội</option>
                 <option value="HCM_CTV">Nhóm CTV Khu Vực TP.HCM</option>
               </select>
@@ -160,11 +169,11 @@ export default function ZaloBroadcastModal({
                   {activeJob.title} - {activeJob.company}
                 </span>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Lương: {activeJob.salary} • Bảo hành: {activeJob.warrantyPeriod} • JD: {activeJob.jdFile || 'Kèm theo'}
+                  Lương: {activeJob.salary} • Bảo hành: {activeJob.warrantyPeriod} • Địa điểm: {activeJob.location || 'Toàn quốc'}
                 </p>
               </div>
               <span className="px-2.5 py-1 rounded-lg text-xs font-black bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-mono">
-                🎁 {activeJob.bonus}
+                🎁 Bonus: {activeJob.bonus || '1.875.000 ₫'}
               </span>
             </div>
           )}
@@ -174,7 +183,7 @@ export default function ZaloBroadcastModal({
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                 <Edit3 className="w-3.5 h-3.5 text-blue-600" />
-                Nội Dung Tin Nhắn Gửi Zalo OA (Có Thể Chỉnh Sửa)
+                Nội Dung Tin Nhắn Gửi Zalo (Có Thể Chỉnh Sửa)
               </label>
               <button
                 type="button"
@@ -195,11 +204,11 @@ export default function ZaloBroadcastModal({
             />
           </div>
 
-          {/* Policy & Safety Notice */}
-          <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
-            <ShieldCheck className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          {/* Tips info */}
+          <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 flex items-start gap-2.5 text-xs text-blue-900 dark:text-blue-200">
+            <Share2 className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
             <span>
-              <strong>Bảo đảm an toàn Zalo OA:</strong> Tin nhắn được gửi trực tiếp qua Zalo Official Account OpenAPI v3 chính thức. Việc bạn bấm "Duyệt & Phát Sóng" sẽ ghi nhận lịch sử kiểm duyệt của Recruiter.
+              <strong>Mẹo gửi tin Zalo:</strong> Bấm nút <strong>"1-Click Copy & Mở Nhóm Zalo"</strong> bên dưới. Hệ thống sẽ tự động copy tin nhắn và mở Nhóm Zalo CTV để bạn chỉ cần bấm <kbd className="px-1 py-0.5 bg-white dark:bg-slate-800 rounded border font-mono">Ctrl + V</kbd> là xong!
             </span>
           </div>
         </div>
@@ -211,7 +220,7 @@ export default function ZaloBroadcastModal({
             className="flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 cursor-pointer"
           >
             {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>Copy Text</span>
+            <span>{isCopied ? 'Đã Copy!' : 'Chỉ Copy Text'}</span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -219,15 +228,15 @@ export default function ZaloBroadcastModal({
               onClick={onClose}
               className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
             >
-              Hủy
+              Đóng
             </button>
 
             <button
-              onClick={handleApprove}
+              onClick={handleCopyAndOpenGroup}
               className="btn-shiny flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer transition-all"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>Duyệt & Phát Sóng Zalo OA Ngay</span>
+              <span>1-Click Copy & Mở Nhóm Zalo CTV</span>
             </button>
           </div>
         </div>

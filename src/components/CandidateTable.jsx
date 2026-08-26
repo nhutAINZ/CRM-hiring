@@ -277,17 +277,31 @@ export default function CandidateTable({
                         >
                           {c.id} - {c.name}
                         </button>
-                        {c.cvUrl && (
-                          <a
-                            href={c.cvUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline mt-0.5"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            <span>Xem CV</span>
-                          </a>
-                        )}
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {c.cvUrl && (
+                            <a
+                              href={c.cvUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              <span>Xem CV</span>
+                            </a>
+                          )}
+                          {(c.phone || c.sdt) && (
+                            <a
+                              href={`https://zalo.me/${String(c.phone || c.sdt).replace(/[^\d+]/g, '')}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-0.5 text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 hover:bg-sky-100 border border-sky-200 dark:border-sky-800"
+                              title="Chat Zalo Cá Nhân trực tiếp"
+                            >
+                              <span>💬 Zalo</span>
+                            </a>
+                          )}
+                        </div>
+
                       </div>
                     </td>
 

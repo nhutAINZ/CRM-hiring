@@ -78,9 +78,15 @@ Lịch PV: ${candidate.interviewDate ? `${candidate.interviewDate} ${candidate.i
 Link CV: ${candidate.cvUrl || 'Không có'}`;
 
     navigator.clipboard.writeText(text);
+    const phone = candidate.phone || candidate.sdt || '';
+    if (phone) {
+      const cleanPhone = phone.replace(/[^\d+]/g, '');
+      window.open(`https://zalo.me/${cleanPhone}`, '_blank');
+    }
     setCopiedId('zalo');
     setTimeout(() => setCopiedId(null), 2000);
   };
+
 
   const handleCopyClient = () => {
     const shareUrl = sheet2ViewUrl || 'https://docs.google.com/spreadsheets/d/1QxicFfdrkDL_vsUv9uZPwSl1Osi0c06h4xDEBrU6p2Y/edit';
