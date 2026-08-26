@@ -1,0 +1,567 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   DTCG Design Token Layer — plugin87/ux-ui-agent-skills compliant
+   Tier 1: Primitives → Tier 2: Semantic → Tier 3: Component
+   ========================================================================= */
+
+@layer base {
+  :root {
+    /* ── Primitives: Brand Palette ── */
+    --primitive-emerald-300: #6ee7b7;
+    --primitive-emerald-400: #34d399;
+    --primitive-emerald-500: #10b981;
+    --primitive-emerald-600: #059669;
+    --primitive-teal-400:    #2dd4bf;
+    --primitive-teal-500:    #14b8a6;
+    --primitive-cyan-400:    #22d3ee;
+    --primitive-cyan-500:    #06b6d4;
+    --primitive-indigo-400:  #818cf8;
+    --primitive-indigo-500:  #6366f1;
+    --primitive-purple-400:  #c084fc;
+    --primitive-purple-500:  #a855f7;
+    --primitive-amber-400:   #fbbf24;
+    --primitive-amber-500:   #f59e0b;
+    --primitive-rose-400:    #fb7185;
+    --primitive-rose-500:    #f43f5e;
+    --primitive-blue-400:    #60a5fa;
+    --primitive-blue-500:    #3b82f6;
+
+    /* ── Semantic: Surface Tokens (Light - High Contrast & Clean) ── */
+    --color-surface-base:      #f8fafc;
+    --color-surface-card:      #ffffff;
+    --color-surface-elevated:  #ffffff;
+    --color-surface-overlay:   rgba(255, 255, 255, 0.95);
+    --color-surface-input:     #f1f5f9;
+    --color-surface-hover:     #f8fafc;
+
+    /* ── Semantic: Border Tokens (Light) ── */
+    --color-border-subtle:  #e2e8f0;
+    --color-border-default: #cbd5e1;
+    --color-border-strong:  #94a3b8;
+
+    /* ── Semantic: Text Tokens (Light, WCAG 2.2 AA) ── */
+    --color-text-primary:   #0f172a;
+    --color-text-secondary: #334155;
+    --color-text-tertiary:  #64748b;
+    --color-text-inverse:   #ffffff;
+
+    /* ── Semantic: Brand Tokens ── */
+    --color-brand-primary:    var(--primitive-emerald-500);
+    --color-brand-secondary:  var(--primitive-teal-500);
+    --color-brand-accent:     var(--primitive-cyan-500);
+    --color-brand-gradient:   linear-gradient(135deg, var(--primitive-emerald-500), var(--primitive-teal-500), var(--primitive-cyan-500));
+
+    /* ── Semantic: State Tokens ── */
+    --color-success:  var(--primitive-emerald-500);
+    --color-warning:  var(--primitive-amber-500);
+    --color-danger:   var(--primitive-rose-500);
+    --color-info:     var(--primitive-blue-500);
+
+    /* ── Component: Radii ── */
+    --radius-xs:  6px;
+    --radius-sm:  10px;
+    --radius-md:  14px;
+    --radius-lg:  20px;
+    --radius-xl:  28px;
+    --radius-full: 9999px;
+
+    /* ── Component: Shadows (Light) ── */
+    --shadow-xs:  0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm:  0 2px 8px -1px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-md:  0 4px 16px -2px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+    --shadow-lg:  0 10px 30px -4px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+    --shadow-xl:  0 20px 48px -6px rgba(0,0,0,0.14), 0 8px 20px rgba(0,0,0,0.08);
+
+    /* ── Component: Motion Tokens ── */
+    --duration-instant:  80ms;
+    --duration-fast:     160ms;
+    --duration-normal:   240ms;
+    --duration-slow:     400ms;
+    --duration-xslow:    600ms;
+    --ease-spring:       cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out:          cubic-bezier(0.0, 0.0, 0.2, 1);
+    --ease-in-out:       cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce:       cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* ── Typography ── */
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  /* ── Dark Mode: Override Semantic Tokens ── */
+  .dark {
+    --color-surface-base:      #030712;
+    --color-surface-card:      rgba(11, 17, 33, 0.82);
+    --color-surface-elevated:  rgba(15, 23, 42, 0.92);
+    --color-surface-overlay:   rgba(6, 11, 24, 0.90);
+    --color-surface-input:     rgba(15, 23, 42, 0.70);
+    --color-surface-hover:     rgba(30, 41, 59, 0.70);
+
+    --color-border-subtle:  rgba(255, 255, 255, 0.06);
+    --color-border-default: rgba(255, 255, 255, 0.10);
+    --color-border-strong:  rgba(255, 255, 255, 0.18);
+
+    --color-text-primary:   #f1f5f9;
+    --color-text-secondary: #94a3b8;
+    --color-text-tertiary:  #475569;
+
+    --shadow-xs:  0 1px 2px rgba(0,0,0,0.25);
+    --shadow-sm:  0 2px 8px -1px rgba(0,0,0,0.40), 0 1px 3px rgba(0,0,0,0.30);
+    --shadow-md:  0 4px 20px -2px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.35);
+    --shadow-lg:  0 12px 36px -4px rgba(0,0,0,0.65), 0 6px 16px rgba(0,0,0,0.45);
+    --shadow-xl:  0 24px 60px -6px rgba(0,0,0,0.80), 0 10px 28px rgba(0,0,0,0.55);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-surface-base);
+    color: var(--color-text-primary);
+    transition: background-color var(--duration-slow) var(--ease-in-out),
+                color var(--duration-slow) var(--ease-in-out);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* =========================================================================
+   Meng To Signature Gradient Border & Glassmorphic Card System
+   ========================================================================= */
+
+/* Base Card — Light Mode */
+.mengto-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-card);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-normal) var(--ease-spring),
+              box-shadow var(--duration-normal) var(--ease-spring),
+              border-color var(--duration-normal) var(--ease-out);
+}
+
+/* Specular top-edge highlight — built-in for all cards */
+.mengto-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.50) 0%,
+    rgba(255, 255, 255, 0.00) 60%
+  );
+  z-index: 0;
+}
+
+.dark .mengto-card {
+  --_surface: rgba(11, 17, 33, 0.82);
+  --_border-a: rgba(255, 255, 255, 0.16);
+  --_border-b: rgba(16, 185, 129, 0.20);
+  --_border-c: rgba(255, 255, 255, 0.03);
+
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--_surface), var(--_surface)) padding-box,
+    linear-gradient(135deg, var(--_border-a), var(--_border-b), var(--_border-c)) border-box;
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.mengto-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-border-default);
+}
+
+.dark .mengto-card:hover {
+  --_border-a: rgba(255, 255, 255, 0.28);
+  --_border-b: rgba(16, 185, 129, 0.38);
+  box-shadow: var(--shadow-lg), 0 0 28px -6px rgba(16,185,129,0.20);
+}
+
+/* ── Accent Color Variants ── */
+.dark .mengto-card-emerald { --_border-b: rgba(16, 185, 129, 0.42); }
+.dark .mengto-card-cyan    { --_border-b: rgba(6, 182, 212, 0.42); }
+.dark .mengto-card-purple  { --_border-b: rgba(168, 85, 247, 0.42); }
+.dark .mengto-card-amber   { --_border-b: rgba(245, 158, 11, 0.55); }
+.dark .mengto-card-blue    { --_border-b: rgba(59, 130, 246, 0.42); }
+.dark .mengto-card-rose    { --_border-b: rgba(244, 63, 94, 0.42); }
+
+/* ── Glass Surface (for modals/overlays) ── */
+.glass-surface {
+  background: var(--color-surface-overlay);
+  backdrop-filter: blur(32px) saturate(1.6);
+  -webkit-backdrop-filter: blur(32px) saturate(1.6);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.dark .glass-surface {
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-xl);
+}
+
+/* =========================================================================
+   Status Badge Utility — plugin87 anti-slop pill pattern
+   15% opacity background + 30% opacity border + icon dot
+   ========================================================================= */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-badge-emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.30);
+}
+.status-badge-emerald::before { background: #10b981; }
+.dark .status-badge-emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.32);
+}
+
+.status-badge-rose {
+  background: rgba(244, 63, 94, 0.10);
+  color: #e11d48;
+  border: 1px solid rgba(244, 63, 94, 0.28);
+}
+.status-badge-rose::before { background: #f43f5e; }
+.dark .status-badge-rose {
+  background: rgba(244, 63, 94, 0.14);
+  color: #fb7185;
+  border-color: rgba(244, 63, 94, 0.30);
+}
+
+.status-badge-amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.30);
+}
+.status-badge-amber::before { background: #f59e0b; }
+.dark .status-badge-amber {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.32);
+}
+
+.status-badge-blue {
+  background: rgba(59, 130, 246, 0.10);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.28);
+}
+.status-badge-blue::before { background: #3b82f6; }
+.dark .status-badge-blue {
+  background: rgba(59, 130, 246, 0.14);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.30);
+}
+
+.status-badge-slate {
+  background: rgba(100, 116, 139, 0.10);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.25);
+}
+.status-badge-slate::before { background: #64748b; }
+.dark .status-badge-slate {
+  background: rgba(100, 116, 139, 0.14);
+  color: #94a3b8;
+  border-color: rgba(100, 116, 139, 0.28);
+}
+
+.status-badge-purple {
+  background: rgba(168, 85, 247, 0.10);
+  color: #7c3aed;
+  border: 1px solid rgba(168, 85, 247, 0.28);
+}
+.status-badge-purple::before { background: #a855f7; }
+.dark .status-badge-purple {
+  background: rgba(168, 85, 247, 0.14);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.30);
+}
+
+/* =========================================================================
+   Shiny Action Button
+   ========================================================================= */
+
+.btn-shiny {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.btn-shiny::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+  transition: left var(--duration-slow) var(--ease-out);
+  pointer-events: none;
+}
+
+.btn-shiny:hover::after { left: 150%; }
+.btn-shiny:active { transform: scale(0.96); }
+
+/* =========================================================================
+   Ambient Radial Mesh Background
+   ========================================================================= */
+
+.ambient-mesh {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: var(--radius-full);
+  filter: blur(110px);
+  opacity: 0.14;
+  pointer-events: none;
+  will-change: transform;
+  animation: floatOrb 22s ease-in-out infinite alternate;
+}
+
+.dark .ambient-orb { opacity: 0.20; }
+
+/* =========================================================================
+   Keyframe Animations — Motion Token Compliant
+   ========================================================================= */
+
+@keyframes floatOrb {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(24px, -16px) scale(1.06); }
+  66%  { transform: translate(-16px, 20px) scale(0.97); }
+  100% { transform: translate(12px, -28px) scale(1.04); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 12px rgba(16,185,129,0.30); }
+  50%       { opacity: 0.8; box-shadow: 0 0 24px rgba(16,185,129,0.60); }
+}
+
+/* Urgency pulse ring */
+@keyframes pulseRing {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245,158,11,0.55); }
+  70%  { transform: scale(1);    box-shadow: 0 0 0 10px rgba(245,158,11,0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+}
+
+@keyframes pulseRingRose {
+  0%   { box-shadow: 0 0 0 0 rgba(244,63,94,0.55); }
+  70%  { box-shadow: 0 0 0 10px rgba(244,63,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(244,63,94,0); }
+}
+
+/* Shimmer sweep for loading / urgency badges */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Live dot ping */
+@keyframes livePing {
+  0%   { transform: scale(1);   opacity: 1; }
+  75%  { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Count-up bar fill */
+@keyframes fillBar {
+  from { width: 0%; }
+  to   { width: var(--bar-width, 100%); }
+}
+
+/* Tab indicator slide */
+@keyframes tabSlide {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Spin for refresh */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Rotate gradient for logo ring */
+@keyframes rotateGrad {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* =========================================================================
+   Animation Utility Classes
+   ========================================================================= */
+
+.animate-fade-in     { animation: fadeIn  var(--duration-normal) var(--ease-spring) both; }
+.animate-slide-down  { animation: slideDown var(--duration-fast) var(--ease-spring) both; }
+.animate-slide-up    { animation: slideUp var(--duration-normal) var(--ease-spring) both; }
+.animate-pulse-glow  { animation: pulseGlow 2.5s ease-in-out infinite; }
+.animate-pulse-ring  { animation: pulseRing 2s ease-out infinite; }
+.animate-shimmer {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  background-size: 200% auto;
+  animation: shimmer 2.2s linear infinite;
+}
+.animate-spin-slow   { animation: spinSlow 1s linear infinite; }
+.animate-live-ping   { animation: livePing 1.4s cubic-bezier(0,0,0.2,1) infinite; }
+
+/* =========================================================================
+   Progressive Top Blur (Scroll Header Effect)
+   ========================================================================= */
+
+.progressive-top-blur {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+/* =========================================================================
+   Custom Scrollbars (Minimal, non-intrusive)
+   ========================================================================= */
+
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: var(--radius-full);
+}
+.dark ::-webkit-scrollbar-thumb  { background: rgba(51, 65, 85, 0.6); }
+::-webkit-scrollbar-thumb:hover  { background: rgba(100, 116, 139, 0.6); }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 0.8); }
+
+.kanban-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148,163,184,0.3) transparent;
+}
+
+/* =========================================================================
+   Form Input Base Style
+   ========================================================================= */
+
+.input-base {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-input);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+  outline: none;
+}
+
+.input-base:focus {
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+}
+
+.dark .input-base { background: var(--color-surface-input); }
+.dark .input-base:focus { box-shadow: 0 0 0 3px rgba(16,185,129,0.20); }
+
+/* =========================================================================
+   Nav Tab Indicator (Linear-style active underline)
+   ========================================================================= */
+
+.nav-tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--color-brand-gradient);
+  transform-origin: left;
+  animation: tabSlide var(--duration-fast) var(--ease-spring) both;
+}
+
+/* =========================================================================
+   KPI Card Ambient Glow (behind icon)
+   ========================================================================= */
+
+.kpi-icon-glow {
+  position: relative;
+}
+.kpi-icon-glow::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  filter: blur(12px);
+  opacity: 0.5;
+  z-index: -1;
+  background: inherit;
+}
+
+/* =========================================================================
+   Table Row Hover Lift
+   ========================================================================= */
+
+.table-row-hover {
+  transition: background var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-spring),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.table-row-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(0,0,0,0.08);
+}
+
+.dark .table-row-hover:hover {
+  box-shadow: 0 4px 16px -2px rgba(0,0,0,0.40);
+}
