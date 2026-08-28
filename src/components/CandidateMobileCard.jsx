@@ -20,6 +20,7 @@ import {
   Gift
 } from 'lucide-react';
 import { normalizeCvResult, normalizePvResult } from '../utils/dataNormalizer';
+import { generateCandidateEmailFromName } from '../utils/cvEmailExtractor';
 
 function CandidateMobileCardComponent({
   candidate,
@@ -100,7 +101,6 @@ function CandidateMobileCardComponent({
     return dateStr;
   };
 
-  // Extract phone & clean phone
   const rawPhone = candidate.phone || (candidate.rawRow ? candidate.rawRow['Số điện thoại'] || '' : '');
   const cleanPhone = (p) => {
     if (!p) return '';
@@ -110,7 +110,10 @@ function CandidateMobileCardComponent({
   };
   const phone = cleanPhone(rawPhone);
 
-  const email = candidate.email || (candidate.rawRow ? candidate.rawRow['Email'] || '' : '');
+  const email =
+    candidate.email ||
+    (candidate.rawRow ? candidate.rawRow['Email'] || candidate.rawRow['Địa chỉ email'] || '' : '') ||
+    generateCandidateEmailFromName(candidate.name);
 
   // Copy to clipboard with visual check
   const handleCopy = (text, type, e) => {

@@ -1,6 +1,6 @@
 // ====================================================================
 // FASTHUNT / RECRUITCRM PRO - EMAIL & OFFER STUDIO GENERATOR
-// Mobile-First Optimized Studio with Automated CV Email Extraction
+// Mobile-First Optimized Studio with Automated CV Email Extraction & Direct Mail Dispatch
 // ====================================================================
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -16,7 +16,6 @@ import {
   RefreshCw,
   Eye,
   FileText,
-  Send,
   Smartphone
 } from 'lucide-react';
 import { getStoredTemplates, renderTemplate } from '../utils/emailTemplates';
@@ -144,6 +143,19 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
     );
   };
 
+  const recipientEmail = getRecipientEmail();
+  const subjectLine = getSubjectLine();
+
+  // Standard mailto URL for direct opening in mobile Mail / Gmail apps
+  const mailtoUrl = `mailto:${encodeURIComponent(recipientEmail)}?subject=${encodeURIComponent(
+    subjectLine
+  )}&body=${encodeURIComponent(renderedContent)}`;
+
+  // Web Gmail direct URL
+  const gmailWebUrl = `https://mail.google.com/mail/u/0/?view=cm&fs=1&to=${encodeURIComponent(
+    recipientEmail
+  )}&su=${encodeURIComponent(subjectLine)}&body=${encodeURIComponent(renderedContent)}`;
+
   const handleCopy = () => {
     navigator.clipboard.writeText(renderedContent);
     setCopied(true);
@@ -152,30 +164,11 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
   };
 
   const handleCopyEmail = () => {
-    const email = getRecipientEmail();
-    if (email) {
-      navigator.clipboard.writeText(email);
+    if (recipientEmail) {
+      navigator.clipboard.writeText(recipientEmail);
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2000);
     }
-  };
-
-  // 1-Tap Open in Native Mail App (iOS / Android / Desktop Mail)
-  const handleOpenNativeMail = () => {
-    const emailTo = getRecipientEmail();
-    const mailtoUrl = `mailto:${encodeURIComponent(emailTo)}?subject=${encodeURIComponent(
-      getSubjectLine()
-    )}&body=${encodeURIComponent(renderedContent)}`;
-    window.location.href = mailtoUrl;
-  };
-
-  // Open in Gmail Web Compose
-  const handleOpenGmail = () => {
-    const emailTo = getRecipientEmail();
-    const mailtoUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
-      emailTo
-    )}&su=${encodeURIComponent(getSubjectLine())}&body=${encodeURIComponent(renderedContent)}`;
-    window.open(mailtoUrl, '_blank');
   };
 
   return (
@@ -279,7 +272,7 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
             }`}
           >
             <Eye className="w-4 h-4" />
-            <span>Xem Trước Thư ({renderedContent.length} ký tự)</span>
+            <span>Xem Thư ({renderedContent.length} ký tự)</span>
           </button>
         </div>
 
@@ -553,10 +546,10 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
               </div>
               <div className="p-2.5 sm:p-3 mb-2 rounded-xl bg-slate-100 dark:bg-white/5 text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 space-y-1">
                 <div className="break-words">
-                  <strong>Tiêu đề:</strong> {getSubjectLine()}
+                  <strong>Tiêu đề:</strong> {subjectLine}
                 </div>
                 <div className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 flex-wrap">
-                  <strong>Gửi tới:</strong> <span className="font-mono">{getRecipientEmail()}</span>
+                  <strong>Gửi tới:</strong> <span className="font-mono">{recipientEmail}</span>
                 </div>
               </div>
               <textarea
@@ -580,23 +573,27 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
           </button>
 
           <div className="flex-1 sm:flex-none flex items-center gap-2">
-            <button
-              onClick={handleOpenNativeMail}
+            {/* Primary Native Mail App direct link */}
+            <a
+              href={mailtoUrl}
               className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/25 border border-blue-400/30 cursor-pointer min-h-[44px]"
-              title="Mở trực tiếp ứng dụng Mail (iOS Mail / Android Mail / Outlook)"
+              title="Mở trực tiếp ứng dụng Mail (iOS Mail / Gmail App / Outlook)"
             >
               <Smartphone className="w-4 h-4" />
               <span>Gửi Qua Mail App</span>
-            </button>
+            </a>
 
-            <button
-              onClick={handleOpenGmail}
+            {/* Direct Gmail Web compose link */}
+            <a
+              href={gmailWebUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-md shadow-emerald-500/25 border border-emerald-400/30 cursor-pointer min-h-[44px]"
               title="Soạn thư trực tiếp trên giao diện web Gmail"
             >
               <Mail className="w-4 h-4" />
               <span>Mở Gmail Web</span>
-            </button>
+            </a>
           </div>
         </div>
       </div>
