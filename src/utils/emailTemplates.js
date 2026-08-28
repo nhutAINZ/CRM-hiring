@@ -52,7 +52,7 @@ Qua quá trình thẩm duyệt CV, chúng tôi đánh giá cao kinh nghiệm và
 THÔNG TIN BUỔI PHỎNG VẤN:
 - Thời gian: {{GIO_PV}} ngày {{NGAY_PV}}
 - Địa điểm: {{DIA_DIEM_PV}}
-- Người liên hệ đón tiếp: {{NGUOI_LIEN_HE}} - ĐT: {{SDT}}
+- Người liên hệ đón tiếp: {{NGUOI_LIEN_HE}} - Hotline / Zalo: {{SDT}}
 - Hình thức: Phỏng vấn trực tiếp chuyên môn & văn hóa doanh nghiệp
 
 LƯU Ý DÀNH CHO ỨNG VIÊN:
@@ -77,6 +77,10 @@ Hội đồng tuyển dụng đánh giá cao sự chuẩn bị chu đáo, tinh t
 
 Hồ sơ của bạn đã được lưu trữ trong Cơ sở dữ liệu Nhân tài (Talent Pool) của {{CONG_TY}}. Chúng tôi sẽ chủ động liên hệ lại với bạn ngay khi có các cơ hội và vị trí mới phù hợp hơn trong tương lai.
 
+Nếu bạn cần hỗ trợ thêm thông tin phản hồi, vui lòng liên hệ:
+- Phụ trách tuyển dụng: {{NGUOI_LIEN_HE}}
+- Hotline / Zalo: {{SDT}}
+
 Chúc bạn luôn gặt hái được nhiều thành công rực rỡ và sớm tìm được bến đỗ nghề nghiệp lý tưởng!
 
 Trân trọng,
@@ -95,6 +99,7 @@ Hệ thống quản lý tuyển dụng xin gửi thông tin cập nhật tiến 
 - Trạng thái CV: {{TRANG_THAI_CV}}
 - Lịch / Kết quả Phỏng vấn: {{KET_QUA_PV}}
 - Kế hoạch Onboarding: {{NGAY_BAT_DAU}}
+- Phụ trách điều phối: {{NGUOI_LIEN_HE}} (Hotline/Zalo: {{SDT}})
 
 Cảm ơn bạn đã luôn đồng hành cùng hệ thống. Vui lòng kiểm tra lại bảng quản lý để theo dõi hoa hồng và các hồ sơ tiếp theo!
 
