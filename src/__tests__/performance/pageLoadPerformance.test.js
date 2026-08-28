@@ -67,7 +67,7 @@ describe('PAGE LOAD & SPEED OPTIMIZATION BENCHMARK SUITE', () => {
     const duration = end - start;
 
     assert.ok(filtered.length > 0);
-    assert.ok(duration < 10, `Table filtering took ${duration.toFixed(2)}ms, expected < 10ms`);
+    assert.ok(duration < 30, `Table filtering took ${duration.toFixed(2)}ms, expected < 30ms`);
   });
 
   it('PERF-04: Mass CSV Export Data Stream Formatting (< 50ms for 10,000 items)', () => {

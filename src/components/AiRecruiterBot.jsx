@@ -28,9 +28,13 @@ export default function AiRecruiterBot({
   sheet2ViewUrl,
   jobSheetUrl = 'https://docs.google.com/spreadsheets/d/1PJUSclHhVYLvoYTzmwkwpzsRfPOqODs0RDrvhW99Uko/edit?gid=0#gid=0',
   onOpenEmail,
-  onOpenDetail
+  onOpenDetail,
+  externalIsOpen,
+  setExternalIsOpen
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = setExternalIsOpen || setInternalIsOpen;
   const [messages, setMessages] = useState([
     {
       id: 'welcome',
@@ -225,10 +229,10 @@ Bạn có thể thử các lệnh gợi ý bên dưới để xem phân tích ch
       {/* ── 1. Floating Action Button ── */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-5 right-5 z-50 px-4 py-3 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2.5 font-bold text-xs sm:text-sm cursor-pointer border border-blue-400/40 group"
+        className="fixed bottom-18 md:bottom-5 right-4 sm:right-5 z-40 px-3.5 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-bold text-xs sm:text-sm cursor-pointer border border-blue-400/40 group"
       >
         <div className="relative">
-          <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform" />
           <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-yellow-400 animate-ping" />
         </div>
         <span>FastHunt AI Bot</span>

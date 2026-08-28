@@ -1,17 +1,26 @@
 import React from 'react';
 import { Menu, Flame, Gift, ArrowRight } from 'lucide-react';
 
-export default function TopBanner({ collapsed, setCollapsed, onOpenRewards }) {
+export default function TopBanner({ collapsed, setCollapsed, onOpenRewards, onOpenMobileMenu }) {
+  const handleToggle = () => {
+    if (window.innerWidth < 768 && onOpenMobileMenu) {
+      onOpenMobileMenu();
+    } else {
+      setCollapsed(!collapsed);
+    }
+  };
+
   return (
-    <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white shadow-sm flex items-center justify-between px-4 py-2 text-xs font-bold transition-all">
+    <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white shadow-sm flex items-center justify-between px-3 sm:px-4 py-2 text-xs font-bold transition-all">
       {/* Left: Sidebar Toggle Button */}
       <button
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={handleToggle}
         className="p-1 rounded-lg hover:bg-white/20 text-white cursor-pointer transition-colors flex items-center justify-center"
-        title={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
+        title="Menu điều hướng"
       >
         <Menu className="w-5 h-5" />
       </button>
+
 
       {/* Center: Top Green Announcement Text */}
       <div className="flex items-center justify-center gap-2 text-center animate-pulse">

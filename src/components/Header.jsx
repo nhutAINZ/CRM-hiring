@@ -12,7 +12,8 @@ import {
   BarChart3,
   AlertTriangle,
   Download,
-  Sparkles
+  Sparkles,
+  Menu
 } from 'lucide-react';
 
 export default function Header({
@@ -27,12 +28,14 @@ export default function Header({
   candidateCount,
   activeView,
   setActiveView,
-  urgentCount
+  urgentCount,
+  onOpenMobileMenu
 }) {
   const formatTime = (date) => {
     if (!date) return 'Chưa cập nhật';
     return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
+
 
   const navTabs = [
     {
@@ -81,10 +84,19 @@ export default function Header({
     <header className="sticky top-0 z-40 transition-all bg-white/95 dark:bg-[#060b18]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-white/10 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ── Top Navbar Row ── */}
-        <div className="py-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3">
 
-          {/* ── Logo & CRM Branding ── */}
-          <div className="flex items-center gap-3">
+          {/* ── Left: Mobile Hamburger & Logo Branding ── */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Mobile Hamburger Menu */}
+            <button
+              onClick={onOpenMobileMenu}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 md:hidden cursor-pointer"
+              title="Mở menu điều hướng"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
             <div className="relative flex-shrink-0">
               <div
                 className="absolute -inset-[2px] rounded-[14px] opacity-75"
@@ -95,29 +107,30 @@ export default function Header({
                   borderRadius: '14px'
                 }}
               />
-              <div className="relative w-10 h-10 rounded-[12px] bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 z-10">
-                <Sparkles className="w-5 h-5" />
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-[10px] sm:rounded-[12px] bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 z-10">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
             </div>
 
             <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-none">
-                  RecruitCRM Pro
+              <div className="flex items-center gap-1.5 sm:gap-2.5">
+                <h1 className="text-base sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-none">
+                  FastHunt
                 </h1>
-                <span className="relative inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30">
-                  <span className="relative flex h-2 w-2">
+                <span className="hidden sm:inline-flex relative items-center gap-1.5 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30">
+                  <span className="relative flex h-1.5 w-1.5">
                     <span className="animate-live-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500" />
                   </span>
-                  Live Sheet Sync
+                  Live Sync
                 </span>
               </div>
-              <p className="text-[11.5px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-                Hệ thống Quản trị Tuyển dụng & Giám sát Pipeline Real-time
+              <p className="hidden sm:block text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium truncate max-w-[280px] lg:max-w-none">
+                Quản trị Tuyển dụng & Pipeline Real-time
               </p>
             </div>
           </div>
+
 
           {/* ── Action Controls ── */}
           <div className="flex items-center flex-wrap gap-2">

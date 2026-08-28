@@ -22,6 +22,9 @@ import AiRecruiterBot from './components/AiRecruiterBot';
 import ZaloAssistantView from './components/ZaloAssistantView';
 import ZaloBroadcastModal from './components/ZaloBroadcastModal';
 import CvAnalysisDetailModal from './components/CvAnalysisDetailModal';
+import MobileBottomNav from './components/MobileBottomNav';
+import MobileVerticalTaskbar from './components/MobileVerticalTaskbar';
+import MobileComponentSelector from './components/MobileComponentSelector';
 
 
 import {
@@ -57,6 +60,8 @@ export default function App() {
   // Default view is 'table' (Vị trí ứng tuyển matching user screenshot)
   const [activeView, setActiveView] = useState('table'); // 'table' | 'jobs' | 'dashboard' | 'kanban' | 'analytics' | 'urgent' | 'clients' | 'ctv'
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
 
   // Data state
   const [candidates, setCandidates] = useState([]);
@@ -82,6 +87,8 @@ export default function App() {
   const [broadcastJob, setBroadcastJob] = useState(null);
   const [isCvAnalysisOpen, setIsCvAnalysisOpen] = useState(false);
   const [cvAnalysisData, setCvAnalysisData] = useState(null);
+  const [isComponentSelectorOpen, setIsComponentSelectorOpen] = useState(false);
+  const [isAiBotOpen, setIsAiBotOpen] = useState(false);
 
 
   // Filter state
@@ -266,7 +273,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#030712] text-slate-900 dark:text-slate-100 transition-colors">
       
-      {/* ── Left Sidebar Navigation (FastHunt Blue Theme & Logo) ── */}
+      {/* ── Left Sidebar Navigation (Desktop Sticky + Mobile Slide-Over Drawer) ── */}
       <Sidebar
         activeView={activeView}
         setActiveView={setActiveView}
@@ -276,20 +283,23 @@ export default function App() {
         jobSheetUrl={jobSheetUrl}
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
+        mobileOpen={mobileDrawerOpen}
+        setMobileOpen={setMobileDrawerOpen}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenTemplates={() => setIsTemplateEditorOpen(true)}
         onExportCsv={handleExportCsv}
         onOpenUpdates={() => setIsUpdatesOpen(true)}
       />
 
-      {/* ── Main Layout Content Container (Padded left for Sidebar) ── */}
-      <div className={`transition-all duration-300 min-h-screen flex flex-col ${sidebarCollapsed ? 'ml-20' : 'ml-64'}`}>
+      {/* ── Main Layout Content Container (Zero margin on mobile, padded on desktop) ── */}
+      <div className={`transition-all duration-300 min-h-screen flex flex-col ml-0 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
         
-        {/* ── Top Red Banner Announcement ("Chia sẻ cho bạn ngay, nhận ngay phần thưởng") ── */}
+        {/* ── Top Red Banner Announcement ("Tuyển nhiều tiền nhiều...") ── */}
         <TopBanner
           collapsed={sidebarCollapsed}
           setCollapsed={setSidebarCollapsed}
           onOpenRewards={() => setIsSettingsOpen(true)}
+          onOpenMobileMenu={() => setMobileDrawerOpen(true)}
         />
 
         {/* ── Top Auxiliary CRM Header Bar ── */}
@@ -306,10 +316,12 @@ export default function App() {
           activeView={activeView}
           setActiveView={setActiveView}
           urgentCount={globalMetrics.urgentCandidates.length}
+          onOpenMobileMenu={() => setMobileDrawerOpen(true)}
         />
 
-        {/* ── Main Content Area ── */}
-        <main className="flex-1 p-4 sm:p-6 max-w-[1600px] w-full mx-auto space-y-6">
+        {/* ── Main Content Area (Optimized padding for phones and desktop) ── */}
+        <main className="flex-1 p-3 sm:p-6 pb-24 md:pb-8 max-w-[1600px] w-full mx-auto space-y-4 sm:space-y-6">
+
           
           {/* Error Notification Banner */}
           {errorMsg && (
@@ -564,8 +576,53 @@ export default function App() {
         jobSheetUrl={jobSheetUrl}
         onOpenEmail={handleOpenEmail}
         onOpenDetail={handleOpenDetail}
+        externalIsOpen={isAiBotOpen}
+        setExternalIsOpen={setIsAiBotOpen}
+      />
+
+      {/* ── Mobile Vertical Floating Taskbar (Thanh task bar dọc di động) ── */}
+      <MobileVerticalTaskbar
+        activeView={activeView}
+        setActiveView={setActiveView}
+        candidateCount={candidates.length}
+        urgentCount={globalMetrics.urgentCandidates.length}
+        jobCount={jobItems.length}
+        onOpenComponentSelector={() => setIsComponentSelectorOpen(true)}
+        onOpenAiBot={() => setIsAiBotOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenTemplates={() => setIsTemplateEditorOpen(true)}
+        onRefreshData={loadAllData}
+        isRefreshing={isRefreshing}
+      />
+
+      {/* ── Mobile Touch Component Selector Hub (Bộ chọn từng thành phần) ── */}
+      <MobileComponentSelector
+        isOpen={isComponentSelectorOpen}
+        onClose={() => setIsComponentSelectorOpen(false)}
+        activeView={activeView}
+        setActiveView={setActiveView}
+        candidateCount={candidates.length}
+        urgentCount={globalMetrics.urgentCandidates.length}
+        jobCount={jobItems.length}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenTemplates={() => setIsTemplateEditorOpen(true)}
+        onExportCsv={handleExportCsv}
+        onOpenUpdates={() => setIsUpdatesOpen(true)}
+        onOpenAiBot={() => setIsAiBotOpen(true)}
+        jobSheetUrl={jobSheetUrl}
+      />
+
+      {/* ── Mobile Native Bottom Navigation Bar (Visible only on mobile devices) ── */}
+      <MobileBottomNav
+        activeView={activeView}
+        setActiveView={setActiveView}
+        candidateCount={candidates.length}
+        urgentCount={globalMetrics.urgentCandidates.length}
+        onOpenMobileMenu={() => setMobileDrawerOpen(true)}
+        onOpenComponentSelector={() => setIsComponentSelectorOpen(true)}
       />
     </div>
   );
 }
+
 
