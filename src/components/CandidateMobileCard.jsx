@@ -3,29 +3,25 @@
 // Touch-Optimized Vertical Card for Mobile-First Candidate Feed (375-430px)
 // ====================================================================
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   Phone,
   Mail,
   ExternalLink,
   Clock,
-  Award,
   ChevronDown,
   ChevronUp,
   Check,
-  X,
   Copy,
   MessageCircle,
   FileText,
-  Eye,
   CheckCircle2,
   XCircle,
-  AlertCircle,
   Gift
 } from 'lucide-react';
 import { normalizeCvResult, normalizePvResult } from '../utils/dataNormalizer';
 
-export default function CandidateMobileCard({
+function CandidateMobileCardComponent({
   candidate,
   isSelected,
   onToggleSelect,
@@ -315,3 +311,5 @@ export default function CandidateMobileCard({
     </div>
   );
 }
+
+export default memo(CandidateMobileCardComponent);

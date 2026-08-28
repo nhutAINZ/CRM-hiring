@@ -254,19 +254,19 @@ export default function App() {
     });
   };
 
-  const handleOpenDetail = (candidate) => {
+  const handleOpenDetail = useCallback((candidate) => {
     setSelectedCandidate(candidate);
     setIsDetailOpen(true);
-  };
+  }, []);
 
-  const handleOpenEmail = (candidate) => {
+  const handleOpenEmail = useCallback((candidate) => {
     setSelectedCandidate(candidate);
     setIsEmailOpen(true);
-  };
+  }, []);
 
-  const handleExportCsv = () => {
+  const handleExportCsv = useCallback(() => {
     exportCandidatesToCsv(filteredCandidates, 'danh_sach_ung_vien_tuyen_dung.csv');
-  };
+  }, [filteredCandidates]);
 
   const sheet2ViewUrl = getSheet2ViewUrl(config.sheet2Id);
   const jobSheetUrl = getJobSheetViewUrl(config.jobSheetId, config.jobSheetGid);

@@ -3,7 +3,7 @@
 // Dual Desktop Table / Mobile Touch Card Responsive Architecture
 // ====================================================================
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   ExternalLink,
   Copy,
@@ -13,16 +13,12 @@ import {
   ChevronRight,
   Eye,
   ArrowUpDown,
-  Download,
   CheckSquare,
   Square,
-  Share2,
   Edit3,
   Phone,
   MessageCircle,
   Clock,
-  Calendar,
-  Layers,
   LayoutGrid,
   List
 } from 'lucide-react';
@@ -80,21 +76,21 @@ export default function CandidateTable({
     }
   };
 
-  const handleToggleSelect = (id) => {
+  const handleToggleSelect = useCallback((id) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  };
+  }, []);
 
   // Save Note Inline
-  const handleSaveInlineNote = (candidateId) => {
-    saveCandidateNote(candidateId, tempNoteText);
+  const handleSaveInlineNote = useCallback((candidateId, text) => {
+    saveCandidateNote(candidateId, text !== undefined ? text : tempNoteText);
     setStoredNotes(getStoredNotes());
     setEditingNoteId(null);
-  };
+  }, [tempNoteText]);
 
   // Format relative processing time (e.g. "2 months ago", "25 days ago", "a year ago")
   const getRelativeProcessingTime = (dateStr) => {
