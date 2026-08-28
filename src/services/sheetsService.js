@@ -126,9 +126,24 @@ export const fetchSheet1Data = async (sheet1Id, sheet1Gid) => {
             const positionCompany = extractField(row, ['vị trí ứng tuyển_doanh nghiệp', 'vị trí ứng tuyển', 'vị trí']);
             const desiredSalary = extractField(row, ['mức lương mong muốn', 'lương mong muốn']);
             const startTime = extractField(row, ['thời gian bắt đầu làm việc', 'thời gian bắt đầu']);
-            const cvUrl = extractField(row, ['update cv', 'link cv', 'cv']);
-            const email = extractField(row, ['địa chỉ email', 'email']);
-            const notes = extractField(row, ['ghi chú thêm về ứng viên', 'ghi chú thêm']);
+            let email = extractField(row, [
+              'địa chỉ email',
+              'email ứng viên',
+              'email uv',
+              'email',
+              'gmail',
+              'mail',
+              'e-mail',
+              'hòm thư',
+              'thư điện tử'
+            ]);
+            if (!email && row) {
+              const rowStr = Object.values(row).join(' ');
+              const match = rowStr.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+              if (match) {
+                email = match[0].trim();
+              }
+            }
             const cvResultRaw = extractField(row, ['kết quả cv']);
             const interviewDate = extractField(row, ['ngày phỏng vấn']);
             const interviewTime = extractField(row, ['giờ phỏng vấn']);

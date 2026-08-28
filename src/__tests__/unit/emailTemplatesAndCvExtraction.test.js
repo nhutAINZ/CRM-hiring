@@ -3,6 +3,8 @@ import assert from 'node:assert';
 import {
   extractEmailFromText,
   extractCandidateEmail,
+  generateCandidateEmailFromName,
+  removeVietnameseAccents,
   EMAIL_REGEX
 } from '../../utils/cvEmailExtractor.js';
 import {
@@ -45,40 +47,49 @@ describe('Unit Tests: CV Email Extraction & Email Studio Template Defaults', () 
     const res = extractCandidateEmail(candidate);
     assert.strictEqual(res.isAutoExtracted, true);
     assert.strictEqual(res.email, 'cuong.le@techhub.io');
-    assert.strictEqual(res.warning, null);
+    assert.strictEqual(res.badgeText, 'Tự động trích từ CV');
   });
 
-  it('should return warning when no email is found in scanned image CV', () => {
-    const candidate = {
-      name: 'Scan CV Candidate',
-      cvUrl: 'https://drive.google.com/scan_image.jpg'
+  it('should automatically generate clean candidate email fallback from Vietnamese name when no email is provided', () => {
+    const candidate1 = {
+      name: 'Lý Tiến Mạnh',
+      positionCompany: 'Nhân viên vận hành sàn TMĐT'
     };
 
-    const res = extractCandidateEmail(candidate);
-    assert.strictEqual(res.isAutoExtracted, false);
-    assert.strictEqual(res.email, '');
-    assert.ok(res.warning.includes('Không tìm thấy email'));
+    const res1 = extractCandidateEmail(candidate1);
+    assert.strictEqual(res1.isAutoExtracted, true);
+    assert.strictEqual(res1.email, 'lytienmanh@gmail.com');
+    assert.strictEqual(res1.badgeText, 'Tự động điền theo tên');
+
+    const candidate2 = {
+      name: 'Lê Thị Ngọc',
+      positionCompany: 'Nhân viên in sơ đồ'
+    };
+
+    const res2 = extractCandidateEmail(candidate2);
+    assert.strictEqual(res2.isAutoExtracted, true);
+    assert.strictEqual(res2.email, 'lethingoc@gmail.com');
   });
 
   it('should render default contact person and hotline across all 4 email templates', () => {
     const defaultVariables = {
-      TEN_UNG_VIEN: 'Nguyễn Văn An',
-      VI_TRI: 'Chuyên viên Tuyển dụng',
-      CONG_TY: 'FastHunt Suite',
+      TEN_UNG_VIEN: 'Lý Tiến Mạnh',
+      VI_TRI: 'Nhân viên vận hành sàn TMĐT',
+      CONG_TY: 'Ultimate Sup',
       NGUOI_LIEN_HE: 'Anh Võ - Bộ phận Tuyển Dụng',
       SDT: '0966 383 750',
       MA_CTV: 'CTV_99',
       TRANG_THAI_CV: 'Pass CV',
       KET_QUA_PV: 'Pass PV',
-      NGAY_BAT_DAU: '01/09/2026',
+      NGAY_BAT_DAU: 'CÓ THỂ ĐI LÀM NGAY',
       GIO_PV: '09h00',
       NGAY_PV: '30/08/2026',
       DIA_DIEM_PV: 'Hà Nội',
       HAN_CHOT_PV: '29/08/2026',
-      HAN_CHOT: '31/08/2026',
+      HAN_CHOT: '17h00 ngày 24/08/2026',
       LUONG_THU_VIEC: '8.500.000',
       LUONG_CHINH_THUC: '10.000.000',
-      DIA_CHI: 'Hà Nội'
+      DIA_CHI: '18 Ngõ 55 Dịch Vọng, Cầu Giấy, Hà Nội'
     };
 
     // Template A (Offer Letter)

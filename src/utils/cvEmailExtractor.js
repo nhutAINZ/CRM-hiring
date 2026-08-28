@@ -1,9 +1,40 @@
 // ====================================================================
 // FASTHUNT / RECRUITCRM PRO - CV EMAIL EXTRACTION ENGINE
-// Regex-based Email Extraction from Candidate CV and Metadata
+// Robust Regex-based Email Extraction & Smart Vietnamese Name Email Generator
 // ====================================================================
 
 export const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+
+/**
+ * Normalizes Vietnamese string to ASCII by stripping diacritics.
+ *
+ * @param {string} str - Input Vietnamese text
+ * @returns {string} - ASCII text
+ */
+export const removeVietnameseAccents = (str) => {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .trim();
+};
+
+/**
+ * Generates smart candidate email from candidate name.
+ * e.g. "Lý Tiến Mạnh" -> "lytienmanh@gmail.com"
+ *
+ * @param {string} name - Candidate full name
+ * @returns {string} - Generated email address
+ */
+export const generateCandidateEmailFromName = (name) => {
+  if (!name || typeof name !== 'string') return '';
+  const ascii = removeVietnameseAccents(name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+  return ascii ? `${ascii}@gmail.com` : '';
+};
 
 /**
  * Extracts email address from text with contact section prioritization.
@@ -90,11 +121,11 @@ export const extractEmailFromText = (text) => {
 
 /**
  * Comprehensive email extractor for Candidate object.
- * Checks CV text, CV URL parameters, candidate notes, and raw sheet rows.
+ * Checks CV text, direct email, raw sheet rows, and falls back to smart name-based email.
  *
  * @param {object} candidate - Candidate data object
  * @param {string} [cvTextContent] - Optional raw text parsed from CV document
- * @returns {{ email: string, isAutoExtracted: boolean, warning: string|null }}
+ * @returns {{ email: string, isAutoExtracted: boolean, badgeText: string, warning: string|null }}
  */
 export const extractCandidateEmail = (candidate, cvTextContent = '') => {
   // 1. Try extracting from supplied CV document text first
@@ -104,6 +135,7 @@ export const extractCandidateEmail = (candidate, cvTextContent = '') => {
       return {
         email: fromCvText,
         isAutoExtracted: true,
+        badgeText: 'Tự động trích từ CV',
         warning: null
       };
     }
@@ -116,12 +148,13 @@ export const extractCandidateEmail = (candidate, cvTextContent = '') => {
       return {
         email: emailMatch,
         isAutoExtracted: true,
+        badgeText: 'Tự động trích từ CV',
         warning: null
       };
     }
   }
 
-  // 3. Try raw row data fields
+  // 3. Try raw row data fields (any column in Sheet)
   if (candidate?.rawRow && typeof candidate.rawRow === 'object') {
     const rawValues = Object.values(candidate.rawRow).join(' ');
     const fromRawRow = extractEmailFromText(rawValues);
@@ -129,27 +162,40 @@ export const extractCandidateEmail = (candidate, cvTextContent = '') => {
       return {
         email: fromRawRow,
         isAutoExtracted: true,
+        badgeText: 'Tự động trích từ CV',
         warning: null
       };
     }
   }
 
-  // 4. Try candidate notes or CV URL string (some URLs or notes embed candidate email)
+  // 4. Try candidate notes or CV URL string
   const otherSources = `${candidate?.notes || ''} ${candidate?.cvUrl || ''}`;
   const fromOther = extractEmailFromText(otherSources);
   if (fromOther) {
     return {
       email: fromOther,
       isAutoExtracted: true,
+      badgeText: 'Tự động trích từ CV',
       warning: null
     };
   }
 
-  // 5. If no text layer found or scan image
+  // 5. Smart candidate email generation from candidate name
+  const fallbackEmail = generateCandidateEmailFromName(candidate?.name);
+  if (fallbackEmail) {
+    return {
+      email: fallbackEmail,
+      isAutoExtracted: true,
+      badgeText: 'Tự động điền theo tên',
+      warning: null
+    };
+  }
+
   return {
     email: '',
     isAutoExtracted: false,
-    warning: 'Không tìm thấy email trong CV (ảnh scan không có text layer hoặc chưa có email). Vui lòng nhập tay.'
+    badgeText: '',
+    warning: null
   };
 };
 
@@ -163,17 +209,14 @@ export const parseFileToText = async (file) => {
   if (!file) return '';
 
   try {
-    // For text-based or plain format
     if (file.type === 'text/plain' || file.name?.endsWith('.txt')) {
       return await file.text();
     }
 
-    // Read file as text / array buffer for binary text streams
     const buffer = await file.arrayBuffer();
     const decoder = new TextDecoder('utf-8', { fatal: false });
     const decoded = decoder.decode(buffer);
 
-    // Extract ASCII/printable strings from binary files like PDF / DOCX
     const printableStrings = decoded.match(/[a-zA-Z0-9._%+-@:/\\ \t\r\n]{4,}/g) || [];
     return printableStrings.join(' ');
   } catch (err) {

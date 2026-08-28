@@ -18,12 +18,15 @@ import {
   User,
   Building,
   Wand2,
-  AlertCircle,
   Upload,
   RefreshCw
 } from 'lucide-react';
 import { getStoredTemplates, renderTemplate } from '../utils/emailTemplates';
-import { extractCandidateEmail, parseFileToText } from '../utils/cvEmailExtractor';
+import {
+  extractCandidateEmail,
+  parseFileToText,
+  generateCandidateEmailFromName
+} from '../utils/cvEmailExtractor';
 import confetti from 'canvas-confetti';
 
 export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }) {
@@ -31,13 +34,13 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
   const [activeTab, setActiveTab] = useState('templateA'); // 'templateA' | 'templateB' | 'templateC' | 'templateD'
   const [copied, setCopied] = useState(false);
   const [isAutoExtracted, setIsAutoExtracted] = useState(false);
-  const [extractionWarning, setExtractionWarning] = useState(null);
+  const [badgeLabel, setBadgeLabel] = useState('Tự động trích từ CV');
   const [isParsingFile, setIsParsingFile] = useState(false);
   const fileInputRef = useRef(null);
 
   const today = new Date();
 
-  // Initial Email Extraction
+  // Initial Email Extraction (Sheet / CV / Name fallback)
   const initialEmailResult = extractCandidateEmail(candidate);
 
   const [formData, setFormData] = useState({
@@ -45,7 +48,7 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
     THANG: String(today.getMonth() + 1).padStart(2, '0'),
     NAM: String(today.getFullYear()),
     TEN_UNG_VIEN: candidate?.name || 'Nguyễn Văn A',
-    EMAIL_UNG_VIEN: initialEmailResult.email || '',
+    EMAIL_UNG_VIEN: initialEmailResult.email || generateCandidateEmailFromName(candidate?.name) || '',
     VI_TRI: candidate?.positionCompany || 'Nhân viên tư vấn',
     CONG_TY: candidate?.positionCompany?.split('-')[1]?.trim() || 'Doanh Nghiệp Đối Tác',
     CHI_NHANH: 'Chi nhánh Hà Nội',
@@ -79,7 +82,7 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
   useEffect(() => {
     const res = extractCandidateEmail(candidate);
     setIsAutoExtracted(res.isAutoExtracted);
-    setExtractionWarning(res.warning);
+    setBadgeLabel(res.badgeText || 'Tự động trích từ CV');
     if (res.email) {
       setFormData((prev) => ({ ...prev, EMAIL_UNG_VIEN: res.email }));
     }
@@ -113,15 +116,11 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
       if (res.email) {
         setFormData((prev) => ({ ...prev, EMAIL_UNG_VIEN: res.email }));
         setIsAutoExtracted(true);
-        setExtractionWarning(null);
+        setBadgeLabel('Đã trích xuất từ CV tải lên');
         confetti({ particleCount: 35, spread: 50, origin: { y: 0.8 } });
-      } else {
-        setExtractionWarning('Đã đọc file nhưng không tìm thấy định dạng email hợp lệ. Bạn có thể nhập tay.');
-        setIsAutoExtracted(false);
       }
     } catch (err) {
       console.error('Error parsing uploaded CV', err);
-      setExtractionWarning('Lỗi khi đọc file CV. Vui lòng nhập email tay.');
     } finally {
       setIsParsingFile(false);
     }
@@ -145,7 +144,11 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
   };
 
   const handleOpenGmail = () => {
-    const emailTo = formData.EMAIL_UNG_VIEN || candidate?.email || '';
+    const emailTo =
+      formData.EMAIL_UNG_VIEN?.trim() ||
+      candidate?.email ||
+      generateCandidateEmailFromName(candidate?.name || formData.TEN_UNG_VIEN);
+
     const mailtoUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
       emailTo
     )}&su=${encodeURIComponent(getSubjectLine())}&body=${encodeURIComponent(renderedContent)}`;
@@ -248,7 +251,14 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
                 <input
                   type="text"
                   value={formData.TEN_UNG_VIEN}
-                  onChange={(e) => setFormData({ ...formData, TEN_UNG_VIEN: e.target.value })}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    setFormData((prev) => ({
+                      ...prev,
+                      TEN_UNG_VIEN: newName,
+                      EMAIL_UNG_VIEN: prev.EMAIL_UNG_VIEN || generateCandidateEmailFromName(newName)
+                    }));
+                  }}
                   className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 font-medium"
                 />
               </div>
@@ -264,10 +274,10 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
                   {isAutoExtracted && (
                     <span
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10.5px] font-bold border border-emerald-200 dark:border-emerald-800/50"
-                      title="Tự động trích xuất từ file CV / dữ liệu ứng viên"
+                      title="Email đã tự động nhận diện từ hồ sơ ứng viên"
                     >
-                      <Wand2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400 animate-pulse" />
-                      <span>Tự động trích từ CV</span>
+                      <Wand2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                      <span>{badgeLabel}</span>
                     </span>
                   )}
                 </div>
@@ -276,17 +286,12 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
                   <input
                     type="email"
                     value={formData.EMAIL_UNG_VIEN}
-                    onChange={(e) => {
-                      setFormData({ ...formData, EMAIL_UNG_VIEN: e.target.value });
-                      if (e.target.value) {
-                        setExtractionWarning(null);
-                      }
-                    }}
+                    onChange={(e) => setFormData({ ...formData, EMAIL_UNG_VIEN: e.target.value })}
                     placeholder="ungvien@gmail.com"
                     className="w-full pl-3 pr-20 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 font-medium"
                   />
 
-                  {/* Optional CV re-parser / Upload trigger */}
+                  {/* CV File Reader Button */}
                   <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <input
                       type="file"
@@ -310,14 +315,6 @@ export default function EmailGeneratorModal({ candidate, onClose, onOpenEditor }
                     </button>
                   </div>
                 </div>
-
-                {/* Warning message if email was not found automatically */}
-                {extractionWarning && (
-                  <p className="text-[11px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 p-2 rounded-xl border border-amber-200 dark:border-amber-800/50 flex items-start gap-1.5 leading-tight">
-                    <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                    <span>{extractionWarning}</span>
-                  </p>
-                )}
               </div>
 
               {/* 3. Vị Trí Tuyển Dụng */}
