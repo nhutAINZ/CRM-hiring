@@ -25,6 +25,7 @@ import CvAnalysisDetailModal from './components/CvAnalysisDetailModal';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileVerticalTaskbar from './components/MobileVerticalTaskbar';
 import MobileComponentSelector from './components/MobileComponentSelector';
+import MobileFAB from './components/MobileFAB';
 
 
 import {
@@ -610,6 +611,15 @@ export default function App() {
         onOpenUpdates={() => setIsUpdatesOpen(true)}
         onOpenAiBot={() => setIsAiBotOpen(true)}
         jobSheetUrl={jobSheetUrl}
+      />
+
+      {/* ── Mobile Floating Action Speed Dial (FAB) ── */}
+      <MobileFAB
+        onRefresh={loadAllData}
+        isRefreshing={isRefreshing}
+        onExportCsv={handleExportCsv}
+        onOpenAiBot={() => setIsAiBotOpen(true)}
+        onOpenTemplates={() => setIsTemplateEditorOpen(true)}
       />
 
       {/* ── Mobile Native Bottom Navigation Bar (Visible only on mobile devices) ── */}

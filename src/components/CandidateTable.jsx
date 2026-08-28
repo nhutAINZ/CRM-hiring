@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { normalizeCvResult, normalizePvResult, getStoredNotes, saveCandidateNote, exportCandidatesToCsv, fastSortCandidates } from '../utils/dataNormalizer';
 import confetti from 'canvas-confetti';
+import CandidateMobileCard from './CandidateMobileCard';
 
 export default function CandidateTable({
   candidates,
@@ -231,7 +232,7 @@ export default function CandidateTable({
       )}
 
       {/* ── 1. Mobile Cards List View (Visible when on Mobile & 'cards' mode) ── */}
-      <div className={`${mobileViewMode === 'cards' ? 'block sm:hidden' : 'hidden'} divide-y divide-slate-100 dark:divide-slate-800 p-2 space-y-2.5`}>
+      <div className={`${mobileViewMode === 'cards' ? 'block sm:hidden' : 'hidden'} divide-y divide-slate-100 dark:divide-slate-800 p-2 space-y-3`}>
         {paginatedCandidates.length === 0 ? (
           <div className="p-8 text-center text-slate-400 font-bold text-xs">
             Không tìm thấy ứng viên nào phù hợp.
@@ -240,111 +241,24 @@ export default function CandidateTable({
           paginatedCandidates.map((c) => {
             const isSelected = selectedIds.has(c.id);
             const candidateNote = storedNotes[c.id]?.text || c.notes || '';
-            const phone = c.email && c.email.includes('@') ? '' : (c.rawRow ? c.rawRow['Số điện thoại'] || '' : '');
-            const cleanP = cleanPhone(phone);
 
             return (
-              <div
+              <CandidateMobileCard
                 key={c.id}
-                onClick={() => onOpenDetail(c)}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer ${
-                  isSelected
-                    ? 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700'
-                    : 'bg-white dark:bg-slate-850/80 border-slate-200/80 dark:border-slate-800 hover:shadow-md'
-                }`}
-              >
-                {/* Card Top: Checkbox, Name, Status */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleSelect(c.id);
-                      }}
-                      className="p-1 text-slate-400 hover:text-blue-600"
-                    >
-                      {isSelected ? (
-                        <CheckSquare className="w-5 h-5 text-blue-600" />
-                      ) : (
-                        <Square className="w-5 h-5" />
-                      )}
-                    </button>
-
-                    <div className="min-w-0">
-                      <h4 className="font-extrabold text-sm text-slate-900 dark:text-white truncate">
-                        {c.name}
-                      </h4>
-                      <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 truncate">
-                        {c.positionCompany || 'Tư vấn tuyển sinh'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0">
-                    {renderStatusBadge(c)}
-                  </div>
-                </div>
-
-                {/* Sub Metadata: Time, Salary, CTV */}
-                <div className="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{getRelativeProcessingTime(c.timestamp)}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-slate-700 dark:text-slate-300 truncate">
-                      Lương: {c.desiredSalary || 'Thỏa thuận'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Note / Review if any */}
-                {candidateNote && (
-                  <p className="mt-2 text-[11px] italic text-slate-500 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-100 dark:border-slate-700/60 truncate">
-                    📝 {candidateNote}
-                  </p>
-                )}
-
-                {/* Card Action Buttons (Direct Zalo, Email, CV, Detail) */}
-                <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex-wrap">
-                  {cleanP && (
-                    <a
-                      href={`https://zalo.me/${cleanP}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 text-sky-600 dark:text-sky-300 rounded-xl text-xs font-bold border border-sky-200 dark:border-sky-800"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5 text-sky-500" />
-                      <span>Chat Zalo</span>
-                    </a>
-                  )}
-
-                  {c.cvUrl && (
-                    <a
-                      href={c.cvUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Xem CV</span>
-                    </a>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenEmail(c);
-                    }}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 rounded-xl text-xs font-bold border border-indigo-200 dark:border-indigo-800"
-                  >
-                    <Mail className="w-3.5 h-3.5" />
-                    <span>Mẫu Thư</span>
-                  </button>
-                </div>
-              </div>
+                candidate={c}
+                isSelected={isSelected}
+                onToggleSelect={handleToggleSelect}
+                onOpenDetail={onOpenDetail}
+                onOpenEmail={onOpenEmail}
+                onQuickApprove={(cand) => {
+                  confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
+                  handleSaveInlineNote(cand.id);
+                }}
+                onQuickReject={(cand) => {
+                  handleSaveInlineNote(cand.id);
+                }}
+                storedNote={candidateNote}
+              />
             );
           })
         )}

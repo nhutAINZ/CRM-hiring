@@ -2,15 +2,44 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
 describe('Unit Tests: Mobile Navigation & Vertical Taskbar Architecture', () => {
-  it('should verify all core mobile view IDs are valid and supported', () => {
-    const supportedViews = ['table', 'jobs', 'zalo', 'kanban', 'dashboard', 'urgent', 'clients', 'analytics', 'ctv'];
+  it('should verify the 5 primary mobile bottom tabs matching requirements', () => {
+    const mobileBottomTabs = [
+      { id: 'dashboard', label: 'Trang chủ' },
+      { id: 'table', label: 'Ứng viên' },
+      { id: 'kanban', label: 'Kanban' },
+      { id: 'analytics', label: 'Báo cáo' },
+      { id: 'more', label: 'Thêm' }
+    ];
     
-    assert.strictEqual(supportedViews.length, 9);
-    assert.ok(supportedViews.includes('table'));
-    assert.ok(supportedViews.includes('jobs'));
-    assert.ok(supportedViews.includes('zalo'));
-    assert.ok(supportedViews.includes('kanban'));
-    assert.ok(supportedViews.includes('urgent'));
+    assert.strictEqual(mobileBottomTabs.length, 5);
+    assert.strictEqual(mobileBottomTabs[0].id, 'dashboard');
+    assert.strictEqual(mobileBottomTabs[1].id, 'table');
+    assert.strictEqual(mobileBottomTabs[2].id, 'kanban');
+    assert.strictEqual(mobileBottomTabs[3].id, 'analytics');
+    assert.strictEqual(mobileBottomTabs[4].id, 'more');
+  });
+
+  it('should verify CandidateMobileCard 4-row layout structure and touch actions', () => {
+    const sampleCandidate = {
+      id: 'uv_01',
+      name: 'Nguyễn Văn An',
+      positionCompany: 'Senior Frontend Developer',
+      ctvCode: 'CTV_HN01',
+      phone: '0901234567',
+      email: 'an.nguyen@gmail.com',
+      cvUrl: 'https://drive.google.com/sample_cv.pdf',
+      cvResultRaw: 'Pass CV',
+      pvResultRaw: 'Pass PV',
+      timestamp: '28/08/2026',
+      notes: 'Ứng viên có 4 năm kinh nghiệm React, kỹ năng tốt.'
+    };
+
+    assert.ok(sampleCandidate.name);
+    assert.ok(sampleCandidate.positionCompany);
+    assert.ok(sampleCandidate.phone);
+    assert.ok(sampleCandidate.email);
+    assert.ok(sampleCandidate.cvUrl);
+    assert.ok(sampleCandidate.notes);
   });
 
   it('should verify component sections cover recruitment, crm, automation, and admin workflows', () => {

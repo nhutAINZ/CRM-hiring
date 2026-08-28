@@ -565,3 +565,28 @@
 .dark .table-row-hover:hover {
   box-shadow: 0 4px 16px -2px rgba(0,0,0,0.40);
 }
+
+/* =========================================================================
+   Mobile-First Safe Area & Touch Target Optimizations (375-430px)
+   ========================================================================= */
+
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 20px));
+}
+
+.pt-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
+@media (max-width: 768px) {
+  /* Prevent iOS Safari 300ms click delay and zoom */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Ensure minimum tap target */
+  button, a {
+    touch-action: manipulation;
+  }
+}
+
