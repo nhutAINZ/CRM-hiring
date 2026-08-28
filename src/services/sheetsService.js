@@ -126,6 +126,8 @@ export const fetchSheet1Data = async (sheet1Id, sheet1Gid) => {
             const positionCompany = extractField(row, ['vị trí ứng tuyển_doanh nghiệp', 'vị trí ứng tuyển', 'vị trí']);
             const desiredSalary = extractField(row, ['mức lương mong muốn', 'lương mong muốn']);
             const startTime = extractField(row, ['thời gian bắt đầu làm việc', 'thời gian bắt đầu']);
+            const cvUrl = extractField(row, ['update cv', 'link cv', 'cv']);
+            const notes = extractField(row, ['ghi chú thêm về ứng viên', 'ghi chú thêm']);
             let email = extractField(row, [
               'địa chỉ email',
               'email ứng viên',
