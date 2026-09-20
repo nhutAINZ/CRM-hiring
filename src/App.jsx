@@ -22,10 +22,18 @@ import AiRecruiterBot from './components/AiRecruiterBot';
 import ZaloAssistantView from './components/ZaloAssistantView';
 import ZaloBroadcastModal from './components/ZaloBroadcastModal';
 import CvAnalysisDetailModal from './components/CvAnalysisDetailModal';
+import ArchifyView from './components/ArchifyView';
+import MultiAgentHubView from './components/MultiAgentHubView';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileVerticalTaskbar from './components/MobileVerticalTaskbar';
 import MobileComponentSelector from './components/MobileComponentSelector';
 import MobileFAB from './components/MobileFAB';
+import AdminAuthModal from './components/AdminAuthModal';
+import CtvDashboardView from './components/CtvDashboardView';
+import RecruitmentContentGeneratorView from './components/RecruitmentContentGeneratorView';
+import RecruitmentGroupsView from './components/RecruitmentGroupsView';
+import { Lock, Unlock } from 'lucide-react';
+
 
 
 import {
@@ -58,10 +66,70 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [config, setConfig] = useState(getStoredConfig);
   
-  // Default view is 'table' (Vị trí ứng tuyển matching user screenshot)
-  const [activeView, setActiveView] = useState('table'); // 'table' | 'jobs' | 'dashboard' | 'kanban' | 'analytics' | 'urgent' | 'clients' | 'ctv'
+  // Admin & Auth State
+  const [isAdmin, setIsAdmin] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('fasthunt_is_admin') === 'true';
+    }
+    return false;
+  });
+  const [adminPassword, setAdminPassword] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('fasthunt_admin_pwd') || 'admin123';
+    }
+    return 'admin123';
+  });
+  const [isAdminAuthOpen, setIsAdminAuthOpen] = useState(false);
+  const [selectedJobForTools, setSelectedJobForTools] = useState(null);
+
+  // Active view: default to 'ctv-dashboard' or read from URL hash
+  const [activeView, setActiveView] = useState(() => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const hash = window.location.hash.replace('#', '');
+      const validViews = [
+        'ctv-dashboard', 'jobs', 'content-gen', 'group-finder',
+        'multiagent', 'archify', 'table', 'dashboard', 'kanban', 'analytics', 'urgent', 'clients', 'ctv', 'zalo'
+      ];
+      if (validViews.includes(hash)) {
+        return hash;
+      }
+    }
+    return 'ctv-dashboard';
+  });
+
+  const handleLoginAdminSuccess = (targetView = null) => {
+    setIsAdmin(true);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('fasthunt_is_admin', 'true');
+    }
+    if (activeView === 'ctv-dashboard' || targetView) {
+      setActiveView(targetView || 'dashboard');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdmin(false);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('fasthunt_is_admin', 'false');
+    }
+    setActiveView('ctv-dashboard');
+  };
+
+  const handleChangeAdminPassword = (newPwd) => {
+    setAdminPassword(newPwd);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('fasthunt_admin_pwd', newPwd);
+    }
+  };
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  // Synchronize hash with activeView
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.location.hash = activeView;
+    }
+  }, [activeView]);
 
 
   // Data state
@@ -259,6 +327,11 @@ export default function App() {
     setIsDetailOpen(true);
   }, []);
 
+  const handleOpenJobDetail = useCallback((job) => {
+    setSelectedJob(job);
+    setIsJobDetailOpen(true);
+  }, []);
+
   const handleOpenEmail = useCallback((candidate) => {
     setSelectedCandidate(candidate);
     setIsEmailOpen(true);
@@ -267,6 +340,19 @@ export default function App() {
   const handleExportCsv = useCallback(() => {
     exportCandidatesToCsv(filteredCandidates, 'danh_sach_ung_vien_tuyen_dung.csv');
   }, [filteredCandidates]);
+
+  const handleDownloadArchitectureMarkdown = useCallback(() => {
+    const markdownContent = `# 🏛️ FastHunt Recruitment Agent - Archify System Architecture & UML Specification\n\n> Version: 2.5.0\n> Status: Production-Ready & Verified\n\nXem toàn bộ mô hình C4, Sequence Flows, Database ERD, React Component UML và Candidate State Machine tại file ARCHIFY_SYSTEM_ARCHITECTURE.md.`;
+    const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'ARCHIFY_SYSTEM_ARCHITECTURE.md';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, []);
 
   const sheet2ViewUrl = getSheet2ViewUrl(config.sheet2Id);
   const jobSheetUrl = getJobSheetViewUrl(config.jobSheetId, config.jobSheetGid);
@@ -290,6 +376,9 @@ export default function App() {
         onOpenTemplates={() => setIsTemplateEditorOpen(true)}
         onExportCsv={handleExportCsv}
         onOpenUpdates={() => setIsUpdatesOpen(true)}
+        isAdmin={isAdmin}
+        onOpenAdminAuth={() => setIsAdminAuthOpen(true)}
+        onAdminLogout={handleAdminLogout}
       />
 
       {/* ── Main Layout Content Container (Zero margin on mobile, padded on desktop) ── */}
@@ -311,6 +400,7 @@ export default function App() {
           onOpenSettings={() => setIsSettingsOpen(true)}
           onOpenTemplates={() => setIsTemplateEditorOpen(true)}
           onExportCsv={handleExportCsv}
+          onOpenUpdates={() => setIsUpdatesOpen(true)}
           darkMode={darkMode}
           setDarkMode={setDarkMode}
           candidateCount={candidates.length}
@@ -318,6 +408,9 @@ export default function App() {
           setActiveView={setActiveView}
           urgentCount={globalMetrics.urgentCandidates.length}
           onOpenMobileMenu={() => setMobileDrawerOpen(true)}
+          isAdmin={isAdmin}
+          onOpenAdminAuth={() => setIsAdminAuthOpen(true)}
+          onAdminLogout={handleAdminLogout}
         />
 
         {/* ── Main Content Area (Optimized padding for phones and desktop) ── */}
@@ -337,8 +430,82 @@ export default function App() {
             </div>
           )}
 
+          {/* ── 0. Cổng Thông Tin & Dashboard Dành Cho CTV ── */}
+          {activeView === 'ctv-dashboard' && (
+            <CtvDashboardView
+              jobItems={jobItems}
+              onNavigateToJobs={() => setActiveView('jobs')}
+              onNavigateToContentGen={(job) => {
+                setSelectedJobForTools(job);
+                setActiveView('content-gen');
+              }}
+              onNavigateToGroupFinder={(job) => {
+                setSelectedJobForTools(job);
+                setActiveView('group-finder');
+              }}
+              onOpenJobDetail={(job) => {
+                setSelectedJob(job);
+                setIsJobDetailOpen(true);
+              }}
+            />
+          )}
+
+          {/* ── Trợ Lý Gen Content Tuyển Dụng Đa Kênh ── */}
+          {activeView === 'content-gen' && (
+            <RecruitmentContentGeneratorView
+              jobItems={jobItems}
+              selectedJobContext={selectedJobForTools}
+              onNavigateToGroupFinder={(job) => {
+                setSelectedJobForTools(job);
+                setActiveView('group-finder');
+              }}
+            />
+          )}
+
+          {/* ── Danh Bạ & Gợi Ý Group Tuyển Dụng ── */}
+          {activeView === 'group-finder' && (
+            <RecruitmentGroupsView
+              jobItems={jobItems}
+              selectedJobContext={selectedJobForTools}
+              onNavigateToContentGen={(job) => {
+                setSelectedJobForTools(job);
+                setActiveView('content-gen');
+              }}
+            />
+          )}
+
+          {/* ── Khóa Bảo Mật Cho Các Tính Năng Quản Trị Viên (Admin Lock Guard) ── */}
+          {['table', 'dashboard', 'kanban', 'analytics', 'urgent', 'clients', 'ctv', 'zalo', 'multiagent', 'archify'].includes(activeView) && !isAdmin && (
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-8 sm:p-12 text-center max-w-xl mx-auto shadow-xl space-y-4 animate-fade-in my-8">
+              <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto border border-blue-200 dark:border-blue-900/50">
+                <Lock className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+                Khu Vực Quản Trị Hệ Thống
+              </h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                Dữ liệu ứng viên, khách hàng và cấu hình CRM nội bộ được bảo mật bằng mật khẩu quản trị. Vui lòng đăng nhập để mở khóa.
+              </p>
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  onClick={() => setActiveView('ctv-dashboard')}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                >
+                  ← Quay Lại Cổng CTV
+                </button>
+                <button
+                  onClick={() => setIsAdminAuthOpen(true)}
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Unlock className="w-4 h-4" />
+                  <span>Đăng Nhập Quản Trị</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* ── 1. Candidate Management Table View (Trang Mặc Định theo Screenshot) ── */}
-          {activeView === 'table' && (
+          {activeView === 'table' && isAdmin && (
             <div className="space-y-4 animate-fade-in">
               <FilterBar
                 filters={filters}
@@ -359,13 +526,17 @@ export default function App() {
             </div>
           )}
 
-          {/* ── 2. Bảng Tin & Link Jobs Tuyển Dụng View ── */}
+          {/* ── 2. Bảng Tin & Link Jobs Tuyển Dụng View (Công khai cho cả CTV & Admin) ── */}
           {activeView === 'jobs' && (
             <JobsView
               jobItems={jobItems}
               candidates={candidates}
               jobSheetUrl={jobSheetUrl}
               onNavigateToCandidateJob={(jobTitle) => {
+                if (!isAdmin) {
+                  setIsAdminAuthOpen(true);
+                  return;
+                }
                 setFilters((prev) => ({ ...prev, position: jobTitle }));
                 setActiveView('table');
               }}
@@ -373,11 +544,19 @@ export default function App() {
                 setSelectedJob(job);
                 setIsJobDetailOpen(true);
               }}
+              onNavigateToContentGen={(job) => {
+                setSelectedJobForTools(job);
+                setActiveView('content-gen');
+              }}
+              onNavigateToGroupFinder={(job) => {
+                setSelectedJobForTools(job);
+                setActiveView('group-finder');
+              }}
             />
           )}
 
           {/* ── 3. Executive CRM Dashboard Overview ── */}
-          {activeView === 'dashboard' && (
+          {activeView === 'dashboard' && isAdmin && (
             <DashboardOverview
               candidates={candidates}
               metrics={globalMetrics}
@@ -392,7 +571,7 @@ export default function App() {
           )}
 
           {/* ── 4. Kanban Pipeline View ── */}
-          {activeView === 'kanban' && (
+          {activeView === 'kanban' && isAdmin && (
             <div className="animate-fade-in space-y-4">
               <KanbanBoard
                 candidates={filteredCandidates}
@@ -404,7 +583,7 @@ export default function App() {
           )}
 
           {/* ── 5. Analytics & Deep-dive Reporting View ── */}
-          {activeView === 'analytics' && (
+          {activeView === 'analytics' && isAdmin && (
             <div className="animate-fade-in space-y-6">
               <OverviewMetrics
                 metrics={metrics}
@@ -419,7 +598,7 @@ export default function App() {
           )}
 
           {/* ── 6. Urgent Action Queue View ── */}
-          {activeView === 'urgent' && (
+          {activeView === 'urgent' && isAdmin && (
             <div className="space-y-6 animate-fade-in">
               <UrgentAlertSection
                 urgentCandidates={globalMetrics.urgentCandidates}
@@ -439,7 +618,7 @@ export default function App() {
           )}
 
           {/* ── 7. Khách Hàng & Connect Jobs Portal View ── */}
-          {activeView === 'clients' && (
+          {activeView === 'clients' && isAdmin && (
             <ClientsView
               candidates={candidates}
               sheet2Items={sheet2Items}
@@ -453,9 +632,8 @@ export default function App() {
             />
           )}
 
-
           {/* ── 8. Quản Lý & Hỗ Trợ Mã CTV View ── */}
-          {activeView === 'ctv' && (
+          {activeView === 'ctv' && isAdmin && (
             <CtvManagementView
               ctvItems={ctvItems}
               candidates={candidates}
@@ -468,7 +646,7 @@ export default function App() {
           )}
 
           {/* ── 9. Trợ Lý Tuyển Dụng Zalo Cá Nhân (Nick Thường) ── */}
-          {activeView === 'zalo' && (
+          {activeView === 'zalo' && isAdmin && (
             <ZaloAssistantView
               jobItems={jobItems}
               candidates={candidates}
@@ -483,6 +661,28 @@ export default function App() {
                 setIsCvAnalysisOpen(true);
               }}
             />
+          )}
+
+          {/* ── 10. Multi-Agent Swarm Command Center View ── */}
+          {activeView === 'multiagent' && isAdmin && (
+            <MultiAgentHubView
+              candidates={candidates}
+              jobItems={jobItems}
+              ctvItems={ctvItems}
+              onOpenEmail={handleOpenEmail}
+              onOpenDetail={handleOpenDetail}
+              onOpenJobDetail={handleOpenJobDetail}
+              onOpenBroadcast={(job) => {
+                setBroadcastJob(job || jobItems[0]);
+                setIsBroadcastOpen(true);
+              }}
+              darkMode={darkMode}
+            />
+          )}
+
+          {/* ── 11. Archify System Architecture & UML Studio ── */}
+          {activeView === 'archify' && isAdmin && (
+            <ArchifyView onExportMarkdown={handleDownloadArchitectureMarkdown} />
           )}
         </main>
       </div>
@@ -558,6 +758,15 @@ export default function App() {
         />
       )}
 
+      {/* ── Admin Authentication Modal ── */}
+      <AdminAuthModal
+        isOpen={isAdminAuthOpen}
+        onClose={() => setIsAdminAuthOpen(false)}
+        onLoginSuccess={handleLoginAdminSuccess}
+        currentPassword={adminPassword}
+        onChangePassword={handleChangeAdminPassword}
+      />
+
       {/* ── CV Analysis Detail Modal ── */}
       {isCvAnalysisOpen && (
         <CvAnalysisDetailModal
@@ -594,6 +803,8 @@ export default function App() {
         onOpenTemplates={() => setIsTemplateEditorOpen(true)}
         onRefreshData={loadAllData}
         isRefreshing={isRefreshing}
+        isAdmin={isAdmin}
+        onOpenAdminAuth={() => setIsAdminAuthOpen(true)}
       />
 
       {/* ── Mobile Touch Component Selector Hub (Bộ chọn từng thành phần) ── */}
@@ -610,6 +821,9 @@ export default function App() {
         onExportCsv={handleExportCsv}
         onOpenUpdates={() => setIsUpdatesOpen(true)}
         onOpenAiBot={() => setIsAiBotOpen(true)}
+        isAdmin={isAdmin}
+        onOpenAdminAuth={() => setIsAdminAuthOpen(true)}
+        onAdminLogout={handleAdminLogout}
         jobSheetUrl={jobSheetUrl}
       />
 
@@ -628,8 +842,10 @@ export default function App() {
         setActiveView={setActiveView}
         candidateCount={candidates.length}
         urgentCount={globalMetrics.urgentCandidates.length}
+        jobCount={jobItems.length}
         onOpenMobileMenu={() => setMobileDrawerOpen(true)}
         onOpenComponentSelector={() => setIsComponentSelectorOpen(true)}
+        isAdmin={isAdmin}
       />
     </div>
   );

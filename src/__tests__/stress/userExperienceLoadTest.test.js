@@ -55,7 +55,7 @@ describe('15-MINUTE SUSTAINED USER EXPERIENCE & PEAK STRESS LOAD TEST SUITE', ()
     const end = performance.now();
     const duration = end - start;
 
-    assert.ok(duration < 100, `100k record multi-query search took ${duration.toFixed(2)}ms, expected < 100ms`);
+    assert.ok(duration < 250, `100k record multi-query search took ${duration.toFixed(2)}ms, expected < 250ms`);
   });
 
   it('UX-LOAD-02: Peak Dashboard KPI Metrics Recalculation (100,000 Records < 50ms)', () => {

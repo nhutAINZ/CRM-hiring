@@ -24,7 +24,12 @@ import {
   Sparkles,
   ArrowRight,
   ExternalLink,
-  CheckCircle2
+  CheckCircle2,
+  Layers,
+  Lock,
+  Unlock,
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
 
 export default function MobileComponentSelector({
@@ -40,6 +45,9 @@ export default function MobileComponentSelector({
   onExportCsv,
   onOpenUpdates,
   onOpenAiBot,
+  isAdmin = false,
+  onOpenAdminAuth = () => {},
+  onAdminLogout = () => {},
   jobSheetUrl
 }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,6 +59,18 @@ export default function MobileComponentSelector({
       badge: 'Core Workflow',
       badgeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300',
       items: [
+        {
+          id: 'multiagent',
+          title: 'Multi-Agent Swarm Hub',
+          subtitle: 'Điều hành 5 AI Agents tự động: Lọc CV, Tranh biện & SLA Kaizen',
+          icon: Bot,
+          iconColor: 'text-violet-600 dark:text-violet-400',
+          bgColor: 'bg-violet-50 dark:bg-violet-950/50',
+          borderColor: 'border-violet-200 dark:border-violet-800/60',
+          stat: 'AI 6x Swarm',
+          statColor: 'text-violet-600 font-bold',
+          type: 'view'
+        },
         {
           id: 'table',
           title: 'Quản Lý Ứng Viên',
@@ -254,6 +274,37 @@ export default function MobileComponentSelector({
           action: () => {
             if (onOpenUpdates) onOpenUpdates();
           }
+        },
+        {
+          id: 'action-auth',
+          title: isAdmin ? 'Đăng Xuất Quản Trị' : 'Đăng Nhập Quản Trị',
+          subtitle: isAdmin ? 'Rời khỏi quyền Admin, quay lại chế độ CTV' : 'Mở khóa bảng ứng viên nội bộ, Kanban & CRM',
+          icon: isAdmin ? LogOut : ShieldCheck,
+          iconColor: isAdmin ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400',
+          bgColor: isAdmin ? 'bg-rose-50 dark:bg-rose-950/50' : 'bg-emerald-50 dark:bg-emerald-950/50',
+          borderColor: isAdmin ? 'border-rose-200 dark:border-rose-800/60' : 'border-emerald-200 dark:border-emerald-800/60',
+          stat: isAdmin ? 'Chế độ Admin' : 'Chế độ CTV',
+          statColor: isAdmin ? 'text-emerald-600 font-bold' : 'text-blue-600 font-bold',
+          type: 'action',
+          action: () => {
+            if (isAdmin) {
+              onAdminLogout();
+            } else {
+              onOpenAdminAuth();
+            }
+          }
+        },
+        {
+          id: 'archify',
+          title: 'Archify (Kiến Trúc & UML)',
+          subtitle: 'Mô hình C4, cây Component React 19, Sequence flows & ERD',
+          icon: Layers,
+          iconColor: 'text-indigo-600 dark:text-indigo-400',
+          bgColor: 'bg-indigo-50 dark:bg-indigo-950/50',
+          borderColor: 'border-indigo-200 dark:border-indigo-800/60',
+          stat: 'UML Studio',
+          statColor: 'text-indigo-600 font-bold',
+          type: 'view'
         }
       ]
     }
@@ -265,7 +316,10 @@ export default function MobileComponentSelector({
     onOpenTemplates,
     onExportCsv,
     onOpenUpdates,
-    onOpenAiBot
+    onOpenAiBot,
+    isAdmin,
+    onOpenAdminAuth,
+    onAdminLogout
   ]);
 
   // Filter sections based on search query

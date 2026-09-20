@@ -349,6 +349,18 @@ Link CV: ${candidate.cvUrl || 'Không có'}`;
                 <span>Xem CV Gốc</span>
               </a>
             )}
+
+            <a
+              href="#multiagent"
+              onClick={() => {
+                onClose();
+              }}
+              className="btn-shiny flex items-center gap-1 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-500/30 text-xs font-semibold text-violet-600 dark:text-violet-400 hover:bg-violet-100 cursor-pointer"
+              title="Đưa vào Multi-Agent Swarm để tranh biện đánh giá"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Multi-Agent Swarm</span>
+            </a>
           </div>
 
           <button

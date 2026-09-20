@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
+  Zap,
   Briefcase,
   Building,
   MapPin,
@@ -35,7 +36,9 @@ export default function JobsView({
   candidates = [],
   jobSheetUrl = 'https://docs.google.com/spreadsheets/d/1PJUSclHhVYLvoYTzmwkwpzsRfPOqODs0RDrvhW99Uko/edit?gid=0#gid=0',
   onNavigateToCandidateJob,
-  onOpenJobDetail
+  onOpenJobDetail,
+  onNavigateToContentGen,
+  onNavigateToGroupFinder
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
@@ -596,6 +599,29 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
 
                 {/* Card Bottom Actions */}
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
+                  {/* Quick AI & Channels Tools for CTV */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {onNavigateToContentGen && (
+                      <button
+                        onClick={() => onNavigateToContentGen(job)}
+                        className="flex items-center justify-center gap-1.5 py-2 px-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                        title="Tạo bài đăng tuyển dụng đa kênh cho job này"
+                      >
+                        <Zap className="w-3.5 h-3.5 text-amber-300" />
+                        <span>Gen Content</span>
+                      </button>
+                    )}
+                    {onNavigateToGroupFinder && (
+                      <button
+                        onClick={() => onNavigateToGroupFinder(job)}
+                        className="flex items-center justify-center gap-1.5 py-2 px-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
+                        title="Tìm Group Facebook/Zalo phù hợp để đăng tin"
+                      >
+                        <Share2 className="w-3.5 h-3.5 text-indigo-500" />
+                        <span>Tìm Group</span>
+                      </button>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                     {/* Copy Job Share Pitch */}
                     <button

@@ -23,7 +23,15 @@ import {
   X,
   Sparkles,
   Settings,
-  Download
+  Download,
+  Layers,
+  Zap,
+  Share2,
+  Lock,
+  Unlock,
+  ShieldCheck,
+  LogOut,
+  Bot
 } from 'lucide-react';
 
 export default function Sidebar({
@@ -41,12 +49,16 @@ export default function Sidebar({
   onOpenSettings,
   onOpenTemplates,
   onExportCsv,
-  onOpenUpdates
+  onOpenUpdates,
+  isAdmin = false,
+  onOpenAdminAuth = () => {},
+  onAdminLogout = () => {}
 }) {
   const [expandedMenus, setExpandedMenus] = useState({
     ungVien: true,
     khachHang: false,
-    tienIch: true
+    tienIch: true,
+    ctvTools: true
   });
 
   const toggleMenu = (key) => {
@@ -62,7 +74,7 @@ export default function Sidebar({
 
   return (
     <>
-      {/* ── Mobile Backdrop Overlay (Visible only on mobile when drawer is open) ── */}
+      {/* ── Mobile Backdrop Overlay ── */}
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
@@ -73,17 +85,15 @@ export default function Sidebar({
       {/* ── Main Sidebar / Mobile Drawer Container ── */}
       <aside
         className={`fixed top-0 left-0 z-50 h-screen bg-white dark:bg-[#090d16] border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out flex flex-col ${
-          /* Mobile Drawer Translation */
           mobileOpen ? 'translate-x-0 shadow-2xl w-72' : '-translate-x-full md:translate-x-0'
         } ${
-          /* Desktop Width */
           collapsed ? 'md:w-20' : 'md:w-64'
         }`}
       >
         {/* ── 1. Top Logo Header ── */}
         <div className="p-3 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
           <div
-            onClick={() => handleNavClick('table')}
+            onClick={() => handleNavClick(isAdmin ? 'dashboard' : 'ctv-dashboard')}
             className="flex items-center gap-2.5 cursor-pointer group"
           >
             {/* FastHunt Logo Badge */}
@@ -101,17 +111,17 @@ export default function Sidebar({
                     Fast<span className="text-blue-600 dark:text-blue-500">Hunt</span>
                   </span>
                   <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50">
-                    Reco
+                    {isAdmin ? 'Admin' : 'CTV'}
                   </span>
                 </div>
                 <span className="text-[10px] font-medium text-slate-400 tracking-wide uppercase">
-                  Recruitment Suite
+                  {isAdmin ? 'Recruitment CRM' : 'Partner Portal'}
                 </span>
               </div>
             )}
           </div>
 
-          {/* Mobile Close Button (Visible on mobile) */}
+          {/* Mobile Close Button */}
           <div className="flex items-center gap-1">
             <button
               onClick={() => setMobileOpen(false)}
@@ -119,344 +129,332 @@ export default function Sidebar({
             >
               <X className="w-5 h-5" />
             </button>
-
-            {/* Desktop Quick Header Badges */}
-            {(!collapsed && !mobileOpen) && (
-              <div className="hidden md:flex items-center gap-1">
-                <button
-                  onClick={onOpenUpdates}
-                  className="relative p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer transition-colors"
-                  title="Cập nhật mới"
-                >
-                  <Bell className="w-4 h-4" />
-                  <span className="absolute -top-1 -right-1 px-1 rounded-full text-[9px] font-bold bg-blue-600 text-white min-w-[16px] text-center shadow-xs">
-                    99+
-                  </span>
-                </button>
-                <button
-                  onClick={onOpenTemplates}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer transition-colors"
-                  title="Mẫu Thư Tuyển Dụng"
-                >
-                  <FileText className="w-4 h-4" />
-                </button>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* ── 2. User Profile Card ── */}
+        {/* ── 2. User Status Card ── */}
         <div className="p-3 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0 shadow-xs">
-                HN
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0 shadow-xs ${
+                isAdmin
+                  ? 'bg-gradient-to-br from-emerald-500 to-teal-700'
+                  : 'bg-gradient-to-br from-blue-500 to-indigo-600'
+              }`}>
+                {isAdmin ? 'AD' : 'CTV'}
               </div>
               {(!collapsed || mobileOpen) && (
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                    Huỳnh Minh Nhựt
+                    {isAdmin ? 'Quản Trị Viên' : 'Cộng Tác Viên'}
                   </p>
-                  <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                    CTV Recruitment
+                  <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <span className={`w-1.5 h-1.5 rounded-full ${isAdmin ? 'bg-emerald-500' : 'bg-blue-500'}`} />
+                    <span>{isAdmin ? 'Toàn quyền hệ thống' : 'Xem job & giới thiệu CV'}</span>
                   </p>
                 </div>
               )}
             </div>
-            {(!collapsed || mobileOpen) && (
-              <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 cursor-pointer" />
-            )}
           </div>
         </div>
 
         {/* ── 3. Navigation Links List ── */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin">
-          {/* Vị trí ứng tuyển (Main Active View) */}
-          <button
-            onClick={() => handleNavClick('table')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-              activeView === 'table'
-                ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/50 shadow-2xs font-bold'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Briefcase className="w-4 h-4 flex-shrink-0" />
-              {(!collapsed || mobileOpen) && <span>Vị trí ứng tuyển</span>}
-            </div>
-            {(!collapsed || mobileOpen) && candidateCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-300">
-                {candidateCount}
-              </span>
-            )}
-          </button>
-
-          {/* Bảng Tin & Link Jobs */}
-          <button
-            onClick={() => handleNavClick('jobs')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-              activeView === 'jobs'
-                ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/50 shadow-2xs font-bold'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
-              {(!collapsed || mobileOpen) && <span>Bảng Tin & Link Jobs</span>}
-            </div>
+        <div className="flex-1 overflow-y-auto p-2 space-y-1.5 scrollbar-thin">
+          {/* ===================== CTV TOOLS SECTION (AVAILABLE TO EVERYONE) ===================== */}
+          <div className="pb-1">
             {(!collapsed || mobileOpen) && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-300">
-                {jobCount > 0 ? `${jobCount} Jobs` : 'Hot'}
-              </span>
+              <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Dành Cho CTV
+              </div>
             )}
-          </button>
 
-          {/* Ứng viên (Expandable) */}
-          <div>
+            {/* CTV Dashboard */}
             <button
-              onClick={() => {
-                toggleMenu('ungVien');
-                if (collapsed && !mobileOpen) setCollapsed(false);
-              }}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+              onClick={() => handleNavClick('ctv-dashboard')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                activeView === 'ctv-dashboard'
+                  ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/50 shadow-2xs font-bold'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+              }`}
             >
               <div className="flex items-center gap-2.5">
-                <Users className="w-4 h-4 text-slate-500" />
-                {(!collapsed || mobileOpen) && <span>Ứng viên</span>}
+                <LayoutDashboard className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                {(!collapsed || mobileOpen) && <span>Cổng Thông Tin CTV</span>}
               </div>
               {(!collapsed || mobileOpen) && (
-                expandedMenus.ungVien ? (
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                ) : (
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                )
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-300">
+                  HOT
+                </span>
               )}
             </button>
 
-            {(!collapsed || mobileOpen) && expandedMenus.ungVien && (
-              <div className="ml-7 my-1 pl-2 border-l border-slate-200 dark:border-slate-800 space-y-1">
+            {/* Việc làm đang tuyển (Jobs) */}
+            <button
+              onClick={() => handleNavClick('jobs')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                activeView === 'jobs'
+                  ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/50 shadow-2xs font-bold'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Briefcase className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                {(!collapsed || mobileOpen) && <span>Việc Làm Đang Tuyển</span>}
+              </div>
+              {(!collapsed || mobileOpen) && jobCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-300">
+                  {jobCount} Jobs
+                </span>
+              )}
+            </button>
+
+            {/* Gen Content Tuyển Dụng */}
+            <button
+              onClick={() => handleNavClick('content-gen')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                activeView === 'content-gen'
+                  ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 border border-violet-200/80 dark:border-violet-800/50 shadow-2xs font-bold'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Zap className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                {(!collapsed || mobileOpen) && <span>Tạo Bài Tuyển Dụng</span>}
+              </div>
+              {(!collapsed || mobileOpen) && (
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50">
+                  AI
+                </span>
+              )}
+            </button>
+
+            {/* Tìm Group Đăng Tin */}
+            <button
+              onClick={() => handleNavClick('group-finder')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                activeView === 'group-finder'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 shadow-2xs font-bold'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                {(!collapsed || mobileOpen) && <span>Tìm Group Đăng Tin</span>}
+              </div>
+            </button>
+          </div>
+
+          {/* ===================== ADMIN SECTION (ONLY WHEN LOGGED IN AS ADMIN) ===================== */}
+          {isAdmin ? (
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1">
+              {(!collapsed || mobileOpen) && (
+                <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                  <span>Khu Vực Quản Trị</span>
+                  <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                </div>
+              )}
+
+              {/* Dashboard Tổng Quan */}
+              <button
+                onClick={() => handleNavClick('dashboard')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                  activeView === 'dashboard'
+                    ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/50 font-bold'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
+                  {(!collapsed || mobileOpen) && <span>Dashboard CRM</span>}
+                </div>
+              </button>
+
+              {/* Multi-Agent Swarm Hub */}
+              <button
+                onClick={() => handleNavClick('multiagent')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                  activeView === 'multiagent'
+                    ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold shadow-md shadow-indigo-500/25'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Bot className="w-4 h-4 flex-shrink-0 text-amber-300" />
+                  {(!collapsed || mobileOpen) && <span>Multi-Agent Swarm</span>}
+                </div>
+                {(!collapsed || mobileOpen) && (
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-white/20 text-white">
+                    6x AI
+                  </span>
+                )}
+              </button>
+
+              {/* Ứng viên (Expandable) */}
+              <div>
                 <button
-                  onClick={() => handleNavClick('table')}
-                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-                    activeView === 'table'
-                      ? 'text-blue-600 font-bold dark:text-blue-400'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
+                  onClick={() => {
+                    toggleMenu('ungVien');
+                    if (collapsed && !mobileOpen) setCollapsed(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
                 >
-                  Tất cả hồ sơ
-                </button>
-                <button
-                  onClick={() => handleNavClick('kanban')}
-                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-                    activeView === 'kanban'
-                      ? 'text-blue-600 font-bold dark:text-blue-400'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  Kanban Pipeline
-                </button>
-                <button
-                  onClick={() => handleNavClick('urgent')}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-                    activeView === 'urgent'
-                      ? 'text-blue-600 font-bold dark:text-blue-400'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  <span>Hồ sơ gấp</span>
-                  {urgentCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-rose-500 text-white font-bold">
-                      {urgentCount}
-                    </span>
+                  <div className="flex items-center gap-2.5">
+                    <Users className="w-4 h-4 text-slate-500" />
+                    {(!collapsed || mobileOpen) && <span>Quản Lý Ứng Viên</span>}
+                  </div>
+                  {(!collapsed || mobileOpen) && (
+                    <div className="flex items-center gap-1.5">
+                      {candidateCount > 0 && (
+                        <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                          {candidateCount}
+                        </span>
+                      )}
+                      {expandedMenus.ungVien ? (
+                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                      ) : (
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                      )}
+                    </div>
                   )}
                 </button>
-              </div>
-            )}
-          </div>
 
-          {/* Khách hàng & Jobs */}
-          <button
-            onClick={() => handleNavClick('clients')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
-              activeView === 'clients'
-                ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 font-bold border border-blue-200/80 dark:border-blue-800/50'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Building className="w-4 h-4 text-slate-500" />
-              {(!collapsed || mobileOpen) && <span>Khách hàng & Jobs</span>}
+                {expandedMenus.ungVien && (!collapsed || mobileOpen) && (
+                  <div className="pl-7 pr-1 py-1 space-y-1 animate-fade-in">
+                    <button
+                      onClick={() => handleNavClick('table')}
+                      className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer ${
+                        activeView === 'table'
+                          ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 font-bold'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Bảng dữ liệu ứng viên
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('kanban')}
+                      className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer ${
+                        activeView === 'kanban'
+                          ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 font-bold'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Kanban Pipeline
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('urgent')}
+                      className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer ${
+                        activeView === 'urgent'
+                          ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/40 font-bold'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <span>Hồ sơ cần gấp</span>
+                      {urgentCount > 0 && (
+                        <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-rose-500 text-white">
+                          {urgentCount}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Khách Hàng / Clients */}
+              <button
+                onClick={() => handleNavClick('clients')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                  activeView === 'clients'
+                    ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/50 font-bold'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Building className="w-4 h-4 flex-shrink-0" />
+                  {(!collapsed || mobileOpen) && <span>Khách Hàng & CRM</span>}
+                </div>
+              </button>
+
+              {/* Quản Lý Mã CTV */}
+              <button
+                onClick={() => handleNavClick('ctv')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                  activeView === 'ctv'
+                    ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/50 font-bold'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Gift className="w-4 h-4 flex-shrink-0" />
+                  {(!collapsed || mobileOpen) && <span>Quản Lý CTV</span>}
+                </div>
+              </button>
+
+              {/* Archify UML */}
+              <button
+                onClick={() => handleNavClick('archify')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                  activeView === 'archify'
+                    ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/50 font-bold'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Layers className="w-4 h-4 flex-shrink-0" />
+                  {(!collapsed || mobileOpen) && <span>Kiến Trúc Archify</span>}
+                </div>
+              </button>
             </div>
-            {(!collapsed || mobileOpen) && (
-              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-600 text-white">
-                Intergreat
-              </span>
-            )}
-          </button>
-
-          {/* Trợ lý Zalo Cá Nhân (Nick Thường) */}
-          <button
-            onClick={() => handleNavClick('zalo')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
-              activeView === 'zalo'
-                ? 'bg-sky-50 text-sky-600 dark:bg-sky-950/50 dark:text-sky-400 font-bold border border-sky-200/80 dark:border-sky-800/50'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <MessageCircle className="w-4 h-4 text-sky-500" />
-              {(!collapsed || mobileOpen) && <span>Trợ lý Zalo Cá Nhân</span>}
-            </div>
-            {(!collapsed || mobileOpen) && (
-              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-sky-100 dark:bg-sky-900/60 text-sky-600 dark:text-sky-300">
-                Nick Thường
-              </span>
-            )}
-          </button>
-
-          {/* Tiện ích (Expandable) */}
-          <div>
-            <button
-              onClick={() => {
-                toggleMenu('tienIch');
-                if (collapsed && !mobileOpen) setCollapsed(false);
-              }}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-2.5">
-                <Wrench className="w-4 h-4 text-slate-500" />
-                {(!collapsed || mobileOpen) && <span>Tiện ích</span>}
-              </div>
-              {(!collapsed || mobileOpen) && (
-                expandedMenus.tienIch ? (
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                ) : (
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                )
-              )}
-            </button>
-
-            {(!collapsed || mobileOpen) && expandedMenus.tienIch && (
-              <div className="ml-7 my-1 pl-2 border-l border-slate-200 dark:border-slate-800 space-y-1">
-                {/* Cấu hình Google Sheet */}
+          ) : (
+            /* ===================== NOT LOGGED IN CALLOUT ===================== */
+            (!collapsed || mobileOpen) && (
+              <div className="mt-4 p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50/70 dark:from-slate-800/60 dark:to-slate-900 border border-blue-200/60 dark:border-slate-800 space-y-2.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-white">
+                  <Lock className="w-4 h-4 text-blue-600" />
+                  <span>Khu Vực Quản Trị Viên</span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Đăng nhập để mở khóa bảng ứng viên nội bộ, Kanban pipeline, và cài đặt CRM.
+                </p>
                 <button
-                  onClick={() => {
-                    onOpenSettings();
-                    if (setMobileOpen) setMobileOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors text-left cursor-pointer"
+                  onClick={onOpenAdminAuth}
+                  className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Settings className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                  <span>Cấu hình Google Sheet</span>
-                </button>
-
-                {/* Mẫu Email & Thư */}
-                <button
-                  onClick={() => {
-                    onOpenTemplates();
-                    if (setMobileOpen) setMobileOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-left cursor-pointer"
-                >
-                  <FileText className="w-3.5 h-3.5 text-indigo-500" />
-                  <span>Mẫu Email & Thư</span>
-                </button>
-
-                {/* Xuất Excel / CSV */}
-                <button
-                  onClick={() => {
-                    onExportCsv();
-                    if (setMobileOpen) setMobileOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-left cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Xuất file Excel / CSV</span>
+                  <Unlock className="w-3.5 h-3.5" />
+                  <span>Đăng Nhập Quản Trị</span>
                 </button>
               </div>
-            )}
-          </div>
-
-          <div className="my-2 border-t border-slate-100 dark:border-slate-800/80" />
-
-          {/* Dashboard Overview */}
-          <button
-            onClick={() => handleNavClick('dashboard')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-              activeView === 'dashboard'
-                ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 font-bold'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-            }`}
-          >
-            <LayoutDashboard className="w-4 h-4" />
-            {(!collapsed || mobileOpen) && <span>Dashboard Tổng quan</span>}
-          </button>
-
-          {/* Báo cáo & Phân tích */}
-          <button
-            onClick={() => handleNavClick('analytics')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-              activeView === 'analytics'
-                ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 font-bold'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-            }`}
-          >
-            <BarChart3 className="w-4 h-4" />
-            {(!collapsed || mobileOpen) && <span>Báo cáo & Phân tích</span>}
-          </button>
-
-          {/* Cập nhật các thay đổi mới */}
-          <button
-            onClick={() => {
-              onOpenUpdates();
-              if (setMobileOpen) setMobileOpen(false);
-            }}
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
-          >
-            <Bell className="w-4 h-4 text-blue-600 animate-pulse" />
-            {(!collapsed || mobileOpen) && <span>Cập nhật các thay đổi mới</span>}
-          </button>
-
-          {/* Quản lý bonus & Mã CTV */}
-          <button
-            onClick={() => handleNavClick('ctv')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-              activeView === 'ctv'
-                ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 font-bold border border-blue-200/80 dark:border-blue-800/50'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-            }`}
-          >
-            <Gift className="w-4 h-4 text-blue-600" />
-            {(!collapsed || mobileOpen) && <span>Quản lý bonus & Mã CTV</span>}
-          </button>
+            )
+          )}
         </div>
 
-        {/* ── 4. Sidebar Footer ── */}
-        {(!collapsed || mobileOpen) && (
-          <div className="p-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/60 space-y-2">
-            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 text-center space-y-1.5">
-              <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200">
-                FastHunt hỗ trợ CTV & Link Job
-              </p>
-              <a
-                href={jobSheetUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-1.5 w-full py-1.5 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs"
-              >
-                <span>⭐ Bảng Link Job (Sheet)</span>
-              </a>
-              <a
-                href="https://docs.google.com/spreadsheets/d/11g-mvcukMTE0Bdjek5kIgbI_8WuxZshTlS0eCGw60Wk/edit?gid=497830992#gid=497830992"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-1.5 w-full py-1 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all shadow-xs"
-              >
-                <span>🔗 Bảng Mã CTV (Sheet)</span>
-              </a>
-            </div>
-          </div>
-        )}
+        {/* ── 4. Bottom Footer Actions ── */}
+        <div className="p-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 space-y-2">
+          {isAdmin ? (
+            <button
+              onClick={onAdminLogout}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 hover:bg-rose-100 text-xs font-bold border border-rose-200/60 dark:border-rose-900/50 transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              {(!collapsed || mobileOpen) && <span>Đăng Xuất Quản Trị</span>}
+            </button>
+          ) : (
+            <button
+              onClick={onOpenAdminAuth}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              {(!collapsed || mobileOpen) && <span>Đăng Nhập Quản Trị</span>}
+            </button>
+          )}
+
+          {/* Desktop Collapse / Expand Toggle Button */}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="w-full hidden md:flex items-center justify-center py-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-medium cursor-pointer"
+          >
+            {collapsed ? '→ Mở rộng' : '← Thu gọn'}
+          </button>
+        </div>
       </aside>
     </>
   );

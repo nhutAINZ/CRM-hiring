@@ -22,7 +22,12 @@ import {
   Sparkles,
   RefreshCw,
   SlidersHorizontal,
-  FileText
+  FileText,
+  Layers,
+  Zap,
+  Share2,
+  ShieldCheck,
+  Lock
 } from 'lucide-react';
 
 export default function MobileVerticalTaskbar({
@@ -36,7 +41,9 @@ export default function MobileVerticalTaskbar({
   onOpenSettings,
   onOpenTemplates,
   onRefreshData,
-  isRefreshing = false
+  isRefreshing = false,
+  isAdmin = false,
+  onOpenAdminAuth = () => {}
 }) {
   // State for vertical taskbar mode
   // 'mini': small floating pill; 'expanded': full vertical bar with labels; 'collapsed': compact icon bar
@@ -45,7 +52,51 @@ export default function MobileVerticalTaskbar({
   const [dockPosition, setDockPosition] = useState('right'); // 'right' | 'left'
 
   // Primary task items in the vertical rail
-  const primaryTasks = [
+  const ctvPrimaryTasks = [
+    {
+      id: 'ctv-dashboard',
+      label: 'Cổng CTV',
+      short: 'CTV',
+      icon: LayoutDashboard,
+      badge: 'Hot',
+      badgeColor: 'bg-blue-600 text-white',
+      color: 'from-blue-600 to-indigo-600'
+    },
+    {
+      id: 'jobs',
+      label: 'Việc Làm',
+      short: 'Job',
+      icon: Briefcase,
+      badge: jobCount > 0 ? String(jobCount) : 'Hot',
+      badgeColor: 'bg-indigo-600 text-white',
+      color: 'from-indigo-600 to-purple-600'
+    },
+    {
+      id: 'content-gen',
+      label: 'Gen Tin AI',
+      short: 'AI',
+      icon: Zap,
+      badge: 'New',
+      badgeColor: 'bg-amber-500 text-white',
+      color: 'from-amber-500 to-orange-500'
+    },
+    {
+      id: 'group-finder',
+      label: 'Tìm Group',
+      short: 'Grp',
+      icon: Share2,
+      color: 'from-emerald-600 to-teal-600'
+    }
+  ];
+
+  const adminPrimaryTasks = [
+    {
+      id: 'dashboard',
+      label: 'Dashboard',
+      short: 'Dash',
+      icon: LayoutDashboard,
+      color: 'from-emerald-600 to-teal-600'
+    },
     {
       id: 'table',
       label: 'Ứng viên',
@@ -65,27 +116,11 @@ export default function MobileVerticalTaskbar({
       color: 'from-indigo-600 to-purple-600'
     },
     {
-      id: 'zalo',
-      label: 'Zalo Nick',
-      short: 'Zalo',
-      icon: MessageCircle,
-      badge: 'Free',
-      badgeColor: 'bg-sky-500 text-white',
-      color: 'from-sky-500 to-blue-600'
-    },
-    {
       id: 'kanban',
       label: 'Kanban',
       short: 'KB',
       icon: Kanban,
       color: 'from-cyan-600 to-blue-600'
-    },
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      short: 'Dash',
-      icon: LayoutDashboard,
-      color: 'from-emerald-600 to-teal-600'
     },
     {
       id: 'urgent',
@@ -95,6 +130,15 @@ export default function MobileVerticalTaskbar({
       badge: urgentCount > 0 ? urgentCount : null,
       badgeColor: 'bg-rose-500 text-white animate-pulse',
       color: 'from-rose-500 to-amber-500'
+    },
+    {
+      id: 'zalo',
+      label: 'Zalo Nick',
+      short: 'Zalo',
+      icon: MessageCircle,
+      badge: 'Free',
+      badgeColor: 'bg-sky-500 text-white',
+      color: 'from-sky-500 to-blue-600'
     },
     {
       id: 'clients',
@@ -116,8 +160,17 @@ export default function MobileVerticalTaskbar({
       short: 'CTV',
       icon: Gift,
       color: 'from-amber-500 to-orange-500'
+    },
+    {
+      id: 'archify',
+      label: 'Archify',
+      short: 'UML',
+      icon: Layers,
+      color: 'from-blue-600 to-indigo-600'
     }
   ];
+
+  const primaryTasks = isAdmin ? adminPrimaryTasks : ctvPrimaryTasks;
 
   // Current active task info for mini pill
   const activeTask = primaryTasks.find((t) => t.id === activeView) || primaryTasks[0];
