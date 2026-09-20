@@ -17,7 +17,7 @@ export default function AdminAuthModal({
   isOpen,
   onClose,
   onLoginSuccess,
-  currentPassword = 'admin123',
+  currentPassword = 'nhut2206',
   onChangePassword
 }) {
   const [inputPassword, setInputPassword] = useState('');
@@ -34,15 +34,15 @@ export default function AdminAuthModal({
   const handleLogin = (e) => {
     if (e && e.preventDefault) e.preventDefault();
     const cleanInput = (inputPassword || '').trim();
-    const cleanCurrent = (currentPassword || 'admin123').trim();
+    const cleanCurrent = (currentPassword || 'nhut2206').trim();
 
     if (!cleanInput) {
       setErrorMsg('Vui lòng nhập mật khẩu quản trị');
       return;
     }
 
-    // Accept matching current password, master key 'admin123', or 'admin'
-    if (cleanInput === cleanCurrent || cleanInput === 'admin123' || cleanInput === 'admin') {
+    // Accept matching current password or master key 'nhut2206'
+    if (cleanInput === cleanCurrent || cleanInput === 'nhut2206') {
       setErrorMsg('');
       setChangeSuccess(true);
       try {
@@ -61,15 +61,15 @@ export default function AdminAuthModal({
         if (onClose) onClose();
       }, 400);
     } else {
-      setErrorMsg('Mật khẩu không chính xác! Vui lòng thử lại hoặc bấm khôi phục mặc định.');
+      setErrorMsg('Mật khẩu không chính xác! Vui lòng thử lại.');
     }
   };
 
   const handleResetToDefault = () => {
     if (onChangePassword) {
-      onChangePassword('admin123');
+      onChangePassword('nhut2206');
     }
-    setInputPassword('admin123');
+    setInputPassword('nhut2206');
     setErrorMsg('');
     setChangeSuccess(true);
     setTimeout(() => {
@@ -80,11 +80,11 @@ export default function AdminAuthModal({
   const handleChangePasswordSubmit = (e) => {
     e.preventDefault();
     const cleanOld = (oldPwd || '').trim();
-    const cleanCurrent = (currentPassword || 'admin123').trim();
+    const cleanCurrent = (currentPassword || 'nhut2206').trim();
     const cleanNew = (newPwd || '').trim();
     const cleanConfirm = (confirmPwd || '').trim();
 
-    if (cleanOld !== cleanCurrent && cleanOld !== 'admin123' && cleanOld !== 'admin') {
+    if (cleanOld !== cleanCurrent && cleanOld !== 'nhut2206') {
       setErrorMsg('Mật khẩu cũ không đúng');
       return;
     }
@@ -145,20 +145,11 @@ export default function AdminAuthModal({
             </p>
           </div>
 
-          {/* Error Message with Reset Helper */}
+          {/* Error Message */}
           {errorMsg && (
-            <div className="mb-5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-400 text-sm font-medium animate-shake">
-              <div className="flex items-center gap-2.5">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-              <button
-                type="button"
-                onClick={handleResetToDefault}
-                className="mt-2 text-xs text-rose-700 dark:text-rose-300 underline font-bold hover:text-rose-800"
-              >
-                👉 Khôi phục mật khẩu mặc định (admin123)
-              </button>
+            <div className="mb-5 flex items-center gap-2.5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-400 text-sm font-medium animate-shake">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{errorMsg}</span>
             </div>
           )}
 
@@ -200,17 +191,14 @@ export default function AdminAuthModal({
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <div className="flex items-center justify-between mt-2 text-xs">
-                  <span className="text-slate-400">
-                    Mặc định: <button type="button" onClick={() => { setInputPassword('admin123'); setErrorMsg(''); }} className="bg-slate-100 hover:bg-blue-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-blue-600 dark:text-blue-400 font-mono font-bold cursor-pointer">admin123</button>
-                  </span>
+                <div className="flex items-center justify-end mt-2 text-xs">
                   <button
                     type="button"
                     onClick={() => {
                       setIsChangingPwd(true);
                       setErrorMsg('');
                     }}
-                    className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                    className="text-blue-600 dark:text-blue-400 hover:underline font-medium cursor-pointer"
                   >
                     Đổi mật khẩu
                   </button>

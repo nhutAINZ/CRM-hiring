@@ -4,9 +4,9 @@ import assert from 'node:assert';
 describe('Admin Authentication & Security Guard Unit Tests', () => {
   const validateAdminPassword = (input, currentPassword) => {
     const cleanInput = (input || '').trim();
-    const cleanCurrent = (currentPassword || 'admin123').trim();
+    const cleanCurrent = (currentPassword || 'nhut2206').trim();
     if (!cleanInput) return false;
-    return cleanInput === cleanCurrent || cleanInput === 'admin123' || cleanInput === 'admin';
+    return cleanInput === cleanCurrent || cleanInput === 'nhut2206';
   };
 
   it('should allow login with matching custom password', () => {
@@ -14,19 +14,18 @@ describe('Admin Authentication & Security Guard Unit Tests', () => {
   });
 
   it('should allow login with whitespace trimmed', () => {
-    assert.strictEqual(validateAdminPassword('  admin123  ', 'admin123'), true);
+    assert.strictEqual(validateAdminPassword('  nhut2206  ', 'nhut2206'), true);
     assert.strictEqual(validateAdminPassword(' customPass ', 'customPass'), true);
   });
 
-  it('should accept default fallback keys admin123 and admin', () => {
-    assert.strictEqual(validateAdminPassword('admin123', 'different_saved_pwd'), true);
-    assert.strictEqual(validateAdminPassword('admin', 'different_saved_pwd'), true);
+  it('should accept default fallback key nhut2206', () => {
+    assert.strictEqual(validateAdminPassword('nhut2206', 'different_saved_pwd'), true);
   });
 
   it('should reject invalid passwords and empty string', () => {
-    assert.strictEqual(validateAdminPassword('wrongPass', 'custom123'), false);
-    assert.strictEqual(validateAdminPassword('', 'admin123'), false);
-    assert.strictEqual(validateAdminPassword('   ', 'admin123'), false);
+    assert.strictEqual(validateAdminPassword('wrongPass', 'nhut2206'), false);
+    assert.strictEqual(validateAdminPassword('', 'nhut2206'), false);
+    assert.strictEqual(validateAdminPassword('   ', 'nhut2206'), false);
   });
 
   it('should verify admin-only views require isAdmin true', () => {

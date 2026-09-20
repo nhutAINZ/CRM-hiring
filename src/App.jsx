@@ -75,9 +75,11 @@ export default function App() {
   });
   const [adminPassword, setAdminPassword] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('fasthunt_admin_pwd') || 'admin123';
+      const stored = localStorage.getItem('fasthunt_admin_pwd');
+      if (stored && stored !== 'admin123') return stored;
+      return 'nhut2206';
     }
-    return 'admin123';
+    return 'nhut2206';
   });
   const [isAdminAuthOpen, setIsAdminAuthOpen] = useState(false);
   const [selectedJobForTools, setSelectedJobForTools] = useState(null);
