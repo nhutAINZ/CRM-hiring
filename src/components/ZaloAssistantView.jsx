@@ -70,6 +70,9 @@ import {
   formatGroupBroadcastPost,
   formatPersonalMemberPitch,
   calculateAntiSpamDelay,
+  getDisplayJobTitle,
+  getDisplaySalary,
+  getDisplayBonus,
   FASTHUNT_GROUP_MEMBERS,
   sendZcaJobMessage,
   generateZcaNodeRunnerCode,
@@ -655,13 +658,13 @@ export default function ZaloAssistantView({
                             />
                             <div>
                               <p className="text-xs font-black text-slate-900 dark:text-white truncate">
-                                {idx + 1}. {job.title}
+                                {idx + 1}. {getDisplayJobTitle(job)}
                               </p>
                               <p className="text-[11px] text-slate-500 mt-0.5">
-                                Lương: <strong className="text-slate-800 dark:text-slate-200">{job.salary || '15-25 triệu'}</strong> • BH: {job.warrantyPeriod || '60 ngày'}
+                                Lương: <strong className="text-slate-800 dark:text-slate-200">{getDisplaySalary(job)}</strong> • BH: {job.warrantyPeriod || '60 ngày'}
                               </p>
                               <p className="text-[11px] text-rose-600 dark:text-rose-400 font-bold">
-                                🎁 {job.bonus || 'hh 35% - 40% lương uv'}
+                                🎁 {getDisplayBonus(job)}
                               </p>
                             </div>
                           </div>
@@ -1045,7 +1048,7 @@ export default function ZaloAssistantView({
                   >
                     {jobItems.map((j) => (
                       <option key={j.id} value={j.id}>
-                        {j.title} — Lương {j.salary || '15-25tr'} ({j.bonus || 'hh 35%'})
+                        {getDisplayJobTitle(j)} — Lương: {getDisplaySalary(j)} (Hoa hồng: {getDisplayBonus(j)})
                       </option>
                     ))}
                   </select>

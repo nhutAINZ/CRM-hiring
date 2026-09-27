@@ -93,8 +93,8 @@ describe('Unit Tests: FastHunt Zalo Admin Agent & zca-js Integration', () => {
     assert.strictEqual(delay.ms, delay.seconds * 1000);
   });
 
-  it('should verify FastHunt 196 member list contains screenshot contacts', () => {
-    assert.ok(FASTHUNT_GROUP_MEMBERS.length >= 20);
+  it('should verify FastHunt 196 member list contains exactly 196 members and screenshot contacts', () => {
+    assert.strictEqual(FASTHUNT_GROUP_MEMBERS.length, 196);
     const memberNames = FASTHUNT_GROUP_MEMBERS.map(m => m.name);
     assert.ok(memberNames.includes('Áii Thư'));
     assert.ok(memberNames.includes('Anh Quân Bvg'));

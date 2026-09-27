@@ -107,10 +107,11 @@ export default function MultiAgentHubView({
       sender: 'supervisor',
       text: `### 👋 Chào mừng bạn đến với FastHunt Multi-Agent Swarm Hub!
 Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Swarm) đã sẵn sàng phối hợp cùng bạn:
-- 🎯 **Screener Agent**: Trích xuất kỹ năng & chấm điểm độ phù hợp JD.
+- 🎯 **Screener Agent**: Trích xuất kỹ năng, đối soát CV & chấm điểm độ phù hợp JD.
 - 📅 **Scheduler Agent**: Soạn thư mời, đề xuất khung giờ & điều phối phỏng vấn.
 - 📈 **SLA Auditor Agent**: Bắt nghẽn hồ sơ >48h & tối ưu phễu theo chuẩn Kaizen.
 - 🤝 **CTV Partner Agent**: Phân bổ job thưởng bounty cao cho mạng lưới giới thiệu.
+- 🤖 **Zalo Bot Agent (zca-js)**: Tự động phát tin lên Nhóm CTV FASTHUNT & Add fen nhắn 1-1 chống spam.
 - 💬 **Copilot Agent**: Giải đáp & tư vấn chiến lược ứng viên.
 
 *Nhập yêu cầu vào ô bên dưới hoặc chọn các tác vụ mẫu để bắt đầu!*`,

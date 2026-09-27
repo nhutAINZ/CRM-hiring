@@ -330,6 +330,44 @@ ${auditResults.bottlenecks.slice(0, 4).map(b => `- **${b.candidateName}** (${b.p
 
 > 🛠️ **Khuyến nghị Kaizen:** Kích hoạt tính năng nhắc nhở tự động qua Zalo cho Hiring Manager để rút ngắn 35% thời gian phản hồi hồ sơ.`;
 
+  } else if (promptLower.includes('zalo') || promptLower.includes('push job') || promptLower.includes('đẩy job') || promptLower.includes('bắn job') || promptLower.includes('nhóm ctv') || promptLower.includes('zca')) {
+    activeAgents.push('zalo_bot', 'ctv_partner');
+    addStep('supervisor', `Phát hiện intent: **Đẩy Job & Phát Thông Báo Tuyển Dụng Lên Nhóm Zalo CTV (zca-js)**. Kích hoạt **${AGENT_REGISTRY.zalo_bot.name}** và **${AGENT_REGISTRY.ctv_partner.name}**.`, 'completed');
+    await new Promise(r => setTimeout(r, 400));
+
+    addStep('zalo_bot', `Đang kết nối thư viện zca-js và trích xuất danh sách Job gấp có thưởng nóng 50k/CV...`, 'executing');
+    await new Promise(r => setTimeout(r, 500));
+
+    const highBonusJobs = jobs.filter(j => j.bonus || j.salary).slice(0, 3);
+    addStep('zalo_bot', `Đã định dạng tin đăng chuẩn phong cách Admin Zalo cho **Nhóm CTV FASTHUNT (196 thành viên)** kèm link Google Form & Web Dashboard.`, 'completed');
+    await new Promise(r => setTimeout(r, 400));
+
+    synthesizedText = `### 🤖 Báo cáo Phát Tin Đẩy Job Qua Zalo Bot (zca-js Engine)
+
+**Zalo Bot Agent** & **CTV Partner Agent** đã chuẩn bị sẵn sàng nội dung broadcast gửi tới **Nhóm CTV FASTHUNT (196 thành viên)**:
+
+#### 📢 Nội Dung Đăng Group Zalo Chung (@All):
+\`\`\`text
+@All Team ơi mình mới lên job Và các job gấp thưởng ngay 50k cv đi pv:
+1/Junior UA lương 13-15 triệu bh 60 ngày hh 35% lương uv
+Link jd https://docs.google.com/document/d/1sd7PoULYpz9F7g927X__OhC20Mr0VoeS/edit
+2/Middle UA lương 15-25 triệu bh 60 ngày hh 40% lương uv
+Link jd https://docs.google.com/document/u/0/d/1ZOHr82yS6uMeU1jx1biaFLejX5utpGHZ/edit
+3/Video Editor & Motion Graphic Specialist lương 11-15 triệu bh 60 ngày hh 35% lương uv
+Link jd https://docs.google.com/document/u/0/d/1kTrxQabYRX1oFFfOCnBgPzSHUe7ySRDk/edit
+
+team chạy gấp các job này nha 50 cá 1 cv đủ đk đi pv
+🌐 Web xem job: https://crmhiring.netlify.app/#ctv-dashboard
+📥 Form gửi CV: https://docs.google.com/forms/d/e/1FAIpQLSesf4DX0FgtE46bcWjgxjwGu7bOSFSu76pLCXG5zFMbxY2Bvw/viewform
+\`\`\`
+
+#### 🤝 Tính Năng Add Fen & Gửi Tin 1-1 (Anti-Spam Delay Engine):
+- **Cơ chế:** Delay 15s – 35s ± Jitter ngẫu nhiên giữa các lượt gửi.
+- **Biến thể SpinTax:** Tự động tạo tin nhắn riêng biệt cho từng thành viên (Áii Thư, Anh Quân, Bảo...).
+- **Đích đến:** Hỗ trợ phát qua API zca-js hoặc mở Zalo Web 1-click.
+
+👉 *Bạn có thể chuyển sang tab **Trợ Lý Zalo & Bot (zca-js)** để bắt đầu chạy chu trình tự động!*`;
+
   } else if (promptLower.includes('ctv') || promptLower.includes('bonus') || promptLower.includes('hoa hồng') || promptLower.includes('bounty') || promptLower.includes('headhunt')) {
     activeAgents.push('ctv_partner', 'screener');
     addStep('supervisor', `Phát hiện intent: **Khớp nối Mạng lưới CTV & Thưởng Bounty Tuyển dụng**. Kích hoạt **${AGENT_REGISTRY.ctv_partner.name}**.`, 'completed');
@@ -349,7 +387,8 @@ ${highBonusJobs.length > 0 ? highBonusJobs.map(j => `#### 🌟 ${j.title || j.vi
 - 🏢 Khách hàng: ${j.company || j.khachHang || 'Doanh nghiệp đối tác'}
 - 💰 Mức lương: ${j.salary || 'Thương lượng'}
 - 🎁 Thưởng Bounty CTV: **${j.bonus || j.bounty || '10,000,000 - 25,000,000 VNĐ / Candidate Onboard'}**
-- 📌 Yêu cầu chính: ${j.requirements || j.moTa || 'Kinh nghiệm từ 2-4 năm trong ngành.'}`).join('\n\n') : `- Vị trí: Senior Fullstack Engineer (Bounty: 15,000,000 VNĐ)\n- Vị trí: Tech Lead Java (Bounty: 25,000,000 VNĐ)\n- Vị trí: Sales B2B Manager (Bounty: 10,000,000 VNĐ)`}
+- 📌 Yêu cầu chính: ${j.requirements || j.moTa || 'Kinh nghiệm từ 2-4 năm trong ngành.'}
+- 📥 Form gửi CV CTV: https://docs.google.com/forms/d/e/1FAIpQLSesf4DX0FgtE46bcWjgxjwGu7bOSFSu76pLCXG5zFMbxY2Bvw/viewform`).join('\n\n') : `- Vị trí: Senior Fullstack Engineer (Bounty: 15,000,000 VNĐ)\n- Vị trí: Tech Lead Java (Bounty: 25,000,000 VNĐ)\n- Vị trí: Sales B2B Manager (Bounty: 10,000,000 VNĐ)`}
 
 💡 *Mẹo:* Bạn có thể bấm vào tab **CTV Management** hoặc dùng mẫu tin broadcast Zalo để gửi nhanh đến các cộng tác viên.`;
 

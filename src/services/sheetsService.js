@@ -325,18 +325,22 @@ export const fetchJobSheetData = async (
 
           const jobs = results.data
             .map((row, idx) => {
-              const title = extractField(row, ['vị trí ứng tuyển', 'vị trí', 'job title', 'chức danh']);
-              const location = extractField(row, ['khu vực', 'địa điểm', 'location']);
-              const industry = extractField(row, ['loại ngành', 'ngành nghề', 'category', 'industry']);
+              const title = extractField(row, [
+                'vị trí tuyển dụng', 'tên vị trí', 'vị trí ứng tuyển', 'vị trí',
+                'tên công việc', 'công việc', 'tiêu đề', 'job title', 'chức danh',
+                'chức vụ', 'title', 'position', 'job'
+              ]);
+              const location = extractField(row, ['khu vực', 'địa điểm', 'địa chỉ', 'location', 'nơi làm việc']);
+              const industry = extractField(row, ['loại ngành', 'ngành nghề', 'category', 'industry', 'lĩnh vực']);
               const status = extractField(row, ['trạng thái', 'tình trạng', 'status']);
-              const datePosted = extractField(row, ['ngày đăng', 'date posted']);
-              const company = extractField(row, ['công ty', 'doanh nghiệp', 'khách hàng', 'company']);
-              const salary = extractField(row, ['mức lương tham khảo', 'mức lương', 'lương', 'salary']);
-              const headcount = extractField(row, ['số lượng tuyển', 'số lượng', 'headcount']);
-              const warrantyPeriod = extractField(row, ['thời gian bảo hành', 'bảo hành', 'warranty']);
-              const bonus = extractField(row, ['bonus (hh) cho ctv', 'bonus', 'hoa hồng', 'hh cho ctv']);
-              const requirements = extractField(row, ['ghi chú cần thiết hoặc yêu cầu thêm', 'yêu cầu', 'ghi chú', 'requirements']);
-              const jdFile = extractField(row, ['job description', 'jd', 'mô tả công việc']);
+              const datePosted = extractField(row, ['ngày đăng', 'date posted', 'ngày']);
+              const company = extractField(row, ['công ty', 'doanh nghiệp', 'khách hàng', 'đối tác', 'company', 'client']);
+              const salary = extractField(row, ['mức lương tham khảo', 'mức lương', 'thu nhập', 'lương', 'salary', 'income']);
+              const headcount = extractField(row, ['số lượng tuyển', 'số lượng', 'headcount', 'chỉ tiêu']);
+              const warrantyPeriod = extractField(row, ['thời gian bảo hành', 'bảo hành', 'warranty', 'thời hạn bảo hành']);
+              const bonus = extractField(row, ['bonus (hh) cho ctv', 'bonus', 'hoa hồng', 'hh cho ctv', 'hh', 'bounty', 'thưởng', 'hoa hồng ctv']);
+              const requirements = extractField(row, ['ghi chú cần thiết hoặc yêu cầu thêm', 'yêu cầu', 'ghi chú', 'requirements', 'mô tả']);
+              const jdFile = extractField(row, ['job description', 'jd', 'link jd', 'mô tả công việc', 'link mô tả']);
 
               // Skip completely empty placeholder rows
               if (!title && !company && !bonus) return null;
