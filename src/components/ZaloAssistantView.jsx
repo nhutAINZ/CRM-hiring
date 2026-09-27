@@ -493,6 +493,14 @@ export default function ZaloAssistantView({
             <span>Mở Zalo Web</span>
           </a>
 
+          <button
+            onClick={() => openZaloGroup(config.ctvGroupUrl)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 text-xs font-bold border border-sky-400/30 transition-colors cursor-pointer"
+          >
+            <Users className="w-3.5 h-3.5 text-sky-300" />
+            <span>Mở Nhóm CTV</span>
+          </button>
+
           <a
             href={FASTHUNT_SUBMIT_FORM_URL}
             target="_blank"
@@ -1444,8 +1452,11 @@ export default function ZaloAssistantView({
                 value={settingsForm.ctvGroupUrl}
                 onChange={(e) => setSettingsForm({ ...settingsForm, ctvGroupUrl: e.target.value })}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                placeholder="https://zalo.me/g/..."
+                placeholder="https://chat.zalo.me hoặc https://zalo.me/g/..."
               />
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                💡 <strong>Lưu ý:</strong> Để liên kết chuẩn xác: Vào Zalo app/web ➔ Mở nhóm CTV FASTHUNT ➔ Thông tin nhóm ➔ Copy <strong>"Link tham gia nhóm"</strong> (dạng <code className="text-blue-400">https://zalo.me/g/xxxxxx</code>). Nếu để trống hoặc dùng mặc định, hệ thống sẽ mở Zalo Web (<code className="text-sky-400">https://chat.zalo.me</code>).
+              </p>
             </div>
 
             {isSavedSettings && (

@@ -15,8 +15,8 @@ export const DEFAULT_PERSONAL_ZALO_CONFIG = {
   recruiterName: 'Huỳnh Minh Nhựt (HR FastHunt)',
   zaloPhone: '0901234567',
   zaloChatUrl: 'https://zalo.me/0901234567',
-  ctvGroupName: 'Nhóm Tuyển Dụng & CTV FastHunt Toàn Quốc',
-  ctvGroupUrl: 'https://zalo.me/g/fasthunt_ctv_recruitment',
+  ctvGroupName: 'Nhóm CTV FASTHUNT',
+  ctvGroupUrl: 'https://chat.zalo.me',
   companyName: 'FASTHUNT Tuyển Dụng & Nhân Tài',
   accountType: 'PERSONAL_NICK', // Nick Thường Cá Nhân (Không cần OA)
   defaultGreeting: 'Chào bạn, mình là HR bên FASTHUNT, mình liên hệ với bạn về cơ hội công việc nhé!',
@@ -180,7 +180,11 @@ export function getStoredZaloConfig() {
   try {
     const raw = localStorage.getItem(ZALO_PERSONAL_CONFIG_STORAGE_KEY);
     if (!raw) return DEFAULT_PERSONAL_ZALO_CONFIG;
-    return { ...DEFAULT_PERSONAL_ZALO_CONFIG, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    if (parsed.ctvGroupUrl && parsed.ctvGroupUrl.includes('fasthunt_ctv_recruitment')) {
+      parsed.ctvGroupUrl = 'https://chat.zalo.me';
+    }
+    return { ...DEFAULT_PERSONAL_ZALO_CONFIG, ...parsed };
   } catch {
     return DEFAULT_PERSONAL_ZALO_CONFIG;
   }
@@ -398,8 +402,11 @@ export function openZaloGroup(groupUrl, messageText = '') {
   if (messageText && navigator.clipboard) {
     navigator.clipboard.writeText(messageText).catch(() => {});
   }
-  const url = groupUrl || 'https://chat.zalo.me';
-  window.open(url, '_blank');
+  let targetUrl = groupUrl?.trim();
+  if (!targetUrl || targetUrl.includes('fasthunt_ctv_recruitment') || !targetUrl.startsWith('http')) {
+    targetUrl = 'https://chat.zalo.me';
+  }
+  window.open(targetUrl, '_blank');
 }
 
 /**
