@@ -17,6 +17,7 @@ export const DEFAULT_CONFIG = {
 export const CTV_SHEET_URL = 'https://docs.google.com/spreadsheets/d/11g-mvcukMTE0Bdjek5kIgbI_8WuxZshTlS0eCGw60Wk/edit?gid=497830992#gid=497830992';
 export const JOB_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1PJUSclHhVYLvoYTzmwkwpzsRfPOqODs0RDrvhW99Uko/edit?gid=0#gid=0';
 export const INTERGREAT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4/edit?gid=0#gid=0';
+export const CTV_SUBMIT_CV_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSesf4DX0FgtE46bcWjgxjwGu7bOSFSu76pLCXG5zFMbxY2Bvw/viewform';
 
 
 export const getStoredConfig = () => {
@@ -65,6 +66,11 @@ export const getJobSheetViewUrl = (
   jobSheetGid = DEFAULT_CONFIG.jobSheetGid
 ) => {
   return `https://docs.google.com/spreadsheets/d/${jobSheetId}/edit?gid=${jobSheetGid}#gid=${jobSheetGid}`;
+};
+
+// Helper to get CTV Submit CV Google Form URL
+export const getCtvSubmitFormUrl = () => {
+  return CTV_SUBMIT_CV_FORM_URL;
 };
 
 /**

@@ -15,10 +15,11 @@ import {
   ChevronRight,
   Filter,
   CreditCard,
-  MessageCircle
+  MessageCircle,
+  FileUp
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { CTV_SHEET_URL } from '../services/sheetsService';
+import { CTV_SHEET_URL, CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
 import { twoPointerFilter } from '../utils/dataNormalizer';
 
 export default function CtvManagementView({
@@ -126,7 +127,18 @@ Tổng CV đã nộp: ${ctv.stats.total} hồ sơ`;
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <a
+              href={CTV_SUBMIT_CV_FORM_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 text-slate-950 rounded-xl text-xs sm:text-sm font-black shadow-md transition-all cursor-pointer whitespace-nowrap"
+            >
+              <FileUp className="w-4 h-4 text-slate-950" />
+              <span>GỬI CV VỀ DOANH NGHIỆP</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+
             <button
               onClick={handleCopyLink}
               className="flex items-center gap-1.5 px-3.5 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-extrabold backdrop-blur-md transition-all cursor-pointer"

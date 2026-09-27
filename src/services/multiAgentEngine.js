@@ -75,6 +75,16 @@ export const AGENT_REGISTRY = {
     badgeColor: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300',
     description: 'Giải đáp thắc mắc của ứng viên về văn hóa doanh nghiệp, chế độ đãi ngộ, quy trình phỏng vấn theo định dạng chuẩn.',
     model: 'Conversational Talent Support'
+  },
+  zalo_bot: {
+    id: 'zalo_bot',
+    name: 'Zalo Bot & CTV Dispatcher Agent (zca-js)',
+    role: 'Automated Zalo Bot Dispatcher & Group Broadcaster',
+    avatar: '🤖',
+    color: 'from-violet-600 to-indigo-600',
+    badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300',
+    description: 'Tự động phát thông báo tuyển dụng, tiền thưởng bonus và link Google Form nộp CV trực tiếp tới các nhóm Zalo CTV bằng zca-js (https://tdung.gitbook.io/zca-js).',
+    model: 'zca-js Unofficial Zalo API Engine'
   }
 };
 

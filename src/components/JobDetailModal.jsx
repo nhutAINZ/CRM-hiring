@@ -19,6 +19,7 @@ import {
   Info
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
 
 export default function JobDetailModal({
   job,
@@ -258,13 +259,23 @@ ${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${jo
             <span>Mở Dòng #{job.rowIndex} Trên Google Sheet</span>
           </a>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <a
+              href={CTV_SUBMIT_CV_FORM_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-black shadow-md transition-all cursor-pointer"
+            >
+              <ExternalLink className="w-4 h-4 text-amber-300" />
+              <span>GỬI CV ỨNG VIÊN VỀ DOANH NGHIỆP</span>
+            </a>
+
             <button
               onClick={handleCopyShare}
-              className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-extrabold shadow-md transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-extrabold shadow-md transition-all cursor-pointer"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Share2 className="w-4 h-4" />}
-              <span>{copied ? 'Đã Copy Tin Tuyển Dụng!' : 'Copy Tin Tuyển Dụng CTV'}</span>
+              <span>{copied ? 'Đã Copy Tin!' : 'Copy Tin CTV'}</span>
             </button>
           </div>
         </div>

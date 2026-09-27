@@ -197,7 +197,42 @@ app.post('/api/zalo/broadcast/reject', (req, res) => {
   return res.json({ success: true, item });
 });
 
+import { getZcaSessionStatus, updateZcaSessionConfig, dispatchJobViaZca, ZCA_GITBOOK_URL } from './zcaBotEngine.js';
+
+// ── 6. zca-js Unofficial Zalo Bot Engine APIs (https://tdung.gitbook.io/zca-js) ──
+app.get('/api/zca/status', (req, res) => {
+  res.json({
+    success: true,
+    data: getZcaSessionStatus()
+  });
+});
+
+app.post('/api/zca/config', (req, res) => {
+  const updated = updateZcaSessionConfig(req.body);
+  res.json({ success: true, data: updated });
+});
+
+app.post('/api/zca/send-job-to-ctv', async (req, res) => {
+  try {
+    const { job, target, targetType, message, config } = req.body;
+    if (!job) return res.status(400).json({ error: 'Job payload is required' });
+
+    const result = await dispatchJobViaZca({
+      job,
+      target,
+      targetType: targetType || 'GROUP',
+      message: message || '',
+      config: config || {}
+    });
+
+    return res.json({ success: true, result });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 FastHunt Zalo AI Assistant Backend Server running on http://localhost:${PORT}`);
   console.log(`📡 Webhook Endpoint: http://localhost:${PORT}/webhook/zalo`);
+  console.log(`🤖 zca-js Bot API: http://localhost:${PORT}/api/zca/status (Docs: ${ZCA_GITBOOK_URL})`);
 });

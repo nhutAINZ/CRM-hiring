@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Briefcase,
   Flame,
@@ -19,9 +19,17 @@ import {
   MapPin,
   HelpCircle,
   Zap,
-  ArrowRight
+  ArrowRight,
+  Upload,
+  Copy,
+  Check,
+  Send,
+  X,
+  FileUp,
+  Link2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
 
 export default function CtvDashboardView({
   jobItems = [],
@@ -30,6 +38,10 @@ export default function CtvDashboardView({
   onNavigateToGroupFinder,
   onOpenJobDetail
 }) {
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [copiedFormLink, setCopiedFormLink] = useState(false);
+  const [selectedJobForSubmit, setSelectedJobForSubmit] = useState(null);
+
   // Filter active jobs
   const activeJobs = useMemo(() => {
     return jobItems.filter((job) => {
@@ -72,6 +84,18 @@ export default function CtvDashboardView({
     } catch (e) {}
   };
 
+  const handleCopyFormLink = () => {
+    navigator.clipboard.writeText(CTV_SUBMIT_CV_FORM_URL);
+    setCopiedFormLink(true);
+    triggerCelebration();
+    setTimeout(() => setCopiedFormLink(false), 2500);
+  };
+
+  const handleOpenSubmitForJob = (job) => {
+    setSelectedJobForSubmit(job);
+    window.open(CTV_SUBMIT_CV_FORM_URL, '_blank');
+  };
+
   return (
     <div className="space-y-8 animate-fade-in pb-12">
       {/* 🌟 1. HERO BANNER FOR COLLABORATORS */}
@@ -92,10 +116,23 @@ export default function CtvDashboardView({
             </span>
           </h1>
           <p className="mt-3 sm:mt-4 text-sm sm:text-base text-blue-100/90 leading-relaxed font-normal">
-            Hàng chục việc làm tuyển dụng gấp với mức thưởng hấp dẫn từ <strong className="text-amber-300 font-bold">1.200.000đ - 30% lương</strong>. Tận dụng các công cụ tạo nội dung thông minh và danh bạ group tuyển dụng để tiếp cận ứng viên hiệu quả nhất!
+            Hàng chục việc làm tuyển dụng gấp với mức thưởng hấp dẫn từ <strong className="text-amber-300 font-bold">1.200.000đ - 30% lương</strong>. Nộp CV trực tiếp về doanh nghiệp qua form chính thức để ghi nhận hoa hồng nhanh nhất!
           </p>
 
           <div className="mt-6 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
+            {/* Main Submit CV CTA */}
+            <a
+              href={CTV_SUBMIT_CV_FORM_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={triggerCelebration}
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer"
+            >
+              <FileUp className="w-4 h-4 text-slate-950" />
+              <span>GỬI CV ỨNG VIÊN VỀ DOANH NGHIỆP</span>
+              <ExternalLink className="w-4 h-4" />
+            </a>
+
             <button
               onClick={() => {
                 triggerCelebration();
@@ -107,6 +144,7 @@ export default function CtvDashboardView({
               <span>Xem {activeJobs.length} Job Đang Tuyển</span>
               <ArrowRight className="w-4 h-4 text-blue-600" />
             </button>
+
             <button
               onClick={() => onNavigateToContentGen && onNavigateToContentGen()}
               className="px-5 py-3 rounded-2xl bg-blue-600/40 hover:bg-blue-600/60 backdrop-blur-md border border-white/20 text-white font-semibold text-sm transition-all transform hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer"
@@ -114,6 +152,7 @@ export default function CtvDashboardView({
               <Zap className="w-4 h-4 text-amber-300" />
               <span>Tạo Bài Tuyển Dụng Ngay</span>
             </button>
+
             <button
               onClick={() => onNavigateToGroupFinder && onNavigateToGroupFinder()}
               className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-semibold text-sm transition-all transform hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer"
@@ -125,7 +164,56 @@ export default function CtvDashboardView({
         </div>
       </div>
 
-      {/* 📊 2. CTV KEY METRICS */}
+      {/* 📥 2. CV SUBMISSION SECTION BOX (GỬI CV ỨNG VIÊN VỀ DOANH NGHIỆP) */}
+      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-extrabold uppercase tracking-wider text-emerald-100">
+              <Upload className="w-3.5 h-3.5 text-amber-300" />
+              <span>Cổng Nộp CV Chính Thức Cho CTV</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight">
+              Gửi CV Ứng Viên Về Doanh Nghiệp
+            </h2>
+            <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
+              Bạn vừa tìm được ứng viên tiềm năng? Hãy nộp ngay hồ sơ (CV PDF/Word) qua Form Google chính thức của Doanh nghiệp. Đội ngũ HR FastHunt sẽ tiến hành sơ vấn, sắp xếp lịch phỏng vấn và bảo lưu hoa hồng CTV ngay khi ứng viên trúng tuyển!
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            <button
+              onClick={handleCopyFormLink}
+              className="px-4 py-3 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/20 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {copiedFormLink ? <Check className="w-4 h-4 text-amber-300" /> : <Copy className="w-4 h-4" />}
+              <span>{copiedFormLink ? 'Đã Copy Link Form!' : 'Copy Link Form Gửi CV'}</span>
+            </button>
+
+            <a
+              href={CTV_SUBMIT_CV_FORM_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={triggerCelebration}
+              className="px-6 py-3.5 rounded-2xl bg-white text-emerald-800 hover:bg-emerald-50 font-black text-xs sm:text-sm shadow-lg shadow-emerald-950/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Send className="w-4 h-4 text-emerald-700" />
+              <span>Mở Google Form Gửi CV</span>
+              <ExternalLink className="w-4 h-4 text-emerald-700" />
+            </a>
+
+            <button
+              onClick={() => setIsSubmitModalOpen(true)}
+              className="px-4 py-3 rounded-2xl bg-emerald-900/40 hover:bg-emerald-900/60 border border-emerald-400/40 text-emerald-100 font-bold text-xs sm:text-sm backdrop-blur-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Xem Popup Form</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 📊 3. CTV KEY METRICS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
@@ -194,7 +282,7 @@ export default function CtvDashboardView({
         </div>
       </div>
 
-      {/* 🚀 3. 3-STEP GUIDE FOR COLLABORATORS */}
+      {/* 🚀 4. 3-STEP GUIDE FOR COLLABORATORS */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800 gap-2">
           <div>
@@ -232,19 +320,31 @@ export default function CtvDashboardView({
             </p>
           </div>
 
-          <div className="relative p-5 rounded-2xl bg-gradient-to-b from-slate-50 to-white dark:from-slate-800/40 dark:to-slate-900 border border-slate-200/70 dark:border-slate-800">
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-black text-lg flex items-center justify-center mb-4 shadow-md shadow-emerald-500/20">
-              3
+          <div className="relative p-5 rounded-2xl bg-gradient-to-b from-slate-50 to-white dark:from-slate-800/40 dark:to-slate-900 border border-slate-200/70 dark:border-slate-800 flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-black text-lg flex items-center justify-center mb-4 shadow-md shadow-emerald-500/20">
+                3
+              </div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">Gửi CV & Nhận Thưởng</h3>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                Nộp CV qua <strong>Form Gửi CV Doanh Nghiệp</strong>. Khi ứng viên qua phỏng vấn và nhận việc (onboard) vượt qua bảo hành, bạn nhận ngay hoa hồng chuyển khoản 100%!
+              </p>
             </div>
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">Nhận Thưởng Hoa Hồng</h3>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              Gửi CV cho bộ phận tuyển dụng. Khi ứng viên qua phỏng vấn và nhận việc (onboard) vượt qua bảo hành, bạn nhận ngay tiền hoa hồng chuyển khoản 100%!
-            </p>
+            <a
+              href={CTV_SUBMIT_CV_FORM_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 font-bold text-xs border border-emerald-200 dark:border-emerald-800 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <FileUp className="w-3.5 h-3.5" />
+              <span>Mở Form Gửi CV Ngay</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
           </div>
         </div>
       </div>
 
-      {/* 🔥 4. TOP JOBS TUYỂN GẤP & HOA HỒNG CAO */}
+      {/* 🔥 5. TOP JOBS TUYỂN GẤP & HOA HỒNG CAO */}
       <div>
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2.5">
@@ -336,6 +436,16 @@ export default function CtvDashboardView({
 
                 {/* Bottom Action Buttons */}
                 <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                  <a
+                    href={CTV_SUBMIT_CV_FORM_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2 px-3 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center justify-center gap-1 shadow-xs cursor-pointer"
+                    title="Gửi CV ứng viên cho vị trí này về doanh nghiệp"
+                  >
+                    <FileUp className="w-3.5 h-3.5 text-white" />
+                    <span>Nộp CV</span>
+                  </a>
                   <button
                     onClick={() => onNavigateToContentGen && onNavigateToContentGen(job)}
                     className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
@@ -365,7 +475,7 @@ export default function CtvDashboardView({
         </div>
       </div>
 
-      {/* 🏷️ 5. INDUSTRIES DISTRIBUTION */}
+      {/* 🏷️ 6. INDUSTRIES DISTRIBUTION */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs">
         <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight mb-4">
           Khám Phá Theo Nhóm Ngành Tuyển Dụng
@@ -385,6 +495,62 @@ export default function CtvDashboardView({
           ))}
         </div>
       </div>
+
+      {/* ── 7. POPUP MODAL GOOGLE FORM GỬI CV ── */}
+      {isSubmitModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in">
+          <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <FileUp className="w-5 h-5 text-amber-300" />
+                <div>
+                  <h3 className="font-black text-sm sm:text-base">GỬI CV ỨNG VIÊN VỀ DOANH NGHIỆP</h3>
+                  <p className="text-[11px] text-emerald-100">Biểu mẫu Google Form tiếp nhận ứng viên chính thức</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <a
+                  href={CTV_SUBMIT_CV_FORM_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  title="Mở toàn màn hình tab mới"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <button
+                  onClick={() => setIsSubmitModalOpen(false)}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 bg-slate-100 dark:bg-slate-950 p-2 sm:p-4 overflow-y-auto">
+              <iframe
+                src={CTV_SUBMIT_CV_FORM_URL}
+                title="Gửi CV Ứng Viên Về Doanh Nghiệp"
+                className="w-full h-[600px] rounded-2xl border border-slate-200 dark:border-slate-800 bg-white"
+              />
+            </div>
+
+            <div className="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 text-xs">
+              <span className="text-slate-500 dark:text-slate-400">
+                🔒 Kết nối an toàn với hệ thống tuyển dụng FastHunt
+              </span>
+              <button
+                onClick={handleCopyFormLink}
+                className="px-3.5 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-300 cursor-pointer flex items-center gap-1.5"
+              >
+                {copiedFormLink ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedFormLink ? 'Đã Copy Link' : 'Copy Link Form'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

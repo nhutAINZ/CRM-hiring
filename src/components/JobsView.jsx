@@ -27,9 +27,12 @@ import {
   PauseCircle,
   RefreshCw,
   LayoutGrid,
-  List
+  List,
+  FileUp,
+  Upload
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
 
 export default function JobsView({
   jobItems = [],
@@ -266,13 +269,24 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
 
           <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
             <a
+              href={CTV_SUBMIT_CV_FORM_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 rounded-2xl text-xs sm:text-sm font-black shadow-lg hover:shadow-xl transition-all cursor-pointer whitespace-nowrap"
+            >
+              <FileUp className="w-4 h-4 text-slate-950" />
+              <span>GỬI CV VỀ DOANH NGHIỆP</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+
+            <a
               href={jobSheetUrl}
               target="_blank"
               rel="noreferrer"
               className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-slate-100 text-blue-700 rounded-2xl text-xs sm:text-sm font-extrabold shadow-lg hover:shadow-xl transition-all cursor-pointer whitespace-nowrap"
             >
               <ExternalLink className="w-4 h-4 text-blue-600" />
-              <span>Mở Google Sheet Jobs Gốc</span>
+              <span>Mở Google Sheet Jobs</span>
             </a>
 
             <button
@@ -600,25 +614,35 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
                 {/* Card Bottom Actions */}
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
                   {/* Quick AI & Channels Tools for CTV */}
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <a
+                      href={CTV_SUBMIT_CV_FORM_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center gap-1 py-2 px-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                      title="Gửi CV ứng viên cho vị trí này về doanh nghiệp"
+                    >
+                      <FileUp className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Nộp CV</span>
+                    </a>
                     {onNavigateToContentGen && (
                       <button
                         onClick={() => onNavigateToContentGen(job)}
-                        className="flex items-center justify-center gap-1.5 py-2 px-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                        className="flex items-center justify-center gap-1 py-2 px-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
                         title="Tạo bài đăng tuyển dụng đa kênh cho job này"
                       >
                         <Zap className="w-3.5 h-3.5 text-amber-300" />
-                        <span>Gen Content</span>
+                        <span>Gen Bài</span>
                       </button>
                     )}
                     {onNavigateToGroupFinder && (
                       <button
                         onClick={() => onNavigateToGroupFinder(job)}
-                        className="flex items-center justify-center gap-1.5 py-2 px-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
+                        className="flex items-center justify-center gap-1 py-2 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
                         title="Tìm Group Facebook/Zalo phù hợp để đăng tin"
                       >
                         <Share2 className="w-3.5 h-3.5 text-indigo-500" />
-                        <span>Tìm Group</span>
+                        <span>Group</span>
                       </button>
                     )}
                   </div>
@@ -721,6 +745,16 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
                       </td>
                       <td className="py-3.5 px-4 text-center">
                         <div className="flex items-center justify-center gap-1.5">
+                          <a
+                            href={CTV_SUBMIT_CV_FORM_URL}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1"
+                            title="Gửi CV ứng viên cho vị trí này về doanh nghiệp"
+                          >
+                            <FileUp className="w-3 h-3 text-amber-300" />
+                            <span>Nộp CV</span>
+                          </a>
                           <button
                             onClick={() => handleCopyJobShare(job)}
                             className="p-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-lg transition-colors cursor-pointer"

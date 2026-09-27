@@ -10,14 +10,15 @@ import {
 } from '../services/multiAgentEngine.js';
 
 describe('Multi-Agent Swarm Engine Test Suite', () => {
-  it('should have 6 registered agents in AGENT_REGISTRY', () => {
-    assert.strictEqual(Object.keys(AGENT_REGISTRY).length, 6);
+  it('should have 7 registered agents in AGENT_REGISTRY', () => {
+    assert.strictEqual(Object.keys(AGENT_REGISTRY).length, 7);
     assert.ok(AGENT_REGISTRY.supervisor);
     assert.ok(AGENT_REGISTRY.screener);
     assert.ok(AGENT_REGISTRY.scheduler);
     assert.ok(AGENT_REGISTRY.auditor);
     assert.ok(AGENT_REGISTRY.ctv_partner);
     assert.ok(AGENT_REGISTRY.copilot);
+    assert.ok(AGENT_REGISTRY.zalo_bot);
   });
 
   it('calculateCandidateFit computes high score for matching job position and skills', () => {

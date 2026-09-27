@@ -242,6 +242,24 @@ export default function Sidebar({
                 {(!collapsed || mobileOpen) && <span>Tìm Group Đăng Tin</span>}
               </div>
             </button>
+
+            {/* Gửi CV Ứng Viên Về Doanh Nghiệp Form */}
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLSesf4DX0FgtE46bcWjgxjwGu7bOSFSu76pLCXG5zFMbxY2Bvw/viewform"
+              target="_blank"
+              rel="noreferrer"
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800/60 mt-1"
+            >
+              <div className="flex items-center gap-2.5">
+                <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                {(!collapsed || mobileOpen) && <span className="font-bold">Gửi CV Doanh Nghiệp</span>}
+              </div>
+              {(!collapsed || mobileOpen) && (
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-emerald-500 text-white">
+                  Form
+                </span>
+              )}
+            </a>
           </div>
 
           {/* ===================== ADMIN SECTION (ONLY WHEN LOGGED IN AS ADMIN) ===================== */}
@@ -387,6 +405,26 @@ export default function Sidebar({
                   <Gift className="w-4 h-4 flex-shrink-0" />
                   {(!collapsed || mobileOpen) && <span>Quản Lý CTV</span>}
                 </div>
+              </button>
+
+              {/* Trợ Lý Zalo & Bot zca-js */}
+              <button
+                onClick={() => handleNavClick('zalo')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                  activeView === 'zalo'
+                    ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/50 font-bold'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <MessageCircle className="w-4 h-4 text-sky-500 flex-shrink-0" />
+                  {(!collapsed || mobileOpen) && <span>Trợ Lý Zalo & Bot (zca-js)</span>}
+                </div>
+                {(!collapsed || mobileOpen) && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-300 border border-sky-300 dark:border-sky-800">
+                    Bot
+                  </span>
+                )}
               </button>
 
               {/* Archify UML */}
