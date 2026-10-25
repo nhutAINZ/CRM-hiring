@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
+import { getDirectJdUrl } from '../services/zcaBotService';
 
 export default function JobsView({
   jobItems = [],
@@ -602,11 +603,28 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
                     </div>
                   )}
 
-                  {/* JD File Attachment Tag */}
-                  {job.jdFile && (
-                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                      <FileText className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-                      <span className="truncate">{job.jdFile}</span>
+                  {/* JD File Attachment Tag with Direct Copy Link */}
+                  {(job.jdFile || job.linkJd) && (
+                    <div className="flex items-center justify-between gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-mono bg-slate-50 dark:bg-slate-800/40 px-2.5 py-1 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                      <div className="flex items-center gap-1.5 truncate">
+                        <FileText className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                        <span className="truncate">{job.jdFile || 'File JD'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const url = getDirectJdUrl(job);
+                          navigator.clipboard.writeText(url);
+                          confetti({ particleCount: 15, spread: 40, origin: { y: 0.7 } });
+                          alert('Đã copy link JD trực tiếp cho CTV!');
+                        }}
+                        className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline shrink-0 flex items-center gap-0.5 cursor-pointer ml-1"
+                        title="Sao chép link JD trực tiếp để gửi CTV"
+                      >
+                        <Copy className="w-3 h-3" />
+                        <span>Copy link</span>
+                      </button>
                     </div>
                   )}
                 </div>

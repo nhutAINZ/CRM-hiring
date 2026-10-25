@@ -93,12 +93,17 @@ const normalizeHeader = (header) => {
 /**
  * Find exact or fuzzy value from row object based on candidate field keywords
  */
-const extractField = (row, fieldKeywords) => {
+const extractField = (row, fieldKeywords, excludeKeywords = []) => {
   const keys = Object.keys(row);
   for (const keyword of fieldKeywords) {
-    const matchedKey = keys.find((k) => normalizeHeader(k).includes(normalizeHeader(keyword)));
+    const matchedKey = keys.find((k) => {
+      const norm = normalizeHeader(k);
+      if (excludeKeywords.some((ex) => norm.includes(normalizeHeader(ex)))) return false;
+      return norm.includes(normalizeHeader(keyword));
+    });
     if (matchedKey && row[matchedKey] !== undefined && row[matchedKey] !== null) {
-      return cleanText(row[matchedKey]);
+      const val = cleanText(row[matchedKey]);
+      if (val) return val;
     }
   }
   return '';
@@ -330,11 +335,21 @@ export const fetchJobSheetData = async (
 
           const jobs = results.data
             .map((row, idx) => {
-              const title = extractField(row, [
-                'vị trí tuyển dụng', 'tên vị trí', 'vị trí ứng tuyển', 'vị trí',
-                'tên công việc', 'công việc', 'tiêu đề', 'job title', 'chức danh',
-                'chức vụ', 'title', 'position', 'job'
-              ]);
+              let title = extractField(
+                row,
+                [
+                  'vị trí tuyển dụng', 'tên vị trí', 'vị trí ứng tuyển', 'vị trí',
+                  'tên công việc', 'công việc', 'tiêu đề', 'chức danh',
+                  'chức vụ', 'job title', 'title', 'position', 'cột 1'
+                ],
+                ['job description', 'jd', 'link jd', 'mô tả']
+              );
+
+              // Fallback to row['Cột 1'] if title still not matched
+              if (!title) {
+                title = cleanText(row['Cột 1'] || row['cột 1'] || row['Cột 0'] || '');
+              }
+
               const location = extractField(row, ['khu vực', 'địa điểm', 'địa chỉ', 'location', 'nơi làm việc']);
               const industry = extractField(row, ['loại ngành', 'ngành nghề', 'category', 'industry', 'lĩnh vực']);
               const status = extractField(row, ['trạng thái', 'tình trạng', 'status']);
@@ -346,6 +361,7 @@ export const fetchJobSheetData = async (
               const bonus = extractField(row, ['bonus (hh) cho ctv', 'bonus', 'hoa hồng', 'hh cho ctv', 'hh', 'bounty', 'thưởng', 'hoa hồng ctv']);
               const requirements = extractField(row, ['ghi chú cần thiết hoặc yêu cầu thêm', 'yêu cầu', 'ghi chú', 'requirements', 'mô tả']);
               const jdFile = extractField(row, ['job description', 'jd', 'link jd', 'mô tả công việc', 'link mô tả']);
+              const linkJd = (jdFile && /^https?:\/\//i.test(jdFile)) ? jdFile.trim() : '';
 
               // Skip completely empty placeholder rows
               if (!title && !company && !bonus) return null;
@@ -364,6 +380,8 @@ export const fetchJobSheetData = async (
                 bonus: bonus || 'Thỏa thuận',
                 requirements: requirements || '',
                 jdFile: jdFile || '',
+                linkJd: linkJd || '',
+                jdUrl: linkJd || '',
                 rowIndex: idx + 2,
                 sheetRowUrl: `https://docs.google.com/spreadsheets/d/${jobSheetId}/edit?gid=${jobSheetGid}#gid=${jobSheetGid}&range=A${idx + 2}`,
                 rawRow: row

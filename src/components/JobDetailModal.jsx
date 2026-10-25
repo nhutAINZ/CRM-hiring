@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
+import { getDirectJdUrl } from '../services/zcaBotService';
 
 export default function JobDetailModal({
   job,
@@ -29,6 +30,7 @@ export default function JobDetailModal({
   onOpenEmailCandidate
 }) {
   const [copied, setCopied] = useState(false);
+  const [copiedJdLink, setCopiedJdLink] = useState(false);
 
   if (!job) return null;
 
@@ -163,15 +165,42 @@ ${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${jo
               </div>
             )}
 
-            {job.jdFile && (
-              <div className="pt-2 flex items-center justify-between text-xs bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+            {(job.jdFile || job.linkJd || job.jdUrl) && (
+              <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-2 min-w-0">
                   <FileText className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                  <span className="font-bold text-slate-800 dark:text-slate-200 truncate">{job.jdFile}</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                    {job.jdFile || 'File JD Tuyển Dụng'}
+                  </span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
-                  File JD
-                </span>
+                <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const directUrl = getDirectJdUrl(job);
+                      if (navigator?.clipboard) {
+                        navigator.clipboard.writeText(directUrl);
+                      }
+                      setCopiedJdLink(true);
+                      confetti({ particleCount: 20, spread: 45, origin: { y: 0.6 } });
+                      setTimeout(() => setCopiedJdLink(false), 2000);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-300 font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer border border-blue-200 dark:border-blue-800"
+                    title="Sao chép link xem JD cho CTV"
+                  >
+                    {copiedJdLink ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedJdLink ? 'Đã copy link JD!' : 'Copy link JD'}</span>
+                  </button>
+                  <a
+                    href={getDirectJdUrl(job)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
+                    title="Mở link JD trong tab mới"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
               </div>
             )}
           </div>

@@ -125,7 +125,7 @@ export default function App() {
   // Active view: default to 'ctv-dashboard' or read from URL hash
   const [activeView, setActiveView] = useState(() => {
     if (typeof window !== 'undefined' && window.location.hash) {
-      const hash = window.location.hash.replace('#', '');
+      const hash = window.location.hash.replace('#', '').split('?')[0];
       const validViews = [
         'ctv-dashboard', 'jobs', 'content-gen', 'group-finder',
         'multiagent', 'archify', 'table', 'dashboard', 'kanban', 'analytics', 'urgent', 'clients', 'ctv', 'zalo'
@@ -236,6 +236,36 @@ export default function App() {
   const [cvAnalysisData, setCvAnalysisData] = useState(null);
   const [isComponentSelectorOpen, setIsComponentSelectorOpen] = useState(false);
   const [isAiBotOpen, setIsAiBotOpen] = useState(false);
+
+  // Deep-link auto-open for specific Job via ?jobId=... or #...?jobId=...
+  useEffect(() => {
+    if (jobItems.length > 0 && typeof window !== 'undefined') {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        let targetJobId = urlParams.get('jobId') || urlParams.get('job');
+        if (!targetJobId && window.location.hash.includes('jobId=')) {
+          const hashParts = window.location.hash.split('?');
+          if (hashParts[1]) {
+            const hashParams = new URLSearchParams(hashParts[1]);
+            targetJobId = hashParams.get('jobId') || hashParams.get('job');
+          }
+        }
+        if (targetJobId) {
+          const matched = jobItems.find(j => 
+            String(j.id) === String(targetJobId) || 
+            String(j.rowIndex) === String(targetJobId) ||
+            (j.title && j.title.toLowerCase().includes(targetJobId.toLowerCase()))
+          );
+          if (matched) {
+            setSelectedJob(matched);
+            setIsJobDetailOpen(true);
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to parse jobId from deep link:', e);
+      }
+    }
+  }, [jobItems]);
 
 
   // Filter state

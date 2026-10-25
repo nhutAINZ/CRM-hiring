@@ -7,6 +7,7 @@ import {
   resolveSpintax,
   calculateAntiSpamDelay,
   generateZcaNodeRunnerCode,
+  getDirectJdUrl,
   DEFAULT_ZCA_CONFIG,
   FASTHUNT_GROUP_MEMBERS,
   FASTHUNT_SUBMIT_FORM_URL,
@@ -135,5 +136,45 @@ describe('Unit Tests: FastHunt Zalo Admin Agent & zca-js Integration', () => {
     assert.ok(script.includes(ZCA_DOCS_URL));
     assert.ok(script.includes(CTV_SUBMIT_CV_FORM_URL));
     assert.ok(script.includes('runRecruitmentBot'));
+  });
+
+  it('should guarantee getDirectJdUrl always returns a valid clickable URL for CTV', () => {
+    // 1. Explicit linkJd
+    const jobWithUrl = { id: 'job_1', title: 'Developer', linkJd: 'https://docs.google.com/document/d/123/edit' };
+    assert.strictEqual(getDirectJdUrl(jobWithUrl), 'https://docs.google.com/document/d/123/edit');
+
+    // 2. Known FastHunt Google Docs
+    const uaJob = { id: 'job_2', title: 'Junior UA', jdFile: 'Junior UA.docx' };
+    assert.strictEqual(getDirectJdUrl(uaJob), 'https://docs.google.com/document/d/1sd7PoULYpz9F7g927X__OhC20Mr0VoeS/edit');
+
+    // 3. Fallback when jdFile is a bare file name (never return bare filename!)
+    const fileOnlyJob = { id: 'job_12', title: 'CHUYÊN VIÊN R&D', jdFile: '[ĐỒNG PHỤC HẢI ANH] JD CHUYÊN VIÊN R&D.docx' };
+    const directUrl = getDirectJdUrl(fileOnlyJob);
+    assert.ok(directUrl.startsWith('https://') || directUrl.startsWith('http://'));
+    assert.ok(directUrl.includes('jobId=job_12'));
+    assert.ok(!directUrl.endsWith('.docx'));
+
+    // 4. Custom JD link override takes top priority
+    const customJob = { id: 'job_99', title: 'Custom Position', customJdLink: 'https://drive.google.com/file/d/custom/view' };
+    assert.strictEqual(getDirectJdUrl(customJob), 'https://drive.google.com/file/d/custom/view');
+  });
+
+  it('should format group broadcast post where all Link jd lines are clickable URLs', () => {
+    const jobsWithFileNames = [
+      { id: 'job_1', title: 'SALES ERP B2B', salary: '15-20tr', jdFile: 'Sales ERP B2B.docx' },
+      { id: 'job_2', title: 'BUSINESS ANALYST', salary: '20-30tr', jdFile: 'Business Analyst.docx' }
+    ];
+
+    const post = formatGroupBroadcastPost(jobsWithFileNames, '@All Team ơi:', {
+      customJdLinks: {
+        job_1: 'https://docs.google.com/document/d/sales-erp/edit'
+      }
+    });
+
+    // Check custom link override worked for job_1
+    assert.ok(post.includes('Link jd https://docs.google.com/document/d/sales-erp/edit'));
+    // Check job_2 has a direct clickable web URL, NOT "Link jd Business Analyst.docx"
+    assert.ok(!post.includes('Link jd Business Analyst.docx'));
+    assert.ok(post.includes('Link jd https://crmhiring.netlify.app/#ctv-dashboard?jobId=job_2'));
   });
 });

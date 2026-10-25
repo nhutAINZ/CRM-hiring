@@ -21,7 +21,22 @@ export const FASTHUNT_SUBMIT_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIp
  */
 export function getDisplayJobTitle(job = {}) {
   if (!job) return 'Vị trí tuyển dụng';
-  const title = job.title || job.viTri || job.jobTitle || job.position || job.name || job.chucDanh || job.tenViTri || job.côngViệc || '';
+  let title = job.title || job.viTri || job.jobTitle || job.position || job.name || job.chucDanh || job.tenViTri || job.côngViệc || '';
+
+  // If title was stored with rawRow Cột 1
+  if (job.rawRow) {
+    const rawC1 = job.rawRow['Cột 1'] || job.rawRow['cột 1'] || job.rawRow['Vị trí'] || job.rawRow['vị trí'];
+    if (rawC1 && typeof rawC1 === 'string' && rawC1.trim()) {
+      title = rawC1.trim();
+    }
+  }
+
+  // Clean file extensions if accidentally present in title (e.g. Sales ERP B2B.docx -> Sales ERP B2B)
+  if (typeof title === 'string') {
+    title = title.replace(/\.(docx?|pdf)$/i, '').trim();
+    title = title.replace(/^\[?JD\]?\s*[-_:]?\s*/i, '').trim();
+  }
+
   if (title && title.toLowerCase() !== 'vị trí tuyển dụng') {
     return title.trim();
   }
@@ -29,6 +44,48 @@ export function getDisplayJobTitle(job = {}) {
     return `${title || 'Vị trí tuyển dụng'} (${job.company})`;
   }
   return title || 'Vị trí tuyển dụng';
+}
+
+/**
+ * Helper to get a direct, clickable URL for any Job description.
+ * Guaranteed to return a valid http:// or https:// URL so CTV can directly access and click.
+ */
+export function getDirectJdUrl(job = {}, webDashboardUrl = FASTHUNT_WEB_URL) {
+  if (!job) return webDashboardUrl || FASTHUNT_WEB_URL;
+
+  // 1. Direct custom JD link or explicit linkJd / jdUrl starting with http:// or https://
+  const explicitLink = job.customJdLink || job.linkJd || job.jdUrl || job.jdLink;
+  if (explicitLink && typeof explicitLink === 'string' && /^https?:\/\//i.test(explicitLink.trim())) {
+    return explicitLink.trim();
+  }
+
+  // 2. If jdFile is itself an http/https URL
+  if (job.jdFile && typeof job.jdFile === 'string' && /^https?:\/\//i.test(job.jdFile.trim())) {
+    return job.jdFile.trim();
+  }
+
+  // 3. If jdFile contains an http/https URL within text
+  if (job.jdFile && typeof job.jdFile === 'string') {
+    const urlMatch = job.jdFile.match(/https?:\/\/[^\s]+/i);
+    if (urlMatch) return urlMatch[0];
+  }
+
+  // 4. FastHunt Google Docs library mapping for recurring jobs
+  const titleClean = (job.title || '').toLowerCase();
+  if (titleClean.includes('junior ua')) {
+    return 'https://docs.google.com/document/d/1sd7PoULYpz9F7g927X__OhC20Mr0VoeS/edit';
+  }
+  if (titleClean.includes('middle ua')) {
+    return 'https://docs.google.com/document/u/0/d/1ZOHr82yS6uMeU1jx1biaFLejX5utpGHZ/edit';
+  }
+  if (titleClean.includes('video editor') || titleClean.includes('motion graphic')) {
+    return 'https://docs.google.com/document/u/0/d/1kTrxQabYRX1oFFfOCnBgPzSHUe7ySRDk/edit';
+  }
+
+  // 5. Default to direct CTV Web Dashboard link with jobId query parameter
+  const base = (webDashboardUrl || FASTHUNT_WEB_URL).split('?')[0].split('#')[0].replace(/\/$/, '');
+  const id = job.id || job.stt || job.rowIndex || '';
+  return `${base}/#ctv-dashboard?jobId=${id}`;
 }
 
 /**
@@ -270,6 +327,7 @@ export function formatGroupBroadcastPost(jobList = [], customAnnouncement = '', 
   const hotBonus = options.hotBonus || '50k cá 1 cv đủ đk đi pv';
   const webDashboardUrl = options.webUrl || FASTHUNT_WEB_URL;
   const formUrl = options.formUrl || FASTHUNT_SUBMIT_FORM_URL;
+  const customJdLinks = options.customJdLinks || {};
 
   // If no job list provided, build default high-priority jobs
   const jobsToRender = jobList.length > 0 ? jobList : [
@@ -302,7 +360,13 @@ export function formatGroupBroadcastPost(jobList = [], customAnnouncement = '', 
     const salary = j.salary ? `lương ${j.salary}` : 'lương thỏa thuận';
     const warranty = j.warrantyPeriod ? `bh ${j.warrantyPeriod}` : 'bh 60 ngày';
     const bonus = j.bonus ? `${j.bonus}` : 'hh 35% lương uv';
-    const jdLink = j.linkJd || j.jdUrl || j.jdFile || `${webDashboardUrl}`;
+    
+    // Always resolve to a guaranteed direct, clickable URL for CTV
+    const effectiveJob = {
+      ...j,
+      customJdLink: (customJdLinks && customJdLinks[j.id]) || j.customJdLink
+    };
+    const jdLink = getDirectJdUrl(effectiveJob, webDashboardUrl);
 
     return `${num}/${title} ${salary} ${warranty} ${bonus}\nLink jd ${jdLink}`;
   }).join('\n');
@@ -331,12 +395,14 @@ export function formatPersonalMemberPitch(member = {}, job = {}, options = {}) {
   const salary = getDisplaySalary(job);
   const bonus = getDisplayBonus(job);
   const hotBonus = options.hotBonus || 'Thưởng nóng 50k/CV đủ điều kiện phỏng vấn';
+  const directJdUrl = getDirectJdUrl(job, webUrl);
 
   const spintaxTemplate = `{Chào ${memberName} nha|Hi ${memberName}|Chào bạn ${memberName}|Hello ${memberName}}! {${adminName} bên Nhóm CTV FASTHUNT gửi bạn job mới nè|Bên mình đang có job tuyển gấp hoa hồng rất tốt nè|Admin FASTHUNT nhắn bạn tham khảo job hot tuần này nhé}.
 
 🔥 Vị trí: {${jobTitle}}
 💰 Lương: {${salary}}
 🎁 Hoa hồng CTV: {${bonus}} (${hotBonus})
+🔗 Link xem JD chi tiết: ${directJdUrl}
 
 {${memberName} có ứng viên phù hợp giới thiệu giúp mình nhé|Nếu có bạn bè hay ứng viên match vị trí này gửi mình nha|Bạn kết bạn và nộp CV ứng viên qua link dưới này nha}:
 📥 Form gửi CV: ${formUrl}
@@ -349,6 +415,7 @@ export function formatPersonalMemberPitch(member = {}, job = {}, options = {}) {
     jobTitle,
     salary,
     bonus,
+    directJdUrl,
     formUrl,
     webUrl
   });
