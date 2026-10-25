@@ -67,7 +67,7 @@ describe('Unit Tests: Frontend Design, Royal Blue Theme, Dark Mode & Watermark S
   it('should verify CtvDashboardView has Royal Blue hero banner and clean white styling', () => {
     const ctvContent = fs.readFileSync(ctvDashboardPath, 'utf-8');
     
-    assert.ok(ctvContent.includes('from-blue-600 via-blue-700 to-indigo-800'), 'Hero banner must use Royal Blue gradient');
+    assert.ok(ctvContent.includes('from-blue-600 via-blue-700 to-blue-900'), 'Hero banner must use Royal Blue gradient');
     assert.ok(ctvContent.includes('bg-white text-blue-700'), 'CTA button must be crisp white with royal blue text');
     assert.ok(ctvContent.includes('Hồ Sơ Ứng Viên & Tiến Độ Hoa Hồng Của Tôi'), 'Candidate tracker title must be present');
   });

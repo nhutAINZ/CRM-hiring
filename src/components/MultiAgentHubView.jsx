@@ -286,14 +286,14 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       {/* Top Banner Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 md:p-8 text-white shadow-xl border border-indigo-500/20">
-        <div className="absolute -right-12 -top-12 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute right-1/4 -bottom-16 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-6 md:p-8 text-white shadow-xl border border-blue-500/20">
+        <div className="absolute -right-12 -top-12 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute right-1/4 -bottom-16 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-semibold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '6s' }} />
                 FastHunt Autonomous Swarm Architecture
               </div>
@@ -324,7 +324,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
               </div>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <Bot className="w-8 h-8 text-indigo-400" />
+              <Bot className="w-8 h-8 text-blue-400" />
               Trung Tâm Điều Hành Multi-Agent Swarm
             </h1>
             <p className="mt-2 text-sm md:text-base text-slate-300 max-w-2xl leading-relaxed">
@@ -335,7 +335,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
           {/* Quick Stats Widget */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="bg-slate-800/80 backdrop-blur-md rounded-xl p-3 border border-slate-700/60 flex flex-col items-center justify-center">
-              <div className="text-2xl font-black text-indigo-400">6</div>
+              <div className="text-2xl font-black text-blue-400">6</div>
               <div className="text-[11px] text-slate-400 uppercase tracking-wider">Agents Sẵn Sàng</div>
             </div>
             <div className="bg-slate-800/80 backdrop-blur-md rounded-xl p-3 border border-slate-700/60 flex flex-col items-center justify-center">
@@ -354,8 +354,8 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
           {Object.values(AGENT_REGISTRY).map(agent => (
             <div
               key={agent.id}
-              className={`relative rounded-xl p-3 transition-all duration-200 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 hover:border-indigo-400/50 flex flex-col justify-between ${
-                isExecuting || isDebating ? 'ring-1 ring-indigo-500/30' : ''
+              className={`relative rounded-xl p-3 transition-all duration-200 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 hover:border-blue-400/50 flex flex-col justify-between ${
+                isExecuting || isDebating ? 'ring-1 ring-blue-500/30' : ''
               }`}
             >
               <div className="flex items-center justify-between mb-1.5">
@@ -380,7 +380,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
           onClick={() => setActiveTab('console')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
             activeTab === 'console'
-              ? 'bg-indigo-600 text-white shadow-indigo-500/20'
+              ? 'bg-blue-600 text-white shadow-blue-500/20'
               : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700'
           }`}
         >
@@ -392,14 +392,14 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
           onClick={() => setActiveTab('batch')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
             activeTab === 'batch'
-              ? 'bg-indigo-600 text-white shadow-indigo-500/20'
+              ? 'bg-blue-600 text-white shadow-blue-500/20'
               : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700'
           }`}
         >
           <Award className="w-4 h-4" />
           Batch Sourcing Screener
           {batchResults.length > 0 && (
-            <span className="px-1.5 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-[10px]">
+            <span className="px-1.5 py-0.5 rounded-full bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-[10px]">
               {batchResults.length}
             </span>
           )}
@@ -409,7 +409,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
           onClick={() => setActiveTab('debate')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
             activeTab === 'debate'
-              ? 'bg-indigo-600 text-white shadow-indigo-500/20'
+              ? 'bg-blue-600 text-white shadow-blue-500/20'
               : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700'
           }`}
         >
@@ -421,7 +421,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
           onClick={() => setActiveTab('audit')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
             activeTab === 'audit'
-              ? 'bg-indigo-600 text-white shadow-indigo-500/20'
+              ? 'bg-blue-600 text-white shadow-blue-500/20'
               : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700'
           }`}
         >
@@ -438,7 +438,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
           onClick={() => setActiveTab('settings')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
             activeTab === 'settings'
-              ? 'bg-indigo-600 text-white shadow-indigo-500/20'
+              ? 'bg-blue-600 text-white shadow-blue-500/20'
               : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700'
           }`}
         >
@@ -464,7 +464,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
               </div>
               <button
                 onClick={() => setChatHistory([chatHistory[0]])}
-                className="text-xs text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 transition-colors"
+                className="text-xs text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors"
                 title="Xóa lịch sử trò chuyện"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -480,20 +480,20 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                   className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {msg.sender !== 'user' && (
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-600 text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0">
                       🤖
                     </div>
                   )}
 
                   <div className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed ${
                     msg.sender === 'user'
-                      ? 'bg-indigo-600 text-white rounded-tr-none'
+                      ? 'bg-blue-600 text-white rounded-tr-none'
                       : 'bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-tl-none shadow-sm'
                   }`}>
                     {/* Execution Steps Trace */}
                     {msg.steps && msg.steps.length > 0 && (
                       <div className="mb-3 space-y-1.5 pb-3 border-b border-slate-200 dark:border-slate-700">
-                        <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
                           <Layers className="w-3 h-3" />
                           Tiến trình phân phối nhiệm vụ (Task Decomposition):
                         </div>
@@ -525,7 +525,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                       {msg.sender !== 'user' && (
                         <button
                           onClick={() => handleCopy(msg.text, msg.id)}
-                          className="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1"
+                          className="hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1"
                         >
                           {copiedId === msg.id ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
                           {copiedId === msg.id ? 'Đã copy' : 'Sao chép nội dung'}
@@ -538,8 +538,8 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
 
               {/* Active Thinking Steps Live Stream */}
               {isExecuting && swarmSteps.length > 0 && (
-                <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/50 space-y-2 animate-pulse">
-                  <div className="text-xs font-bold text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
+                <div className="p-4 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50 space-y-2 animate-pulse">
+                  <div className="text-xs font-bold text-blue-700 dark:text-blue-300 flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 animate-spin" />
                     Đang điều phối Swarm Agents...
                   </div>
@@ -571,12 +571,12 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                   onChange={(e) => setPromptInput(e.target.value)}
                   placeholder="Nhập yêu cầu (VD: Lọc top 3 ứng viên tốt nhất, kiểm tra hồ sơ nghẽn SLA > 48h...)"
                   disabled={isExecuting}
-                  className="flex-1 px-4 py-3 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  className="flex-1 px-4 py-3 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                 />
                 <button
                   type="submit"
                   disabled={isExecuting || !promptInput.trim()}
-                  className="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20 shrink-0"
+                  className="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-blue-500/20 shrink-0"
                 >
                   {isExecuting ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -624,9 +624,9 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                     key={idx}
                     onClick={() => handleRunSwarmPrompt(item.prompt)}
                     disabled={isExecuting}
-                    className="w-full text-left p-3 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50 hover:bg-indigo-50/60 dark:bg-slate-800/50 dark:hover:bg-indigo-950/30 transition-all group"
+                    className="w-full text-left p-3 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50 hover:bg-blue-50/60 dark:bg-slate-800/50 dark:hover:bg-blue-950/30 transition-all group"
                   >
-                    <div className="font-semibold text-xs text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                    <div className="font-semibold text-xs text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
                       {item.title}
                     </div>
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
@@ -638,9 +638,9 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
             </div>
 
             {/* Swarm Architecture Card */}
-            <div className="bg-gradient-to-br from-indigo-900/10 to-violet-900/10 dark:from-indigo-950/40 dark:to-violet-950/40 rounded-2xl p-5 border border-indigo-200 dark:border-indigo-800/40">
+            <div className="bg-gradient-to-br from-blue-900/10 to-sky-900/10 dark:from-blue-950/40 dark:to-sky-950/40 rounded-2xl p-5 border border-blue-200 dark:border-blue-800/40">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-2">
-                <ShieldCheck className="w-4 h-4 text-indigo-500" />
+                <ShieldCheck className="w-4 h-4 text-blue-500" />
                 Cơ Chế Phối Hợp Đa Tác Nhân
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -703,7 +703,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                   step="5"
                   value={minScoreFilter}
                   onChange={(e) => setMinScoreFilter(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
               </div>
             </div>
@@ -711,7 +711,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
             <button
               onClick={handleRunBatchScreening}
               disabled={isExecuting}
-              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-500/20 shrink-0"
+              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-500/20 shrink-0"
             >
               {isExecuting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
               Chạy Screening Toàn Bộ ({candidates.length} Hồ Sơ)
@@ -722,7 +722,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <h3 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
-                <Award className="w-5 h-5 text-indigo-500" />
+                <Award className="w-5 h-5 text-blue-500" />
                 Ma Trận Xếp Hạng Ứng Viên (AI Fit Score Matrix)
               </h3>
               <span className="text-xs text-slate-500">
@@ -804,7 +804,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                                 setDebateCandidateId(item.candidateId);
                                 setActiveTab('debate');
                               }}
-                              className="px-2.5 py-1 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 font-semibold border border-indigo-200 dark:border-indigo-800 flex items-center gap-1"
+                              className="px-2.5 py-1 text-xs rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/50 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 font-semibold border border-blue-200 dark:border-blue-800 flex items-center gap-1"
                               title="Tổ chức tranh biện giữa các AI Agents"
                             >
                               <Scale className="w-3 h-3" />
@@ -877,7 +877,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
             <button
               onClick={handleRunDebate}
               disabled={isDebating}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-500/20 shrink-0 w-full md:w-auto"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-500/20 shrink-0 w-full md:w-auto"
             >
               {isDebating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Scale className="w-4 h-4" />}
               Bắt Đầu Tranh Biện Đa Tác Nhân (Start Debate)
@@ -949,16 +949,16 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
 
           {/* Verdict Box */}
           {debateVerdict && (
-            <div className="bg-gradient-to-br from-violet-900/10 via-indigo-900/10 to-slate-900/10 dark:from-violet-950/40 dark:via-indigo-950/40 dark:to-slate-950/40 rounded-2xl p-6 border-2 border-indigo-400/40 shadow-lg">
+            <div className="bg-gradient-to-br from-blue-900/10 via-sky-900/10 to-slate-900/10 dark:from-blue-950/40 dark:via-sky-950/40 dark:to-slate-950/40 rounded-2xl p-6 border-2 border-blue-400/40 shadow-lg">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center text-xl font-bold shadow-md">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-600 text-white flex items-center justify-center text-xl font-bold shadow-md">
                   🤖
                 </div>
                 <div>
                   <div className="font-black text-base text-slate-900 dark:text-white">
                     Phán Quyết Đồng Thuận (Supervisor Final Consensus Verdict)
                   </div>
-                  <div className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+                  <div className="text-xs text-blue-600 dark:text-blue-400 font-semibold">
                     Tổng hợp từ lập luận đa chiều của Screener & Auditor
                   </div>
                 </div>
@@ -1013,7 +1013,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
               </h3>
               <button
                 onClick={() => setAuditResult(runPipelineSlaAudit(candidates, jobItems))}
-                className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1"
+                className="text-xs text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 Quét lại toàn phễu
@@ -1043,7 +1043,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                       <div className="text-xs text-slate-600 dark:text-slate-300">
                         <strong>Nguyên nhân:</strong> {item.reason}
                       </div>
-                      <div className="text-xs text-indigo-600 dark:text-indigo-400">
+                      <div className="text-xs text-blue-600 dark:text-blue-400">
                         <strong>Khuyến nghị Kaizen:</strong> {item.recommendedAction}
                       </div>
                     </div>
@@ -1052,7 +1052,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                       {onOpenEmail && (
                         <button
                           onClick={() => onOpenEmail({ name: item.candidateName, position: item.position })}
-                          className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm"
+                          className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm"
                         >
                           <Mail className="w-3.5 h-3.5" />
                           Gửi Thư Nhắc Nhở
@@ -1073,10 +1073,10 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
       {activeTab === 'settings' && (
         <div className="space-y-6 max-w-4xl">
           {/* 9Router Live Status Card */}
-          <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 border border-indigo-500/30 shadow-lg text-white">
+          <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-6 border border-blue-500/30 shadow-lg text-white">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-700/80">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400">
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400">
                   <Network className="w-6 h-6" />
                 </div>
                 <div>
@@ -1100,7 +1100,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                 type="button"
                 onClick={() => checkRouterHealth()}
                 disabled={routerStatus.loading}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-500/20 shrink-0"
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-500/20 shrink-0"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${routerStatus.loading ? 'animate-spin' : ''}`} />
                 {routerStatus.loading ? 'Đang kiểm tra...' : 'Kiểm Tra Kết Nối (Ping)'}
@@ -1111,7 +1111,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700">
                 <div className="text-slate-400 text-[11px]">Endpoint Hiện Tại</div>
-                <div className="font-mono text-indigo-300 mt-0.5 truncate">{routerConfig.endpoint || 'http://localhost:20128/v1'}</div>
+                <div className="font-mono text-blue-300 mt-0.5 truncate">{routerConfig.endpoint || 'http://localhost:20128/v1'}</div>
               </div>
               <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700">
                 <div className="text-slate-400 text-[11px]">Độ Trễ Phản Hồi (Latency)</div>
@@ -1121,7 +1121,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
               </div>
               <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700">
                 <div className="text-slate-400 text-[11px]">Trạng Thái RTK Token Saver</div>
-                <div className="font-bold text-violet-300 mt-0.5">
+                <div className="font-bold text-sky-300 mt-0.5">
                   {routerConfig.tokenSaver ? '✓ Kích hoạt (Giảm 30% Token)' : 'Tắt'}
                 </div>
               </div>
@@ -1141,7 +1141,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
           {/* Configuration Form */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
             <h3 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2 mb-2">
-              <Sliders className="w-5 h-5 text-indigo-500" />
+              <Sliders className="w-5 h-5 text-blue-500" />
               Cấu Hình Tham Số Kết Nối 9Router & Swarm
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
@@ -1171,14 +1171,14 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                       }}
                       className={`p-3 rounded-xl text-left border transition-all ${
                         (config.apiEndpoint || routerConfig.endpoint) === p.endpoint
-                          ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 ring-1 ring-indigo-500'
+                          ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 ring-1 ring-blue-500'
                           : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200'
                       }`}
                     >
                       <div className="font-bold text-xs flex items-center justify-between">
                         <span>{p.label}</span>
                         {(config.apiEndpoint || routerConfig.endpoint) === p.endpoint && (
-                          <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                         )}
                       </div>
                       <div className="font-mono text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
@@ -1263,7 +1263,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                     className="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
                   />
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Nếu chạy 9Router cục bộ không cài đặt mật khẩu, có thể giữ giá trị mặc định <code className="text-indigo-600 dark:text-indigo-400">9router-default-key</code>.
+                    Nếu chạy 9Router cục bộ không cài đặt mật khẩu, có thể giữ giá trị mặc định <code className="text-blue-600 dark:text-blue-400">9router-default-key</code>.
                   </p>
                 </div>
 
@@ -1274,7 +1274,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                       type="checkbox"
                       checked={routerConfig.tokenSaver}
                       onChange={(e) => setRouterConfig({ ...routerConfig, tokenSaver: e.target.checked })}
-                      className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                      className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
                     />
                     <span>Bật RTK Token Saver (Nén ngữ cảnh & tiết kiệm chi phí)</span>
                   </label>
@@ -1284,7 +1284,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                       type="checkbox"
                       checked={routerConfig.autoFailover}
                       onChange={(e) => setRouterConfig({ ...routerConfig, autoFailover: e.target.checked })}
-                      className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                      className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
                     />
                     <span>Tự động Failover khi nhà cung cấp quá tải / hết quota</span>
                   </label>
@@ -1303,7 +1303,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                   step="0.05"
                   value={config.temperature}
                   onChange={(e) => setConfig({ ...config, temperature: parseFloat(e.target.value) })}
-                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
                 <div className="flex justify-between text-[10px] text-slate-400 mt-1">
                   <span>0.0 (Chính xác / Quy chuẩn)</span>
@@ -1322,14 +1322,14 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                   value={config.customInstructions || ''}
                   onChange={(e) => setConfig({ ...config, customInstructions: e.target.value })}
                   placeholder="VD: Ưu tiên ứng viên có chứng chỉ tiếng Nhật N2 trở lên, nhấn mạnh văn hóa làm việc linh hoạt hybrid..."
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               {/* Quickstart snippet */}
               <div className="p-4 rounded-xl bg-slate-950 text-slate-300 font-mono text-xs border border-slate-800 space-y-1.5">
                 <div className="text-slate-400 font-sans font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                  <Cpu className="w-3.5 h-3.5 text-indigo-400" />
+                  <Cpu className="w-3.5 h-3.5 text-blue-400" />
                   Hướng dẫn khởi chạy 9Router trên máy cục bộ (Local Terminal):
                 </div>
                 <div className="text-emerald-400"># 1. Cài đặt và khởi động 9Router proxy</div>
@@ -1344,7 +1344,7 @@ Hệ thống tuyển dụng đa tác nhân tự hành (Autonomous Multi-Agent Sw
                 </span>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-all shadow-md shadow-indigo-500/20"
+                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all shadow-md shadow-blue-500/20"
                 >
                   Lưu Cấu Hình
                 </button>

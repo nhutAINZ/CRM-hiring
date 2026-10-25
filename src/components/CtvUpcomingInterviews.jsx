@@ -31,7 +31,7 @@ export default function CtvUpcomingInterviews({
     <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-5 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-900/40">
+          <div className="p-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-900/40">
             <Calendar className="w-5 h-5" />
           </div>
           <div>
@@ -39,7 +39,7 @@ export default function CtvUpcomingInterviews({
               <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
                 Lịch Phỏng Vấn Sắp Diễn Ra Của Ứng Viên Tôi
               </h3>
-              <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-extrabold text-xs">
+              <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold text-xs">
                 {upcomingInterviews.length} ứng viên
               </span>
             </div>
@@ -49,7 +49,7 @@ export default function CtvUpcomingInterviews({
           </div>
         </div>
 
-        <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full border border-indigo-200 dark:border-indigo-800 w-fit">
+        <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800 w-fit">
           Ưu tiên chăm sóc hôm nay
         </span>
       </div>
@@ -61,12 +61,12 @@ export default function CtvUpcomingInterviews({
           return (
             <div
               key={c.id}
-              className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between space-y-3 hover:border-indigo-400/50 transition-all"
+              className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between space-y-3 hover:border-blue-400/50 transition-all"
             >
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">{c.name}</h4>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                     Chờ PV
                   </span>
                 </div>
@@ -78,13 +78,13 @@ export default function CtvUpcomingInterviews({
                     <span className="truncate">{c.company || 'Doanh nghiệp đối tác'}</span>
                   </div>
                   {c.interviewDate && (
-                    <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-bold text-[11px]">
+                    <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-bold text-[11px]">
                       <Clock className="w-3.5 h-3.5 shrink-0" />
                       <span>Lịch: {c.interviewDate}</span>
                     </div>
                   )}
                   {c.pvResultRaw && !c.interviewDate && (
-                    <div className="text-[11px] text-indigo-500 font-medium">
+                    <div className="text-[11px] text-blue-500 font-medium">
                       Trạng thái: {c.pvResultRaw}
                     </div>
                   )}

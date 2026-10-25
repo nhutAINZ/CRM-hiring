@@ -239,8 +239,8 @@ export default function KanbanBoard({
                           <a
                             href={c.cvUrl}
                             target="_blank"
-                            rel="noreferrer"
-                            className="p-1.5 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-all"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all"
                             title="Mở CV gốc"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />

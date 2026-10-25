@@ -49,7 +49,7 @@ export default function TemplateEditorModal({ onClose, onSaveSuccess }) {
         {/* Header */}
         <div className="bg-slate-900 p-3.5 sm:p-5 text-white flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
               <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="truncate">

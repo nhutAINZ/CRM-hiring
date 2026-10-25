@@ -44,12 +44,15 @@ const cleanText = (str) => {
 
 // Helper to construct GViz CSV URL
 export const getCsvUrl = (spreadsheetId, gid = '0') => {
-  return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&gid=${gid}`;
+  const safeId = encodeURIComponent(String(spreadsheetId || '').trim());
+  const safeGid = encodeURIComponent(String(gid || '0').trim());
+  return `https://docs.google.com/spreadsheets/d/${safeId}/gviz/tq?tqx=out:csv&gid=${safeGid}`;
 };
 
 // Helper to construct view URL for Sheet 2
 export const getSheet2ViewUrl = (sheet2Id = DEFAULT_CONFIG.sheet2Id) => {
-  return `https://docs.google.com/spreadsheets/d/${sheet2Id}/edit`;
+  const safeId = encodeURIComponent(String(sheet2Id || '').trim());
+  return `https://docs.google.com/spreadsheets/d/${safeId}/edit`;
 };
 
 // Helper to construct view URL for CTV Sheet
@@ -57,7 +60,9 @@ export const getCtvSheetViewUrl = (
   ctvSheetId = DEFAULT_CONFIG.ctvSheetId,
   ctvSheetGid = DEFAULT_CONFIG.ctvSheetGid
 ) => {
-  return `https://docs.google.com/spreadsheets/d/${ctvSheetId}/edit?gid=${ctvSheetGid}#gid=${ctvSheetGid}`;
+  const safeId = encodeURIComponent(String(ctvSheetId || '').trim());
+  const safeGid = encodeURIComponent(String(ctvSheetGid || '0').trim());
+  return `https://docs.google.com/spreadsheets/d/${safeId}/edit?gid=${safeGid}#gid=${safeGid}`;
 };
 
 // Helper to construct view URL for Job Sheet

@@ -155,7 +155,7 @@ export default function CtvLeaderboard({ leaderboard = [], activeCtvCode }) {
             {/* Kỳ 2 */}
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center">
                   25
                 </div>
                 <div>

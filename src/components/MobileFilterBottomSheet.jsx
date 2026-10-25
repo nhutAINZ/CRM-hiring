@@ -161,7 +161,7 @@ export default function MobileFilterBottomSheet({
           {/* 3. Trạng thái Phỏng vấn (PV) */}
           <div className="space-y-2">
             <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <Clock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>Trạng thái Phỏng vấn</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -244,7 +244,7 @@ export default function MobileFilterBottomSheet({
           </button>
           <button
             onClick={onClose}
-            className="flex-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold shadow-lg shadow-blue-500/30 min-h-[48px] cursor-pointer"
+            className="flex-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold shadow-lg shadow-blue-500/30 min-h-[48px] cursor-pointer"
           >
             Áp dụng ({totalResults} kết quả)
           </button>

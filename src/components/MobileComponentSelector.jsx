@@ -64,11 +64,11 @@ export default function MobileComponentSelector({
           title: 'Multi-Agent Swarm Hub',
           subtitle: 'Điều hành 5 AI Agents tự động: Lọc CV, Tranh biện & SLA Kaizen',
           icon: Bot,
-          iconColor: 'text-violet-600 dark:text-violet-400',
-          bgColor: 'bg-violet-50 dark:bg-violet-950/50',
-          borderColor: 'border-violet-200 dark:border-violet-800/60',
+          iconColor: 'text-blue-600 dark:text-blue-400',
+          bgColor: 'bg-blue-50 dark:bg-blue-950/50',
+          borderColor: 'border-blue-200 dark:border-blue-800/60',
           stat: 'AI 6x Swarm',
-          statColor: 'text-violet-600 font-bold',
+          statColor: 'text-blue-600 font-bold',
           type: 'view'
         },
         {
@@ -88,11 +88,11 @@ export default function MobileComponentSelector({
           title: 'Bảng Tin & Link Jobs',
           subtitle: 'Khám phá Jobs Hot, xem JD, gán ứng viên vào Job',
           icon: Briefcase,
-          iconColor: 'text-indigo-600 dark:text-indigo-400',
-          bgColor: 'bg-indigo-50 dark:bg-indigo-950/50',
-          borderColor: 'border-indigo-200 dark:border-indigo-800/60',
+          iconColor: 'text-blue-600 dark:text-blue-400',
+          bgColor: 'bg-blue-50 dark:bg-blue-950/50',
+          borderColor: 'border-blue-200 dark:border-blue-800/60',
           stat: jobCount > 0 ? `${jobCount} Jobs đang tuyển` : 'Hot Jobs',
-          statColor: 'text-indigo-600 font-bold',
+          statColor: 'text-blue-600 font-bold',
           type: 'view'
         },
         {
@@ -174,11 +174,11 @@ export default function MobileComponentSelector({
           title: 'Trợ Lý AI FastHunt Bot',
           subtitle: 'Chatbot AI hỏi đáp số liệu, gợi ý ứng viên phù hợp',
           icon: Bot,
-          iconColor: 'text-purple-600 dark:text-purple-400',
-          bgColor: 'bg-purple-50 dark:bg-purple-950/50',
-          borderColor: 'border-purple-200 dark:border-purple-800/60',
+          iconColor: 'text-sky-600 dark:text-sky-400',
+          bgColor: 'bg-sky-50 dark:bg-sky-950/50',
+          borderColor: 'border-sky-200 dark:border-sky-800/60',
           stat: 'Smart AI Agent',
-          statColor: 'text-purple-600 font-bold',
+          statColor: 'text-sky-600 font-bold',
           type: 'action',
           action: () => {
             if (onOpenAiBot) onOpenAiBot();
@@ -189,11 +189,11 @@ export default function MobileComponentSelector({
           title: 'Mẫu Thư Tuyển Dụng & Email',
           subtitle: 'Thư mời phỏng vấn, Offer Letter, Thư cảm ơn',
           icon: FileText,
-          iconColor: 'text-indigo-600 dark:text-indigo-400',
-          bgColor: 'bg-indigo-50 dark:bg-indigo-950/50',
-          borderColor: 'border-indigo-200 dark:border-indigo-800/60',
+          iconColor: 'text-sky-600 dark:text-sky-400',
+          bgColor: 'bg-sky-50 dark:bg-sky-950/50',
+          borderColor: 'border-sky-200 dark:border-sky-800/60',
           stat: 'Template Engine',
-          statColor: 'text-indigo-600 font-bold',
+          statColor: 'text-sky-600 font-bold',
           type: 'action',
           action: () => {
             if (onOpenTemplates) onOpenTemplates();
@@ -238,11 +238,11 @@ export default function MobileComponentSelector({
           title: 'Báo Cáo & Phân Tích Chuyên Sâu',
           subtitle: 'Biểu đồ trực quan, phân bố vị trí, nguồn tuyển dụng',
           icon: BarChart3,
-          iconColor: 'text-indigo-600 dark:text-indigo-400',
-          bgColor: 'bg-indigo-50 dark:bg-indigo-950/50',
-          borderColor: 'border-indigo-200 dark:border-indigo-800/60',
+          iconColor: 'text-blue-600 dark:text-blue-400',
+          bgColor: 'bg-blue-50 dark:bg-blue-950/50',
+          borderColor: 'border-blue-200 dark:border-blue-800/60',
           stat: 'Biểu đồ & Chart',
-          statColor: 'text-indigo-600 font-bold',
+          statColor: 'text-blue-600 font-bold',
           type: 'view'
         },
         {
@@ -299,11 +299,11 @@ export default function MobileComponentSelector({
           title: 'Archify (Kiến Trúc & UML)',
           subtitle: 'Mô hình C4, cây Component React 19, Sequence flows & ERD',
           icon: Layers,
-          iconColor: 'text-indigo-600 dark:text-indigo-400',
-          bgColor: 'bg-indigo-50 dark:bg-indigo-950/50',
-          borderColor: 'border-indigo-200 dark:border-indigo-800/60',
+          iconColor: 'text-blue-600 dark:text-blue-400',
+          bgColor: 'bg-blue-50 dark:bg-blue-950/50',
+          borderColor: 'border-blue-200 dark:border-blue-800/60',
           stat: 'UML Studio',
-          statColor: 'text-indigo-600 font-bold',
+          statColor: 'text-blue-600 font-bold',
           type: 'view'
         }
       ]
@@ -363,7 +363,7 @@ export default function MobileComponentSelector({
 
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+              <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>

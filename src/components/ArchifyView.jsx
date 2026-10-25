@@ -448,9 +448,9 @@ export default function ArchifyView({ onExportMarkdown }) {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* ── 1. Archify Studio Header Banner ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 border border-slate-700/60 p-6 sm:p-8 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border border-slate-700/60 p-6 sm:p-8 text-white shadow-xl">
         <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-48 -mb-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute bottom-0 right-48 -mb-12 w-64 h-64 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
@@ -483,7 +483,7 @@ export default function ArchifyView({ onExportMarkdown }) {
             {onExportMarkdown && (
               <button
                 onClick={onExportMarkdown}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-500/30 cursor-pointer hover:scale-102 active:scale-98"
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-500/30 cursor-pointer hover:scale-102 active:scale-98"
                 title="Tải toàn bộ tài liệu kiến trúc ARCHIFY_SYSTEM_ARCHITECTURE.md"
               >
                 <Download className="w-4 h-4" />
@@ -505,7 +505,7 @@ export default function ArchifyView({ onExportMarkdown }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300">
+            <div className="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300">
               <Server className="w-4 h-4" />
             </div>
             <div>
@@ -523,7 +523,7 @@ export default function ArchifyView({ onExportMarkdown }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300">
+            <div className="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300">
               <Database className="w-4 h-4" />
             </div>
             <div>
@@ -575,7 +575,7 @@ export default function ArchifyView({ onExportMarkdown }) {
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 diagramMode === 'visual'
                   ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Visual Diagrams
@@ -585,7 +585,7 @@ export default function ArchifyView({ onExportMarkdown }) {
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 diagramMode === 'code'
                   ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Terminal className="w-3.5 h-3.5" />
@@ -650,7 +650,7 @@ export default function ArchifyView({ onExportMarkdown }) {
               <div className="rounded-2xl p-5 bg-white dark:bg-[#0c1222] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
                       <Server className="w-4 h-4" />
                     </div>
                     <div>
@@ -658,7 +658,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                       <p className="text-[11px] text-slate-400">Node.js + Express Gateway</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                     ES Modules
                   </span>
                 </div>
@@ -667,7 +667,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
                     <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                       <span>sheetsService.js</span>
-                      <span className="text-[10px] text-indigo-500 font-mono">GViz CSV</span>
+                      <span className="text-[10px] text-blue-500 font-mono">GViz CSV</span>
                     </div>
                     <p className="text-[11px] text-slate-400 mt-1">
                       Kết nối đồng thời 4 Google Sheets: Ứng viên, CRM Khách hàng, Jobs và CTV.
@@ -677,7 +677,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
                     <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                       <span>aiMatchingService.js</span>
-                      <span className="text-[10px] text-purple-500 font-mono">TF-IDF Vector</span>
+                      <span className="text-[10px] text-sky-500 font-mono">TF-IDF Vector</span>
                     </div>
                     <p className="text-[11px] text-slate-400 mt-1">
                       Thuật toán chấm điểm độ khớp ứng viên theo kỹ năng, năm kinh nghiệm và cấp bậc.
@@ -737,7 +737,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800/80">
                     <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                       <span>Google Gemini 1.5 Pro</span>
-                      <span className="text-[10px] text-violet-500 font-mono">LLM NLP</span>
+                      <span className="text-[10px] text-sky-500 font-mono">LLM NLP</span>
                     </div>
                     <p className="text-[11px] text-slate-400 mt-1">
                       Phân tích sâu ưu nhược điểm CV và sinh câu hỏi phỏng vấn chuẩn hóa.
@@ -760,7 +760,7 @@ export default function ArchifyView({ onExportMarkdown }) {
           {diagramMode === 'visual' ? (
             <div className="space-y-6">
               {/* Root App Card */}
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/30 text-white">
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-900/40 to-blue-950/40 border border-blue-500/30 text-white">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black">
@@ -783,14 +783,14 @@ export default function ArchifyView({ onExportMarkdown }) {
                   {
                     name: 'Header.jsx',
                     tag: 'Navigation Bar',
-                    color: 'from-blue-500/10 to-indigo-500/10 border-blue-200 dark:border-blue-800/60',
+                    color: 'from-blue-500/10 to-sky-500/10 border-blue-200 dark:border-blue-800/60',
                     props: ['activeView', 'candidateCount', 'urgentCount', 'isRefreshing', 'onRefresh'],
                     desc: 'Thanh điều hướng trên cùng, hiển thị KPI nhanh, nút refresh và chuyển đổi dark mode.'
                   },
                   {
                     name: 'Sidebar.jsx',
                     tag: 'Drawer & Rail',
-                    color: 'from-indigo-500/10 to-purple-500/10 border-indigo-200 dark:border-indigo-800/60',
+                    color: 'from-blue-500/10 to-sky-500/10 border-blue-200 dark:border-blue-800/60',
                     props: ['collapsed', 'mobileOpen', 'candidateCount', 'urgentCount', 'jobCount'],
                     desc: 'Thanh menu bên trái hỗ trợ thu gọn, danh mục tuyển dụng, khách hàng và công cụ tiện ích.'
                   },
@@ -825,7 +825,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                   {
                     name: 'AiRecruiterBot.jsx',
                     tag: 'AI Assistant',
-                    color: 'from-violet-500/10 to-purple-500/10 border-violet-200 dark:border-violet-800/60',
+                    color: 'from-sky-500/10 to-blue-500/10 border-sky-200 dark:border-sky-800/60',
                     props: ['candidates', 'jobItems', 'isOpen', 'onClose'],
                     desc: 'Bot tuyển dụng AI thông minh hỗ trợ phân tích tỷ lệ Pass và đề xuất chiến lược tuyển dụng.'
                   },
@@ -903,7 +903,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                 onClick={() => setActiveSequenceFlow(flow.id)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                   activeSequenceFlow === flow.id
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                     : 'bg-white dark:bg-[#0c1222] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
                 }`}
               >
@@ -924,7 +924,7 @@ export default function ArchifyView({ onExportMarkdown }) {
             <div className="rounded-2xl p-6 bg-white dark:bg-[#0c1222] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <GitBranch className="w-5 h-5 text-indigo-500" />
+                  <GitBranch className="w-5 h-5 text-blue-500" />
                   {activeSequenceFlow === 'etl' && 'Quy trình Ingestion Dữ Liệu Đa Nguồn (Google Sheets GViz ETL)'}
                   {activeSequenceFlow === 'aimatch' && 'Quy trình Chấm Điểm & Phân Tích Độ Phù Hợp Bằng AI'}
                   {activeSequenceFlow === 'zalo' && 'Quy trình Xử Lý Webhook Zalo OA & Gửi Lịch Phỏng Vấn Tự Động'}
@@ -943,14 +943,14 @@ export default function ArchifyView({ onExportMarkdown }) {
                     { step: '05', actor: 'React State', action: 'Cập nhật candidates[], jobItems[], tính toán KPI Cards và render bảng dữ liệu', target: 'UI Display' }
                   ].map((s, idx) => (
                     <div key={idx} className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
-                      <span className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                      <span className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 font-mono font-bold text-xs flex items-center justify-center shrink-0">
                         {s.step}
                       </span>
                       <div className="flex-1 text-xs">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-slate-800 dark:text-slate-200">{s.actor}</span>
                           <ArrowRight className="w-3 h-3 text-slate-400" />
-                          <span className="font-semibold text-indigo-600 dark:text-indigo-400">{s.target}</span>
+                          <span className="font-semibold text-blue-600 dark:text-blue-400">{s.target}</span>
                         </div>
                         <p className="text-slate-500 dark:text-slate-400 mt-1">{s.action}</p>
                       </div>
@@ -969,14 +969,14 @@ export default function ArchifyView({ onExportMarkdown }) {
                     { step: '05', actor: 'UI Match List', action: 'Hiển thị danh sách ứng viên xếp hạng theo điểm tương thích kèm nhãn gap kỹ năng', target: 'Recruiter View' }
                   ].map((s, idx) => (
                     <div key={idx} className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
-                      <span className="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                      <span className="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 font-mono font-bold text-xs flex items-center justify-center shrink-0">
                         {s.step}
                       </span>
                       <div className="flex-1 text-xs">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-slate-800 dark:text-slate-200">{s.actor}</span>
                           <ArrowRight className="w-3 h-3 text-slate-400" />
-                          <span className="font-semibold text-purple-600 dark:text-purple-400">{s.target}</span>
+                          <span className="font-semibold text-sky-600 dark:text-sky-400">{s.target}</span>
                         </div>
                         <p className="text-slate-500 dark:text-slate-400 mt-1">{s.action}</p>
                       </div>
@@ -1084,7 +1084,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                               </span>
                             )}
                             {col.key === 'FK' && (
-                              <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700">
+                              <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700">
                                 FK
                               </span>
                             )}
@@ -1144,14 +1144,14 @@ export default function ArchifyView({ onExportMarkdown }) {
                       {
                         stage: '3. Phỏng Vấn (INTERVIEW)',
                         statusKey: 'INTERVIEW',
-                        color: 'border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20',
+                        color: 'border-blue-500 bg-blue-50/40 dark:bg-blue-950/20',
                         desc: 'Phỏng vấn chuyên môn Vòng 1 và Vòng 2 với Doanh nghiệp khách hàng.',
                         actions: ['Pass Phỏng Vấn', 'Phỏng Vấn Không Đạt']
                       },
                       {
                         stage: '4. Đề Nghị Nhận Việc (OFFER)',
                         statusKey: 'OFFER',
-                        color: 'border-purple-500 bg-purple-50/40 dark:bg-purple-950/20',
+                        color: 'border-sky-500 bg-sky-50/40 dark:bg-sky-950/20',
                         desc: 'Gửi thư mời nhận việc (Offer Letter) qua Email & Zalo. Chờ ứng viên xác nhận.',
                         actions: ['Ứng Viên Đồng Ý (Accept)', 'Từ Chối Offer']
                       },
@@ -1233,7 +1233,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                     <>
                       <button
                         onClick={() => handleSimAction('SCHEDULE_PV', 'INTERVIEW', 'Chốt Lịch Phỏng Vấn')}
-                        className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all flex items-center justify-between cursor-pointer"
+                        className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all flex items-center justify-between cursor-pointer"
                       >
                         <span>Lên Lịch Phỏng Vấn</span>
                         <ChevronRight className="w-4 h-4" />
@@ -1252,7 +1252,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                     <>
                       <button
                         onClick={() => handleSimAction('PASS_PV', 'OFFER', 'Phỏng Vấn Thành Công (Pass)')}
-                        className="w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all flex items-center justify-between cursor-pointer"
+                        className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all flex items-center justify-between cursor-pointer"
                       >
                         <span>Pass PV ➔ Gửi Offer</span>
                         <ChevronRight className="w-4 h-4" />
@@ -1347,7 +1347,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+                      <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
                         <Code2 className="w-4 h-4" />
                       </div>
                       <div>
@@ -1355,7 +1355,7 @@ export default function ArchifyView({ onExportMarkdown }) {
                         <p className="text-[11px] text-slate-400 font-mono">{mod.path}</p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/60">
                       {mod.category}
                     </span>
                   </div>

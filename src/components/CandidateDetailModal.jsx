@@ -205,7 +205,7 @@ Link CV: ${candidate.cvUrl || 'Không có'}`;
               </div>
 
               {/* Step 4: Onboarding */}
-              <div className="mengto-card mengto-card-purple rounded-2xl p-3 text-purple-900 dark:text-purple-300">
+              <div className="mengto-card mengto-card-blue rounded-2xl p-3 text-blue-900 dark:text-blue-200">
                 <span className="text-[10px] opacity-75 font-bold block uppercase">4. Onboarding</span>
                 <p className="text-xs font-bold mt-1">
                   {candidate.onboardingDate ? candidate.onboardingDate : 'Chưa đi làm'}
@@ -254,10 +254,10 @@ Link CV: ${candidate.cvUrl || 'Không có'}`;
 
           {/* Matched Job & CTV Bonus Callout (from Google Sheet Jobs) */}
           {matchedJob && (
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-rose-500/10 border border-blue-200 dark:border-blue-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/10 via-sky-500/10 to-rose-500/10 border border-blue-200 dark:border-blue-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
               <div className="space-y-1 min-w-0">
                 <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
-                  <Sparkles className="w-4 h-4 text-indigo-500" />
+                  <Sparkles className="w-4 h-4 text-blue-500" />
                   <span>Vị Trí Tuyển Dụng Gốc: {matchedJob.title}</span>
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -342,8 +342,8 @@ Link CV: ${candidate.cvUrl || 'Không có'}`;
               <a
                 href={candidate.cvUrl}
                 target="_blank"
-                rel="noreferrer"
-                className="btn-shiny flex items-center gap-1 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-500/30 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 cursor-pointer"
+                rel="noopener noreferrer"
+                className="btn-shiny flex items-center gap-1 px-3 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-500/30 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 cursor-pointer"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>Xem CV Gốc</span>
@@ -355,7 +355,7 @@ Link CV: ${candidate.cvUrl || 'Không có'}`;
               onClick={() => {
                 onClose();
               }}
-              className="btn-shiny flex items-center gap-1 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-500/30 text-xs font-semibold text-violet-600 dark:text-violet-400 hover:bg-violet-100 cursor-pointer"
+              className="btn-shiny flex items-center gap-1 px-3 py-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-500/30 text-xs font-semibold text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-900/40 cursor-pointer"
               title="Đưa vào Multi-Agent Swarm để tranh biện đánh giá"
             >
               <Sparkles className="w-3.5 h-3.5" />

@@ -220,7 +220,7 @@ export default function OverviewMetrics({ metrics, onSelectUrgent }) {
         >
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-500 dark:text-slate-400">Đã chốt ngày đi làm</span>
-            <span className="font-bold text-purple-600 dark:text-purple-400">Thành công</span>
+            <span className="font-bold text-blue-600 dark:text-blue-400">Thành công</span>
           </div>
         </KpiCard>
 
@@ -248,7 +248,7 @@ export default function OverviewMetrics({ metrics, onSelectUrgent }) {
           </span>
           <span className="text-xs text-slate-500 dark:text-slate-400">
             Tỉ lệ hoàn tất:{' '}
-            <strong className="text-purple-600 dark:text-purple-400 font-bold font-mono">{overallHireRate}%</strong>
+            <strong className="text-blue-600 dark:text-blue-400 font-bold font-mono">{overallHireRate}%</strong>
           </span>
         </div>
 

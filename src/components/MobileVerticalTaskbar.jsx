@@ -60,7 +60,7 @@ export default function MobileVerticalTaskbar({
       icon: LayoutDashboard,
       badge: 'Hot',
       badgeColor: 'bg-blue-600 text-white',
-      color: 'from-blue-600 to-indigo-600'
+      color: 'from-blue-600 to-sky-600'
     },
     {
       id: 'jobs',
@@ -68,8 +68,8 @@ export default function MobileVerticalTaskbar({
       short: 'Job',
       icon: Briefcase,
       badge: jobCount > 0 ? String(jobCount) : 'Hot',
-      badgeColor: 'bg-indigo-600 text-white',
-      color: 'from-indigo-600 to-purple-600'
+      badgeColor: 'bg-blue-600 text-white',
+      color: 'from-blue-600 to-sky-600'
     },
     {
       id: 'content-gen',
@@ -104,7 +104,7 @@ export default function MobileVerticalTaskbar({
       icon: Users,
       badge: candidateCount > 0 ? (candidateCount > 99 ? '99+' : candidateCount) : null,
       badgeColor: 'bg-blue-600 text-white',
-      color: 'from-blue-600 to-indigo-600'
+      color: 'from-blue-600 to-sky-600'
     },
     {
       id: 'jobs',
@@ -112,8 +112,8 @@ export default function MobileVerticalTaskbar({
       short: 'Job',
       icon: Briefcase,
       badge: jobCount > 0 ? jobCount : 'Hot',
-      badgeColor: 'bg-indigo-600 text-white',
-      color: 'from-indigo-600 to-purple-600'
+      badgeColor: 'bg-blue-600 text-white',
+      color: 'from-blue-600 to-sky-600'
     },
     {
       id: 'kanban',
@@ -152,7 +152,7 @@ export default function MobileVerticalTaskbar({
       label: 'Báo cáo',
       short: 'Chart',
       icon: BarChart3,
-      color: 'from-purple-600 to-indigo-600'
+      color: 'from-blue-600 to-cyan-600'
     },
     {
       id: 'ctv',
@@ -166,7 +166,7 @@ export default function MobileVerticalTaskbar({
       label: 'Archify',
       short: 'UML',
       icon: Layers,
-      color: 'from-blue-600 to-indigo-600'
+      color: 'from-blue-600 to-sky-600'
     }
   ];
 
@@ -211,7 +211,7 @@ export default function MobileVerticalTaskbar({
             <div className="w-full flex items-center justify-between px-1 pb-1.5 mb-1 border-b border-slate-100 dark:border-slate-800">
               <button
                 onClick={onOpenComponentSelector}
-                className="relative p-1.5 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+                className="relative p-1.5 rounded-xl bg-gradient-to-br from-blue-600 to-sky-600 text-white shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center"
                 title="Bộ chọn thành phần"
               >
                 <Grid className="w-4 h-4" />
@@ -295,7 +295,7 @@ export default function MobileVerticalTaskbar({
               {/* Trigger AI Bot */}
               <button
                 onClick={onOpenAiBot}
-                className="p-1.5 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center w-full"
+                className="p-1.5 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center w-full"
                 title="Trợ lý AI FastHunt"
               >
                 <Bot className="w-4 h-4" />

@@ -96,7 +96,7 @@ export default function ZaloBroadcastModal({
       <div className="relative w-full max-w-2xl bg-white dark:bg-[#0b1121] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden my-6 flex flex-col specular-highlight">
         
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 p-5 text-white flex items-start justify-between border-b border-white/10">
+        <div className="bg-gradient-to-r from-blue-900 via-blue-950 to-slate-950 p-5 text-white flex items-start justify-between border-b border-white/10">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="p-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/40">
@@ -188,7 +188,7 @@ export default function ZaloBroadcastModal({
               <button
                 type="button"
                 onClick={handleRegenerateAi}
-                className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <Sparkles className="w-3 h-3" />
                 <span>AI Soạn Lại</span>
@@ -233,7 +233,7 @@ export default function ZaloBroadcastModal({
 
             <button
               onClick={handleCopyAndOpenGroup}
-              className="btn-shiny flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer transition-all"
+              className="btn-shiny flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer transition-all"
             >
               <Send className="w-3.5 h-3.5" />
               <span>1-Click Copy & Mở Nhóm Zalo CTV</span>

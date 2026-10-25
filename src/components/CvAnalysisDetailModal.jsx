@@ -61,13 +61,13 @@ export default function CvAnalysisDetailModal({
       <div className="relative w-full max-w-3xl bg-white dark:bg-[#0b1121] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden my-6 flex flex-col specular-highlight max-h-[90vh]">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 p-5 sm:p-6 text-white flex items-start justify-between border-b border-white/10">
+        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 sm:p-6 text-white flex items-start justify-between border-b border-white/10">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="p-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
-                <Sparkles className="w-4 h-4 text-indigo-400" />
+              <span className="p-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                <Sparkles className="w-4 h-4 text-blue-400" />
               </span>
-              <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider">
+              <span className="text-xs font-bold text-blue-300 uppercase tracking-wider">
                 Kết Quả Thẩm Định & Match CV Bằng AI (Claude Engine)
               </span>
             </div>
@@ -77,12 +77,12 @@ export default function CvAnalysisDetailModal({
             <div className="flex items-center gap-4 text-xs text-slate-300 pt-0.5">
               {candidate.phone && (
                 <span className="flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5 text-indigo-400" /> {candidate.phone}
+                  <Phone className="w-3.5 h-3.5 text-blue-400" /> {candidate.phone}
                 </span>
               )}
               {candidate.email && (
                 <span className="flex items-center gap-1">
-                  <Mail className="w-3.5 h-3.5 text-indigo-400" /> {candidate.email}
+                  <Mail className="w-3.5 h-3.5 text-blue-400" /> {candidate.email}
                 </span>
               )}
               <span className="flex items-center gap-1">
@@ -104,10 +104,10 @@ export default function CvAnalysisDetailModal({
           
           {/* Primary Job Match Showcase Banner */}
           {matchedJob && (
-            <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-teal-500/10 border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-500/10 via-sky-500/10 to-teal-500/10 border border-blue-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-1.5 flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-indigo-500" />
+                  <Briefcase className="w-4 h-4 text-blue-500" />
                   <span className="text-xs font-extrabold text-slate-900 dark:text-white">
                     Vị Trí Phù Hợp Nhất: {matchedJob.title}
                   </span>
@@ -142,7 +142,7 @@ export default function CvAnalysisDetailModal({
           {/* AI Executive Evaluation */}
           <div className="mengto-card p-4 space-y-2">
             <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+              <Sparkles className="w-3.5 h-3.5 text-blue-500" />
               <span>Đánh Giá Tổng Quan Của AI (Claude FastHunt)</span>
             </h4>
             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
@@ -207,7 +207,7 @@ export default function CvAnalysisDetailModal({
           {suggestedAlternativeJobs && suggestedAlternativeJobs.length > 0 && (
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-indigo-500" />
+                <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
                 <span>Vị Trí Tuyển Dụng Khác Có Thể Phù Hợp ({suggestedAlternativeJobs.length})</span>
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -255,7 +255,7 @@ export default function CvAnalysisDetailModal({
 
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer transition-all"
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer transition-all"
           >
             Đóng
           </button>

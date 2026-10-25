@@ -142,10 +142,10 @@ export default function AnalyticsCharts({ candidates, metrics, darkMode }) {
         </div>
 
         {/* 2. Top CTV Leaderboard Bar Chart */}
-        <div className="mengto-card mengto-card-purple p-5 shadow-sm flex flex-col justify-between lg:col-span-2">
+        <div className="mengto-card mengto-card-blue p-5 shadow-sm flex flex-col justify-between lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-500 border border-indigo-500/30">
+              <div className="p-2 rounded-xl bg-blue-500/15 text-blue-500 border border-blue-500/30">
                 <BarChart3 className="w-4 h-4" />
               </div>
               <div>
@@ -155,7 +155,7 @@ export default function AnalyticsCharts({ candidates, metrics, darkMode }) {
                 <p className="text-[11px] text-slate-400">Số lượng hồ sơ nộp & Tỉ lệ Pass CV</p>
               </div>
             </div>
-            <span className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-500/30 px-3 py-1 rounded-xl">
+            <span className="text-xs font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/80 border border-blue-500/30 px-3 py-1 rounded-xl">
               {ctvData.length} CTV hoạt động
             </span>
           </div>
@@ -183,7 +183,7 @@ export default function AnalyticsCharts({ candidates, metrics, darkMode }) {
                     name === 'total' ? 'Tổng nộp' : name === 'cvPass' ? 'Pass CV' : 'Pass PV'
                   ]}
                 />
-                <Bar dataKey="total" name="total" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="total" name="total" fill="#2563eb" radius={[6, 6, 0, 0]} />
                 <Bar dataKey="cvPass" name="cvPass" fill="#10b981" radius={[6, 6, 0, 0]} />
                 <Bar dataKey="pvPass" name="pvPass" fill="#06b6d4" radius={[6, 6, 0, 0]} />
               </BarChart>
@@ -191,7 +191,7 @@ export default function AnalyticsCharts({ candidates, metrics, darkMode }) {
           </div>
 
           <div className="flex items-center justify-center gap-6 text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-white/5">
-            <span className="flex items-center gap-1.5 font-bold text-indigo-500">■ Tổng hồ sơ nộp</span>
+            <span className="flex items-center gap-1.5 font-bold text-blue-600">■ Tổng hồ sơ nộp</span>
             <span className="flex items-center gap-1.5 font-bold text-emerald-500">■ Đạt kết quả CV</span>
             <span className="flex items-center gap-1.5 font-bold text-cyan-500">■ Đạt phỏng vấn</span>
           </div>
@@ -201,7 +201,7 @@ export default function AnalyticsCharts({ candidates, metrics, darkMode }) {
       {/* Bottom Row: Positions Breakdown Grid */}
       <div className="mengto-card p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
-          <div className="p-2 rounded-xl bg-purple-500/15 text-purple-500 border border-purple-500/30">
+          <div className="p-2 rounded-xl bg-blue-500/15 text-blue-500 border border-blue-500/30">
             <Briefcase className="w-4 h-4" />
           </div>
           <div>
@@ -224,7 +224,7 @@ export default function AnalyticsCharts({ candidates, metrics, darkMode }) {
                   <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 line-clamp-2">
                     {pos.name}
                   </h4>
-                  <span className="px-2 py-0.5 rounded-lg text-xs font-extrabold bg-purple-100 dark:bg-purple-950/80 border border-purple-500/30 text-purple-700 dark:text-purple-300">
+                  <span className="px-2 py-0.5 rounded-lg text-xs font-extrabold bg-blue-100 dark:bg-blue-950/80 border border-blue-500/30 text-blue-700 dark:text-blue-300">
                     {pos.count} UV
                   </span>
                 </div>

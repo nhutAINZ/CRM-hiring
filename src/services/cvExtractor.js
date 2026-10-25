@@ -17,6 +17,11 @@ export async function extractTextFromFile(file) {
   const fileSize = file.size || 0;
   const extension = fileName.split('.').pop()?.toLowerCase() || '';
 
+  // Security Hardening: Guard against memory exhaustion DoS (25MB limit)
+  if (fileSize > 25 * 1024 * 1024) {
+    throw new Error('Kích thước tệp CV vượt quá giới hạn an toàn cho phép (tối đa 25MB).');
+  }
+
   // 1. Text files (.txt, .md, .csv)
   if (extension === 'txt' || extension === 'md' || extension === 'csv' || file.type.startsWith('text/')) {
     const text = await file.text();

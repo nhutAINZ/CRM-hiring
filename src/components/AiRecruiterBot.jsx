@@ -229,7 +229,7 @@ Bạn có thể thử các lệnh gợi ý bên dưới để xem phân tích ch
       {/* ── 1. Floating Action Button ── */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-18 md:bottom-5 right-4 sm:right-5 z-40 px-3.5 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-bold text-xs sm:text-sm cursor-pointer border border-blue-400/40 group"
+        className="fixed bottom-18 md:bottom-5 right-4 sm:right-5 z-40 px-3.5 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-bold text-xs sm:text-sm cursor-pointer border border-blue-400/40 group"
       >
         <div className="relative">
           <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform" />
@@ -243,7 +243,7 @@ Bạn có thể thử các lệnh gợi ý bên dưới để xem phân tích ch
         <div className="fixed bottom-20 right-4 sm:right-6 z-50 w-[92vw] sm:w-[420px] h-[580px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up">
           
           {/* Top Header */}
-          <div className="p-3.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white flex items-center justify-between shadow-xs">
+          <div className="p-3.5 bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 text-white flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center font-bold">
                 <Bot className="w-5 h-5 text-white" />
@@ -385,7 +385,7 @@ Bạn có thể thử các lệnh gợi ý bên dưới để xem phân tích ch
                       <a
                         href={`https://zalo.me`}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="flex items-center gap-1 text-cyan-600 dark:text-cyan-400 hover:underline font-bold"
                       >
                         <MessageCircle className="w-3 h-3" />

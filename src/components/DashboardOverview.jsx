@@ -57,7 +57,7 @@ export default function DashboardOverview({
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => onNavigateTab('jobs')}
-            className="btn-shiny flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-500/30 cursor-pointer transition-all"
+            className="btn-shiny flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-500/30 cursor-pointer transition-all"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Bảng Tin Jobs ({jobItems.length})</span>
@@ -90,9 +90,9 @@ export default function DashboardOverview({
 
       {/* ── Highlighted Jobs Banner ── */}
       {jobItems.length > 0 && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-blue-500/5 to-purple-500/10 border border-indigo-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-500/10 via-sky-500/5 to-blue-500/10 border border-blue-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-500/30 flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/30 flex-shrink-0">
               <Briefcase className="w-5 h-5" />
             </div>
             <div>
@@ -110,7 +110,7 @@ export default function DashboardOverview({
 
           <button
             onClick={() => onNavigateTab('jobs')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer whitespace-nowrap"
+            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer whitespace-nowrap"
           >
             <span>Khám Phá Danh Sách Jobs</span>
             <ChevronRight className="w-3.5 h-3.5" />
@@ -246,8 +246,8 @@ export default function DashboardOverview({
                         <a
                           href={c.cvUrl}
                           target="_blank"
-                          rel="noreferrer"
-                          className="p-1.5 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50"
                           title="Mở CV"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />

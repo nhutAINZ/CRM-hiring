@@ -254,10 +254,10 @@ export default function CtvDashboardView({
   return (
     <div className="space-y-8 animate-fade-in pb-16">
       {/* 🌟 1. EXECUTIVE HERO BANNER (Harmonious Royal Blue & Crisp White) */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 dark:from-slate-900 dark:via-slate-850 dark:to-blue-950 text-white p-6 sm:p-8 md:p-10 border border-blue-500/20 dark:border-slate-800 shadow-xl shadow-blue-500/5">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 dark:from-slate-900 dark:via-slate-850 dark:to-blue-950 text-white p-6 sm:p-8 md:p-10 border border-blue-500/20 dark:border-slate-800 shadow-xl shadow-blue-500/5">
         {/* Subtle ambient lighting mesh */}
         <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-white/10 dark:bg-blue-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute left-1/3 -bottom-16 w-72 h-72 rounded-full bg-sky-400/10 dark:bg-indigo-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute left-1/3 -bottom-16 w-72 h-72 rounded-full bg-sky-400/10 dark:bg-blue-600/10 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
           {/* Left: Headline & Pitch */}
@@ -269,7 +269,7 @@ export default function CtvDashboardView({
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight text-white">
               Giới Thiệu Ứng Viên — <br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-100 via-sky-200 to-amber-200 dark:from-blue-400 dark:via-indigo-300 dark:to-amber-300">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-100 via-sky-200 to-amber-200 dark:from-blue-400 dark:via-blue-300 dark:to-amber-300">
                 Nhận Hoa Hồng Tới 30% Lương
               </span>
             </h1>
@@ -462,10 +462,10 @@ export default function CtvDashboardView({
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs hover:border-purple-400/50 transition-all">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-400/50 transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nhóm ngành đa dạng</span>
-            <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400">
+            <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400">
               <Award className="w-4 h-4" />
             </div>
           </div>
@@ -574,9 +574,9 @@ export default function CtvDashboardView({
                   <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase">Đã Duyệt (PASS CV)</span>
                   <p className="text-2xl font-black text-blue-700 dark:text-blue-300 mt-1">{ctvStats.passCv}</p>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-900/40">
-                  <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Đang Phỏng Vấn</span>
-                  <p className="text-2xl font-black text-indigo-700 dark:text-indigo-300 mt-1">{ctvStats.interview}</p>
+                <div className="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40">
+                  <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase">Đang Phỏng Vấn</span>
+                  <p className="text-2xl font-black text-blue-700 dark:text-blue-300 mt-1">{ctvStats.interview}</p>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/40">
                   <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Trúng Tuyển (Onboard)</span>
@@ -586,7 +586,7 @@ export default function CtvDashboardView({
 
               {/* Phễu Chuyển Đổi Tuyển Dụng & Tiến Độ Mục Tiêu Tháng */}
               {ctvStats.total > 0 && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/70 via-slate-50 to-indigo-50/70 dark:from-slate-850 dark:via-slate-850 dark:to-blue-950/40 border border-blue-200/60 dark:border-slate-800 space-y-3">
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/70 via-slate-50 to-blue-50/70 dark:from-slate-850 dark:via-slate-850 dark:to-blue-950/40 border border-blue-200/60 dark:border-slate-800 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="w-4 h-4 text-blue-600" />
@@ -595,7 +595,7 @@ export default function CtvDashboardView({
                     <div className="flex items-center gap-3 text-[11px] text-slate-600 dark:text-slate-300">
                       <span>Duyệt CV: <strong className="text-blue-600 dark:text-blue-400">{ctvStats.passRate}%</strong></span>
                       <span>•</span>
-                      <span>Phỏng vấn: <strong className="text-indigo-600 dark:text-indigo-400">{ctvStats.interviewRate}%</strong></span>
+                      <span>Phỏng vấn: <strong className="text-blue-600 dark:text-blue-400">{ctvStats.interviewRate}%</strong></span>
                       <span>•</span>
                       <span>Trúng tuyển: <strong className="text-emerald-600 dark:text-emerald-400">{ctvStats.onboardRate}%</strong></span>
                     </div>
@@ -722,7 +722,7 @@ export default function CtvDashboardView({
                                 Onboard: {c.onboardingDate}
                               </div>
                             ) : c.interviewDate ? (
-                              <div className="text-indigo-600 dark:text-indigo-400 font-medium">
+                              <div className="text-blue-600 dark:text-blue-400 font-medium">
                                 Lịch PV: {c.interviewDate} {c.interviewTime || ''}
                               </div>
                             ) : (
@@ -875,7 +875,7 @@ export default function CtvDashboardView({
           </div>
 
           <div className="relative p-5 rounded-2xl bg-slate-50/80 dark:bg-slate-850 border border-slate-200/70 dark:border-slate-800">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center mb-3 shadow-md shadow-indigo-500/20">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center mb-3 shadow-md shadow-blue-500/20">
               2
             </div>
             <h3 className="font-bold text-sm text-slate-900 dark:text-white">Đăng Tin & Sơ Vấn Ứng Viên</h3>

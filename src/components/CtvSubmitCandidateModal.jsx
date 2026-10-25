@@ -137,7 +137,7 @@ export default function CtvSubmitCandidateModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in">
       <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* Modal Header */}
-        <div className="p-5 bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 text-white flex items-center justify-between">
+        <div className="p-5 bg-gradient-to-r from-blue-700 via-blue-800 to-slate-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white">
               <FileUp className="w-5 h-5 text-amber-300" />
@@ -361,7 +361,7 @@ export default function CtvSubmitCandidateModal({
             <a
               href={CTV_SUBMIT_CV_FORM_URL}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
             >
               <span>Mở Google Form gốc</span>
@@ -371,7 +371,7 @@ export default function CtvSubmitCandidateModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-extrabold text-xs shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-extrabold text-xs shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
               <span>{isSubmitting ? 'Đang Gửi Hồ Sơ...' : 'Gửi Hồ Sơ Ứng Viên Về CRM'}</span>

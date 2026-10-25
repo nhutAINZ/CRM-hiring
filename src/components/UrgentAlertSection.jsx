@@ -182,8 +182,8 @@ Link CV: ${c.cvUrl || 'N/A'}`;
                     <a
                       href={c.cvUrl}
                       target="_blank"
-                      rel="noreferrer"
-                      className="p-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 border border-indigo-200/60 dark:border-indigo-500/25 transition-all"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 hover:bg-blue-100 border border-blue-200/60 dark:border-blue-500/25 transition-all"
                       title="Mở Google Drive CV"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />

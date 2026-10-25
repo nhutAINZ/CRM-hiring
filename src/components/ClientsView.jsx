@@ -314,7 +314,7 @@ export default function ClientsView({
     <div className="space-y-6 animate-fade-in pb-12">
       
       {/* ── 1. Top Header Banner ── */}
-      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 rounded-3xl p-6 text-white shadow-xl space-y-4 relative overflow-hidden specular-highlight">
+      <div className="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-950 rounded-3xl p-6 text-white shadow-xl space-y-4 relative overflow-hidden specular-highlight">
         <div className="absolute right-0 top-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -449,7 +449,7 @@ export default function ClientsView({
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-md ${
                     isIntergreat
                       ? 'bg-gradient-to-tr from-blue-600 to-sky-500 shadow-blue-500/30'
-                      : 'bg-gradient-to-br from-indigo-600 to-blue-600 shadow-indigo-500/30'
+                      : 'bg-gradient-to-br from-blue-600 to-sky-600 shadow-blue-500/30'
                   }`}>
                     {client.name.charAt(0).toUpperCase()}
                   </div>
@@ -534,7 +534,7 @@ export default function ClientsView({
                           {/* Main Button: Open Management & Copy Studio */}
                           <button
                             onClick={() => handleOpenClientDetail(client, job)}
-                            className="flex-1 btn-shiny flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                            className="flex-1 btn-shiny flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer"
                           >
                             <Copy className="w-3.5 h-3.5" />
                             <span>Quản Lý & Copy Ứng Viên Mới</span>
@@ -543,7 +543,7 @@ export default function ClientsView({
                           <a
                             href={targetSheetUrl}
                             target="_blank"
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                             className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
                             title="Mở Google Sheet"
                           >
@@ -575,7 +575,7 @@ export default function ClientsView({
           <div className="relative w-full max-w-4xl bg-white dark:bg-[#0b1121] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden my-6 flex flex-col specular-highlight max-h-[90vh]">
             
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 p-5 text-white flex items-start justify-between border-b border-white/10">
+            <div className="bg-gradient-to-r from-blue-900 via-blue-950 to-slate-950 p-5 text-white flex items-start justify-between border-b border-white/10">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="p-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/40">
@@ -609,7 +609,7 @@ export default function ClientsView({
                   className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-xs font-bold transition-all cursor-pointer ${
                     activeSubTab === 'new_candidates'
                       ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -621,7 +621,7 @@ export default function ClientsView({
                   className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-xs font-bold transition-all cursor-pointer ${
                     activeSubTab === 'existing_in_sheet'
                       ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Layers className="w-3.5 h-3.5" />
@@ -632,7 +632,7 @@ export default function ClientsView({
               <a
                 href={activeClientModal.job.customSheetUrl || intergreatSheetUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
               >
                 <span>Mở Sheet Gốc</span>

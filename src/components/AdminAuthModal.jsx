@@ -118,7 +118,7 @@ export default function AdminAuthModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Decorative Top Gradient */}
-        <div className="h-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600" />
+        <div className="h-2 bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400" />
 
         {/* Close Button */}
         <button
@@ -132,7 +132,7 @@ export default function AdminAuthModal({
         <div className="p-6 md:p-8">
           {/* Header Icon & Title */}
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500/10 to-indigo-500/20 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20 mb-3 shadow-inner">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500/10 to-sky-500/20 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20 mb-3 shadow-inner">
               <ShieldCheck className="w-8 h-8" />
             </div>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -215,7 +215,7 @@ export default function AdminAuthModal({
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
                 >
                   <Unlock className="w-4 h-4" />
                   <span>Mở Khóa Quản Trị</span>

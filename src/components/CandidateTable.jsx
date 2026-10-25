@@ -362,8 +362,8 @@ export default function CandidateTable({
                             <a
                               href={c.cvUrl}
                               target="_blank"
-                              rel="noreferrer"
-                              className="text-[11px] text-blue-600 hover:underline flex items-center gap-0.5 font-semibold"
+                              rel="noopener noreferrer"
+                              className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5 font-semibold"
                             >
                               <span>CV</span>
                               <ExternalLink className="w-2.5 h-2.5" />
@@ -371,7 +371,7 @@ export default function CandidateTable({
                           )}
                           <button
                             onClick={() => onOpenEmail(c)}
-                            className="text-[11px] text-indigo-600 hover:underline flex items-center gap-0.5 font-semibold cursor-pointer"
+                            className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5 font-semibold cursor-pointer"
                           >
                             <Mail className="w-2.5 h-2.5" />
                             <span>Mẫu thư</span>

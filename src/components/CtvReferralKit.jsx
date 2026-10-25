@@ -106,7 +106,7 @@ Chỉ cần giới thiệu bạn bè, người quen tìm việc:
       </div>
 
       {/* Referral Link Box */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/60 to-slate-50 dark:from-slate-850 dark:via-slate-850 dark:to-blue-950/40 border border-blue-200/80 dark:border-slate-700/80 space-y-3">
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 via-sky-50/60 to-slate-50 dark:from-slate-850 dark:via-slate-850 dark:to-blue-950/40 border border-blue-200/80 dark:border-slate-700/80 space-y-3">
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-800 dark:text-white">Link Tiếp Thị Tuyển Dụng Cá Nhân Của Bạn:</span>

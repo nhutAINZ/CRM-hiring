@@ -237,7 +237,7 @@ function CandidateMobileCardComponent({
               onClick={(e) => handleCopy(email, 'email', e)}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors min-h-[36px] max-w-[200px] truncate"
             >
-              <Mail className="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" />
+              <Mail className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
               <span className="truncate">{email}</span>
               {copiedField === 'email' ? (
                 <Check className="w-3 h-3 text-emerald-500 flex-shrink-0" />
@@ -260,7 +260,7 @@ function CandidateMobileCardComponent({
               <a
                 href={candidate.cvUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-100 text-xs transition-colors min-h-[36px]"
               >
@@ -274,7 +274,7 @@ function CandidateMobileCardComponent({
                 e.stopPropagation();
                 onOpenEmail(candidate);
               }}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-100 text-xs transition-colors min-h-[36px]"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold hover:bg-sky-100 text-xs transition-colors min-h-[36px]"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>Gửi Mail</span>

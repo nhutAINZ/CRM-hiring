@@ -242,9 +242,9 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
     <div className="space-y-6 animate-fade-in">
       
       {/* ── 1. Top Executive Banner ── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 p-6 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-blue-700 to-blue-900 p-6 text-white shadow-xl">
         <div className="absolute -right-12 -top-12 h-80 w-80 rounded-full bg-white/10 blur-3xl pointer-events-none" />
-        <div className="absolute right-1/3 bottom-0 h-48 w-48 rounded-full bg-indigo-400/20 blur-2xl pointer-events-none" />
+        <div className="absolute right-1/3 bottom-0 h-48 w-48 rounded-full bg-blue-400/20 blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
           <div className="space-y-2 max-w-3xl">
@@ -271,7 +271,7 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
             <a
               href={CTV_SUBMIT_CV_FORM_URL}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 rounded-2xl text-xs sm:text-sm font-black shadow-lg hover:shadow-xl transition-all cursor-pointer whitespace-nowrap"
             >
               <FileUp className="w-4 h-4 text-slate-950" />
@@ -282,7 +282,7 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
             <a
               href={jobSheetUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-slate-100 text-blue-700 rounded-2xl text-xs sm:text-sm font-extrabold shadow-lg hover:shadow-xl transition-all cursor-pointer whitespace-nowrap"
             >
               <ExternalLink className="w-4 h-4 text-blue-600" />
@@ -333,11 +333,11 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
           </div>
 
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 flex items-center gap-3">
-            <div className="p-2.5 bg-indigo-500/30 rounded-xl text-indigo-200 flex-shrink-0">
+            <div className="p-2.5 bg-blue-500/30 rounded-xl text-blue-200 flex-shrink-0">
               <Building className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-indigo-200 uppercase tracking-wider">Doanh Nghiệp</p>
+              <p className="text-[11px] font-bold text-blue-200 uppercase tracking-wider">Doanh Nghiệp</p>
               <p className="text-xl sm:text-2xl font-black">{distinctCompaniesCount} Đối tác</p>
             </div>
           </div>
@@ -529,7 +529,7 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-base shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-black text-base shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
                         {job.company.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
@@ -641,7 +641,7 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
                         className="flex items-center justify-center gap-1 py-2 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
                         title="Tìm Group Facebook/Zalo phù hợp để đăng tin"
                       >
-                        <Share2 className="w-3.5 h-3.5 text-indigo-500" />
+                        <Share2 className="w-3.5 h-3.5 text-blue-500" />
                         <span>Group</span>
                       </button>
                     )}

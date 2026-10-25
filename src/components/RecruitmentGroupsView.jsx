@@ -403,7 +403,7 @@ export default function RecruitmentGroupsView({
       </div>
 
       {/* 🚀 LIVE FACEBOOK GROUP SEARCH TOOL */}
-      <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 text-white rounded-3xl p-6 sm:p-8 shadow-xl space-y-4 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl space-y-4 relative overflow-hidden">
         <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
         
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -471,7 +471,7 @@ export default function RecruitmentGroupsView({
 
       {/* Target Job Notice if selected */}
       {targetJobObj && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-200/80 dark:border-blue-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in shadow-xs">
+        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-950/40 dark:to-sky-950/40 border border-blue-200/80 dark:border-blue-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in shadow-xs">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-blue-600 text-white shadow-xs">
               <Zap className="w-4 h-4 text-amber-300" />
@@ -497,7 +497,7 @@ export default function RecruitmentGroupsView({
             <button
               type="button"
               onClick={() => onNavigateToContentGen && onNavigateToContentGen(targetJobObj)}
-              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
               <span>Tạo bài đăng cho job này</span>
@@ -568,7 +568,7 @@ export default function RecruitmentGroupsView({
               onClick={() => setSelectedCategory(c.id)}
               className={`px-3 py-1.5 rounded-xl font-medium transition-all cursor-pointer ${
                 selectedCategory === c.id
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >

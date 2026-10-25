@@ -36,7 +36,7 @@ export default function MobileBottomNav({
       label: 'Việc Làm',
       icon: Briefcase,
       badge: jobCount > 0 ? String(jobCount) : null,
-      badgeColor: 'bg-indigo-600 text-white'
+      badgeColor: 'bg-blue-600 text-white'
     },
     {
       id: 'content-gen',

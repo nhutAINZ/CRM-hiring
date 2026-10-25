@@ -92,7 +92,7 @@ export default function SettingsModal({ config, onSaveConfig, onClose, onRefresh
         {/* Header */}
         <div className="bg-slate-900 p-5 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
               {activeTab === 'sheets' ? <Database className="w-5 h-5" /> : <Network className="w-5 h-5" />}
             </div>
             <div>
@@ -125,7 +125,7 @@ export default function SettingsModal({ config, onSaveConfig, onClose, onRefresh
             onClick={() => setActiveTab('9router')}
             className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 ${
               activeTab === '9router'
-                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -234,8 +234,8 @@ export default function SettingsModal({ config, onSaveConfig, onClose, onRefresh
                   <a
                     href={`https://docs.google.com/spreadsheets/d/${form.jobSheetId || '1PJUSclHhVYLvoYTzmwkwpzsRfPOqODs0RDrvhW99Uko'}/edit?gid=${form.jobSheetGid || '0'}#gid=${form.jobSheetGid || '0'}`}
                     target="_blank"
-                    rel="noreferrer"
-                    className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-bold"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-bold"
                   >
                     <span>Mở Sheet Jobs</span>
                     <ExternalLink className="w-3 h-3" />
@@ -307,14 +307,14 @@ export default function SettingsModal({ config, onSaveConfig, onClose, onRefresh
                       onClick={() => setRouterForm({ ...routerForm, endpoint: p.endpoint })}
                       className={`p-3 rounded-xl text-left border transition-all ${
                         routerForm.endpoint === p.endpoint
-                          ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 ring-1 ring-indigo-500'
+                          ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 ring-1 ring-blue-500'
                           : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200'
                       }`}
                     >
                       <div className="font-bold text-xs flex items-center justify-between">
                         <span>{p.label}</span>
                         {routerForm.endpoint === p.endpoint && (
-                          <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                         )}
                       </div>
                       <div className="font-mono text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
@@ -369,7 +369,7 @@ export default function SettingsModal({ config, onSaveConfig, onClose, onRefresh
                       type="checkbox"
                       checked={routerForm.tokenSaver}
                       onChange={(e) => setRouterForm({ ...routerForm, tokenSaver: e.target.checked })}
-                      className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                      className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
                     />
                     <span>Kích hoạt RTK Token Saver (Nén token giảm chi phí 30%)</span>
                   </label>
@@ -379,7 +379,7 @@ export default function SettingsModal({ config, onSaveConfig, onClose, onRefresh
                       type="checkbox"
                       checked={routerForm.autoFailover}
                       onChange={(e) => setRouterForm({ ...routerForm, autoFailover: e.target.checked })}
-                      className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                      className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
                     />
                     <span>Tự động Failover thông minh khi provider nghẽn</span>
                   </label>
@@ -426,7 +426,7 @@ export default function SettingsModal({ config, onSaveConfig, onClose, onRefresh
               <button
                 onClick={handleTest9Router}
                 disabled={routerTesting}
-                className="px-3 py-1.5 rounded-xl bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-200 dark:hover:bg-indigo-800/60 flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                className="px-3 py-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-200 dark:hover:bg-blue-800/60 flex items-center gap-1 cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3 h-3 ${routerTesting ? 'animate-spin' : ''}`} />
                 <span>{routerTesting ? 'Đang dò ping 9Router...' : 'Kiểm tra kết nối 9Router'}</span>
@@ -450,7 +450,7 @@ export default function SettingsModal({ config, onSaveConfig, onClose, onRefresh
             </button>
             <button
               onClick={handleSave}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md cursor-pointer"
             >
               <Save className="w-4 h-4" />
               <span>Lưu Cấu Hình</span>

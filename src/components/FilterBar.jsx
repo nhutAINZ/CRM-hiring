@@ -173,7 +173,7 @@ export default function FilterBar({
             </span>
           )}
           {filters.pvStatus !== 'all' && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold flex-shrink-0">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold flex-shrink-0">
               <span>PV: {filters.pvStatus}</span>
               <X
                 className="w-3 h-3 cursor-pointer"
@@ -191,7 +191,7 @@ export default function FilterBar({
             </span>
           )}
           {filters.datePreset !== 'all' && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold flex-shrink-0">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold flex-shrink-0">
               <span>Thời gian: {filters.datePreset}</span>
               <X
                 className="w-3 h-3 cursor-pointer"

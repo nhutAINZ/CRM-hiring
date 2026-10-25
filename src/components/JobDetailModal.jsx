@@ -64,7 +64,7 @@ ${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${jo
       <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden my-6">
         
         {/* Modal Top Header Banner */}
-        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 p-6 text-white relative">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 p-6 text-white relative">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-xl text-white shadow-inner">
@@ -119,7 +119,7 @@ ${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${jo
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100/50 dark:from-blue-950/40 dark:to-slate-800 border border-blue-200 dark:border-blue-800/60 space-y-1">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-sky-100/50 dark:from-blue-950/40 dark:to-slate-800 border border-blue-200 dark:border-blue-800/60 space-y-1">
               <span className="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                 <DollarSign className="w-4 h-4 text-blue-600" />
                 <span>Mức Thu Nhập / Lương</span>
@@ -263,7 +263,7 @@ ${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${jo
             <a
               href={CTV_SUBMIT_CV_FORM_URL}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-black shadow-md transition-all cursor-pointer"
             >
               <ExternalLink className="w-4 h-4 text-amber-300" />
@@ -272,7 +272,7 @@ ${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${jo
 
             <button
               onClick={handleCopyShare}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-extrabold shadow-md transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl text-xs font-extrabold shadow-md transition-all cursor-pointer"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Share2 className="w-4 h-4" />}
               <span>{copied ? 'Đã Copy Tin!' : 'Copy Tin CTV'}</span>

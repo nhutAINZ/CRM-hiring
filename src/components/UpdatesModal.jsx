@@ -18,7 +18,7 @@ export default function UpdatesModal({ onClose, onOpenSettings }) {
       date: 'Hôm nay',
       title: '⚡ Thuật Toán Hai Con Trỏ O(N/2) Tối Ưu Load Test 100.000 Hồ Sơ',
       icon: Zap,
-      badgeColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300',
+      badgeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300',
       description: 'Áp dụng thuật toán Two-Pointer song song scanning 2 đầu mảng, lọc 50.000 hồ sơ trong 11.73 ms, giúp hệ thống load siêu tốc không lo giật lag.'
     },
     {
@@ -27,7 +27,7 @@ export default function UpdatesModal({ onClose, onOpenSettings }) {
       date: 'Chuẩn ISTQB',
       title: '🧪 100 Test Cases ISTQB Automated Test Suite',
       icon: ShieldCheck,
-      badgeColor: 'bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300',
+      badgeColor: 'bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300',
       description: 'Hoàn thành 100/100 test case tự động bao gồm: Equivalence Partitioning, Boundary Value Analysis, State Transition, Decision Table và Error Guessing.'
     },
     {
@@ -55,7 +55,7 @@ export default function UpdatesModal({ onClose, onOpenSettings }) {
       <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden my-4">
         
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 p-6 text-white relative overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 p-6 text-white relative overflow-hidden">
           <div className="absolute right-0 top-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10 flex items-start justify-between gap-4">
             <div className="space-y-1.5">

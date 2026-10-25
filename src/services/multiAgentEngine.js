@@ -21,8 +21,8 @@ export const AGENT_REGISTRY = {
     name: 'Master Supervisor Orchestrator',
     role: 'Swarm Coordinator & Decision Synthesizer',
     avatar: '🤖',
-    color: 'from-violet-600 to-indigo-600',
-    badgeColor: 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300',
+    color: 'from-blue-600 to-blue-700',
+    badgeColor: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300',
     description: 'Phân tích yêu cầu, chia tách nhiệm vụ (Task Decomposition), điều phối các sub-agents và tổng hợp kết quả cuối cùng qua 9Router.',
     model: '9Router (Auto / GPT-4o / Claude 3.5 / Gemini)'
   },
@@ -61,8 +61,8 @@ export const AGENT_REGISTRY = {
     name: 'CTV & Bounty Headhunter Agent',
     role: 'Referral Network & Commission Specialist',
     avatar: '🤝',
-    color: 'from-purple-600 to-pink-600',
-    badgeColor: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/40 dark:text-purple-300',
+    color: 'from-sky-500 to-blue-600',
+    badgeColor: 'bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-900/40 dark:text-sky-300',
     description: 'Phân tích tin tuyển dụng có bonus cao, khớp hồ sơ phù hợp với mạng lưới CTV và soạn bản tin tuyển dụng hấp dẫn.',
     model: 'Bounty Matching & Referral Network'
   },
@@ -81,8 +81,8 @@ export const AGENT_REGISTRY = {
     name: 'Zalo Bot & CTV Dispatcher Agent (zca-js)',
     role: 'Automated Zalo Bot Dispatcher & Group Broadcaster',
     avatar: '🤖',
-    color: 'from-violet-600 to-indigo-600',
-    badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300',
+    color: 'from-blue-600 to-sky-600',
+    badgeColor: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300',
     description: 'Tự động phát thông báo tuyển dụng, tiền thưởng bonus và link Google Form nộp CV trực tiếp tới các nhóm Zalo CTV bằng zca-js (https://tdung.gitbook.io/zca-js).',
     model: 'zca-js Unofficial Zalo API Engine'
   }

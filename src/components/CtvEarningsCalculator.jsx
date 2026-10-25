@@ -252,7 +252,7 @@ export default function CtvEarningsCalculator({ onOpenSubmitCv }) {
         </div>
 
         {/* Right Output Card (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col justify-between p-6 rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white shadow-xl shadow-blue-500/10 space-y-4">
+        <div className="lg:col-span-5 flex flex-col justify-between p-6 rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 text-white shadow-xl shadow-blue-500/10 space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs uppercase font-bold tracking-wider text-blue-100">

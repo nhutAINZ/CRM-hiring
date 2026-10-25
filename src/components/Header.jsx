@@ -184,7 +184,7 @@ export default function Header({
 
             {/* Logo Avatar */}
             <div className="relative flex-shrink-0">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-500/25">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-500/25">
                 <Sparkles className="w-4 h-4" />
               </div>
             </div>
@@ -243,7 +243,7 @@ export default function Header({
             {!isAdmin ? (
               <button
                 onClick={onOpenAdminAuth}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition-all cursor-pointer min-h-[40px]"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition-all cursor-pointer min-h-[40px]"
                 title="Đăng nhập tài khoản Quản trị viên"
               >
                 <Lock className="w-3.5 h-3.5" />

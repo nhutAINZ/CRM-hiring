@@ -298,9 +298,9 @@ Ai đang tìm việc hoặc bạn bè đang thất nghiệp thì tag gấp vô �
 
         <button
           onClick={() => onNavigateToGroupFinder && onNavigateToGroupFinder(currentJob)}
-          className="px-4 py-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 font-semibold text-xs sm:text-sm border border-indigo-200/60 dark:border-indigo-800/40 flex items-center gap-2 cursor-pointer transition-colors"
+          className="px-4 py-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 font-semibold text-xs sm:text-sm border border-blue-200/60 dark:border-blue-800/40 flex items-center gap-2 cursor-pointer transition-colors"
         >
-          <Share2 className="w-4 h-4 text-indigo-500" />
+          <Share2 className="w-4 h-4 text-blue-500" />
           <span>Tìm Group đăng bài cho Job này</span>
           <ArrowRight className="w-4 h-4" />
         </button>
@@ -449,7 +449,7 @@ Ai đang tìm việc hoặc bạn bè đang thất nghiệp thì tag gấp vô �
           {/* Card 2: Chọn Kênh Đăng Tin */}
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
             <label className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-              <Share2 className="w-4 h-4 text-indigo-600" />
+              <Share2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span>2. Kênh Mạng Xã Hội</span>
             </label>
 
@@ -511,7 +511,7 @@ Ai đang tìm việc hoặc bạn bè đang thất nghiệp thì tag gấp vô �
           {/* Card 3: Chọn Phong Cách / Tone Giọng */}
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
             <label className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-violet-600" />
+              <Sliders className="w-4 h-4 text-blue-600" />
               <span>3. Phong Cách Bài Viết (Tone Giọng)</span>
             </label>
 
@@ -528,7 +528,7 @@ Ai đang tìm việc hoặc bạn bè đang thất nghiệp thì tag gấp vô �
                   onClick={() => setTone(t.id)}
                   className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                     tone === t.id
-                      ? 'bg-violet-50 dark:bg-violet-950/50 border-violet-500 text-violet-700 dark:text-violet-300 shadow-xs'
+                      ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs'
                       : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
                   }`}
                 >
@@ -619,7 +619,7 @@ Ai đang tìm việc hoặc bạn bè đang thất nghiệp thì tag gấp vô �
             <div className="p-6 flex-1 bg-white dark:bg-slate-900 overflow-y-auto max-h-[600px]">
               {/* Header simulation */}
               <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-blue-700 text-white font-bold text-sm flex items-center justify-center shadow-xs">
                   FH
                 </div>
                 <div>

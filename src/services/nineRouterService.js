@@ -97,10 +97,22 @@ export function save9RouterConfig(newConfig) {
 
 /**
  * Formats base endpoint URL to ensure proper /v1 suffix without trailing slashes
+ * Security validation: Strictly allows only http:// and https:// schemes to prevent SSRF / script injection
  */
 export function normalize9RouterUrl(rawUrl = '') {
   let url = (rawUrl || '').trim();
   if (!url) return 'http://localhost:20128/v1';
+
+  // Security Hardening: Only allow http and https protocols
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    // If protocol missing or unsafe (e.g. javascript:, file:), default to http://
+    if (/^[a-zA-Z0-9.-]+(:\d+)?(\/.*)?$/.test(url)) {
+      url = `http://${url}`;
+    } else {
+      return 'http://localhost:20128/v1';
+    }
+  }
+
   url = url.replace(/\/+$/, '');
   if (!url.endsWith('/v1') && !url.includes('/chat/completions') && !url.includes('/models')) {
     url = `${url}/v1`;

@@ -108,7 +108,7 @@ Tổng CV đã nộp: ${ctv.stats.total} hồ sơ`;
     <div className="space-y-6 animate-fade-in">
       
       {/* ── 1. Top Header Banner ── */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-700 rounded-3xl p-6 text-white shadow-lg space-y-4 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-900 rounded-3xl p-6 text-white shadow-lg space-y-4 relative overflow-hidden">
         <div className="absolute right-0 top-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">

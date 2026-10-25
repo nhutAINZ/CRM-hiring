@@ -12,9 +12,44 @@ import { extractCandidateEntities } from '../src/services/cvExtractor.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Security Hardening: Apply Security Headers Middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+
+// Security Hardening: Body limit to prevent memory exhaustion DoS
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+
+// Security Hardening: Lightweight In-Memory Rate Limiter to prevent DoS & brute-force
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 120; // 120 requests/minute per IP
+
+function rateLimiter(req, res, next) {
+  const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const clientRecord = rateLimitMap.get(clientIp);
+
+  if (!clientRecord || now - clientRecord.startTime > RATE_LIMIT_WINDOW_MS) {
+    rateLimitMap.set(clientIp, { startTime: now, count: 1 });
+    return next();
+  }
+
+  clientRecord.count += 1;
+  if (clientRecord.count > MAX_REQUESTS_PER_WINDOW) {
+    return res.status(429).json({ error: 'Quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.' });
+  }
+
+  next();
+}
+
+app.use(rateLimiter);
 
 // In-Memory Database Store for Server Execution
 let serverOaConfig = {
@@ -32,13 +67,27 @@ let serverMessages = [];
 let serverBroadcastQueue = [];
 let cachedJobs = [];
 
-// Helper: Verify Zalo Webhook Signature
+// Helper: Verify Zalo Webhook Signature with constant-time comparison (prevents timing attacks)
 function verifyZaloSignature(req) {
   const signature = req.headers['x-zalo-signature'] || req.headers['x-hub-signature'];
-  if (!signature || !serverOaConfig.webhookSecret) return true; // allow if testing
+  if (!signature) {
+    // If webhookSecret is configured, missing signature must be rejected
+    return !serverOaConfig.webhookSecret;
+  }
+  if (!serverOaConfig.webhookSecret) return true;
+
   try {
-    const hash = crypto.createHmac('sha256', serverOaConfig.webhookSecret).update(JSON.stringify(req.body)).digest('hex');
-    return signature === hash || signature === `sha256=${hash}`;
+    const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+    const hash = crypto.createHmac('sha256', serverOaConfig.webhookSecret).update(rawBody).digest('hex');
+    const cleanSig = String(signature).replace(/^sha256=/, '').trim();
+
+    const sigBuf = Buffer.from(cleanSig, 'utf8');
+    const hashBuf = Buffer.from(hash, 'utf8');
+
+    if (sigBuf.length !== hashBuf.length) {
+      return false;
+    }
+    return crypto.timingSafeEqual(sigBuf, hashBuf);
   } catch {
     return false;
   }

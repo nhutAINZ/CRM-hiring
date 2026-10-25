@@ -20,7 +20,7 @@ export default function TopBanner({ collapsed, setCollapsed, onOpenRewards, onOp
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 dark:bg-slate-900 border-b border-blue-800 dark:border-slate-800 text-white dark:text-slate-200 shadow-2xs flex items-center justify-between px-2.5 sm:px-4 py-1.5 text-xs font-medium transition-all relative overflow-hidden">
+    <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-800 dark:bg-slate-900 border-b border-blue-800 dark:border-slate-800 text-white dark:text-slate-200 shadow-2xs flex items-center justify-between px-2.5 sm:px-4 py-1.5 text-xs font-medium transition-all relative overflow-hidden">
       {/* Left: Desktop Sidebar Toggle */}
       <button
         onClick={handleToggle}
