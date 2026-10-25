@@ -29,7 +29,13 @@ export default function CtvSubmitCandidateModal({
   onOpenCtvAuth = () => {}
 }) {
   const [selectedJobId, setSelectedJobId] = useState('');
-  const [ctvCodeInput, setCtvCodeInput] = useState('');
+  const [ctvCodeInput, setCtvCodeInput] = useState(() => {
+    if (currentCtv?.ctvCode) return currentCtv.ctvCode;
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('fasthunt_referred_ctv') || '';
+    }
+    return '';
+  });
   const [candidateName, setCandidateName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');

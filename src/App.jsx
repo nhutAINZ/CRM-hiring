@@ -86,6 +86,22 @@ export default function App() {
     }
   }, [darkMode]);
 
+  // Capture Referral Affiliate CTV Code from URL (?ref=CTV01)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode && refCode.trim()) {
+          const cleanRef = refCode.trim().toUpperCase();
+          localStorage.setItem('fasthunt_referred_ctv', cleanRef);
+        }
+      } catch (e) {
+        console.warn('Failed to parse referral code:', e);
+      }
+    }
+  }, []);
+
   const [config, setConfig] = useState(getStoredConfig);
   
   // Admin & Auth State

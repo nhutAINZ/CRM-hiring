@@ -31,11 +31,19 @@ import {
   Calendar,
   AlertCircle,
   Filter,
-  Eye
+  Eye,
+  Calculator,
+  Trophy,
+  Target,
+  LayoutGrid
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
 import CtvSubmitCandidateModal from './CtvSubmitCandidateModal';
+import CtvEarningsCalculator from './CtvEarningsCalculator';
+import CtvReferralKit from './CtvReferralKit';
+import CtvLeaderboard from './CtvLeaderboard';
+import CtvUpcomingInterviews from './CtvUpcomingInterviews';
 
 export default function CtvDashboardView({
   jobItems = [],
@@ -57,6 +65,7 @@ export default function CtvDashboardView({
   const [myCandidateSearch, setMyCandidateSearch] = useState('');
   const [myCandidateStageFilter, setMyCandidateStageFilter] = useState('all');
   const [manualLookupCode, setManualLookupCode] = useState('');
+  const [activeSection, setActiveSection] = useState('all');
 
   // Determine active CTV code for tracking
   const activeCtvCode = (currentCtv?.ctvCode || manualLookupCode || '').trim();
@@ -102,7 +111,56 @@ export default function CtvDashboardView({
     });
   }, [candidates, activeCtvCode]);
 
-  // Compute CTV personal stats
+  // Upcoming interviews for this CTV's candidates
+  const upcomingInterviews = useMemo(() => {
+    return myCandidates.filter((c) => {
+      const pv = (c.pvResultRaw || '').toUpperCase();
+      return Boolean(c.interviewDate) || pv.includes('LỊCH') || pv.includes('PV') || pv.includes('PHỎNG VẤN');
+    });
+  }, [myCandidates]);
+
+  // Compute Top CTV Leaderboard from candidate data
+  const ctvLeaderboard = useMemo(() => {
+    const ctvMap = new Map();
+
+    candidates.forEach((c) => {
+      const code = (c.ctvCode || '').trim();
+      if (!code || code === 'N/A' || code === '-' || code.length < 2) return;
+      const upperCode = code.toUpperCase();
+
+      if (!ctvMap.has(upperCode)) {
+        const matchedItem = ctvItems.find((item) => (item.ctvCode || '').toUpperCase().trim() === upperCode);
+        ctvMap.set(upperCode, {
+          ctvCode: upperCode,
+          name: matchedItem?.name || `CTV ${upperCode}`,
+          total: 0,
+          passCv: 0,
+          onboard: 0
+        });
+      }
+
+      const entry = ctvMap.get(upperCode);
+      entry.total++;
+
+      const cvRes = (c.cvResultRaw || '').toUpperCase();
+      const pvRes = (c.pvResultRaw || '').toUpperCase();
+
+      if (cvRes.includes('PASS')) entry.passCv++;
+      if (c.onboardingDate || pvRes.includes('PASS') || pvRes.includes('ONBOARD') || cvRes.includes('ONBOARD')) {
+        entry.onboard++;
+      }
+    });
+
+    return Array.from(ctvMap.values())
+      .sort((a, b) => {
+        if (b.onboard !== a.onboard) return b.onboard - a.onboard;
+        if (b.passCv !== a.passCv) return b.passCv - a.passCv;
+        return b.total - a.total;
+      })
+      .slice(0, 5);
+  }, [candidates, ctvItems]);
+
+  // Compute CTV personal stats with funnel metrics
   const ctvStats = useMemo(() => {
     let passCvCount = 0;
     let onboardCount = 0;
@@ -120,11 +178,20 @@ export default function CtvDashboardView({
       }
     });
 
+    const passRate = myCandidates.length > 0 ? Math.round((passCvCount / myCandidates.length) * 100) : 0;
+    const interviewRate = passCvCount > 0 ? Math.round((interviewCount / passCvCount) * 100) : 0;
+    const onboardRate = interviewCount > 0 ? Math.round((onboardCount / interviewCount) * 100) : (passCvCount > 0 ? Math.round((onboardCount / passCvCount) * 100) : 0);
+    const estimatedEarnings = onboardCount * 2500000;
+
     return {
       total: myCandidates.length,
       passCv: passCvCount,
       interview: interviewCount,
-      onboard: onboardCount
+      onboard: onboardCount,
+      passRate,
+      interviewRate,
+      onboardRate,
+      estimatedEarnings
     };
   }, [myCandidates]);
 
@@ -412,71 +479,145 @@ export default function CtvDashboardView({
         </div>
       </div>
 
+      {/* 🧭 Quick CTV Dashboard Section Navigation Pills */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+        {[
+          { id: 'all', label: 'Tất Cả Dashboard', icon: LayoutGrid },
+          { id: 'my-candidates', label: `Hồ Sơ Của Tôi (${myCandidates.length})`, icon: Users },
+          { id: 'interviews', label: `Lịch Phỏng Vấn (${upcomingInterviews.length})`, icon: Calendar },
+          { id: 'calculator', label: 'Bảng Tính Hoa Hồng', icon: Calculator },
+          { id: 'referral', label: 'Link Tiếp Thị & Mẫu Tin', icon: Share2 },
+          { id: 'leaderboard', label: 'Bảng Vinh Danh', icon: Trophy },
+          { id: 'jobs', label: `Việc Làm Mở (${activeJobs.length})`, icon: Briefcase }
+        ].map((sec) => {
+          const Icon = sec.icon;
+          const isActive = activeSection === sec.id;
+          return (
+            <button
+              key={sec.id}
+              onClick={() => setActiveSection(sec.id)}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                isActive
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5 shrink-0" />
+              <span>{sec.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 📅 Lịch phỏng vấn sắp tới & Nhắc hẹn Zalo 1-Click */}
+      {(activeSection === 'all' || activeSection === 'interviews') && (
+        <CtvUpcomingInterviews
+          upcomingInterviews={upcomingInterviews}
+          onOpenCandidateDetail={onOpenCandidateDetail}
+        />
+      )}
+
       {/* 📂 3. PERSONAL CANDIDATE TRACKER (COI CV THEO TỪNG CTV) */}
-      <div id="my-candidates-section" className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-                Hồ Sơ Ứng Viên & Tiến Độ Hoa Hồng Của Tôi
-              </h2>
-              {activeCtvCode && (
-                <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold text-xs font-mono">
-                  Mã: {activeCtvCode}
-                </span>
+      {(activeSection === 'all' || activeSection === 'my-candidates') && (
+        <div id="my-candidates-section" className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                  Hồ Sơ Ứng Viên & Tiến Độ Hoa Hồng Của Tôi
+                </h2>
+                {activeCtvCode && (
+                  <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold text-xs font-mono">
+                    Mã: {activeCtvCode}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Theo dõi trực tiếp kết quả duyệt CV, lịch phỏng vấn và trạng thái trúng tuyển của các ứng viên do bạn gửi
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {currentCtv ? (
+                <button
+                  onClick={() => {
+                    setSelectedJobForSubmit(null);
+                    setIsSubmitModalOpen(true);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileUp className="w-4 h-4" />
+                  <span>Nộp Thêm CV</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onOpenCtvAuth}
+                  className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Đăng Nhập CTV Để Quản Lý</span>
+                </button>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Theo dõi trực tiếp kết quả duyệt CV, lịch phỏng vấn và trạng thái trúng tuyển của các ứng viên do bạn gửi
-            </p>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            {currentCtv ? (
-              <button
-                onClick={() => {
-                  setSelectedJobForSubmit(null);
-                  setIsSubmitModalOpen(true);
-                }}
-                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <FileUp className="w-4 h-4" />
-                <span>Nộp Thêm CV</span>
-              </button>
-            ) : (
-              <button
-                onClick={onOpenCtvAuth}
-                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Đăng Nhập CTV Để Quản Lý</span>
-              </button>
-            )}
-          </div>
-        </div>
+          {/* If Active CTV is identified */}
+          {activeCtvCode ? (
+            <div className="space-y-5">
+              {/* Quick KPI stats for this CTV */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60">
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">Tổng CV Đã Nộp</span>
+                  <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{ctvStats.total}</p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40">
+                  <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase">Đã Duyệt (PASS CV)</span>
+                  <p className="text-2xl font-black text-blue-700 dark:text-blue-300 mt-1">{ctvStats.passCv}</p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-900/40">
+                  <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Đang Phỏng Vấn</span>
+                  <p className="text-2xl font-black text-indigo-700 dark:text-indigo-300 mt-1">{ctvStats.interview}</p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/40">
+                  <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Trúng Tuyển (Onboard)</span>
+                  <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300 mt-1">{ctvStats.onboard}</p>
+                </div>
+              </div>
 
-        {/* If Active CTV is identified */}
-        {activeCtvCode ? (
-          <div className="space-y-5">
-            {/* Quick KPI stats for this CTV */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60">
-                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">Tổng CV Đã Nộp</span>
-                <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{ctvStats.total}</p>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40">
-                <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase">Đã Duyệt (PASS CV)</span>
-                <p className="text-2xl font-black text-blue-700 dark:text-blue-300 mt-1">{ctvStats.passCv}</p>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-900/40">
-                <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Đang Phỏng Vấn</span>
-                <p className="text-2xl font-black text-indigo-700 dark:text-indigo-300 mt-1">{ctvStats.interview}</p>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/40">
-                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Trúng Tuyển (Onboard)</span>
-                <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300 mt-1">{ctvStats.onboard}</p>
-              </div>
-            </div>
+              {/* Phễu Chuyển Đổi Tuyển Dụng & Tiến Độ Mục Tiêu Tháng */}
+              {ctvStats.total > 0 && (
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/70 via-slate-50 to-indigo-50/70 dark:from-slate-850 dark:via-slate-850 dark:to-blue-950/40 border border-blue-200/60 dark:border-slate-800 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-blue-600" />
+                      <span className="font-bold text-slate-800 dark:text-white">Phễu Chuyển Đổi Tuyển Dụng Của Tôi:</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] text-slate-600 dark:text-slate-300">
+                      <span>Duyệt CV: <strong className="text-blue-600 dark:text-blue-400">{ctvStats.passRate}%</strong></span>
+                      <span>•</span>
+                      <span>Phỏng vấn: <strong className="text-indigo-600 dark:text-indigo-400">{ctvStats.interviewRate}%</strong></span>
+                      <span>•</span>
+                      <span>Trúng tuyển: <strong className="text-emerald-600 dark:text-emerald-400">{ctvStats.onboardRate}%</strong></span>
+                    </div>
+                  </div>
+
+                  {/* Visual Bar */}
+                  <div className="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden flex">
+                    <div style={{ width: `${Math.min(100, Math.max(10, ctvStats.passRate))}%` }} className="bg-blue-600 h-full transition-all" title={`Tỷ lệ duyệt CV: ${ctvStats.passRate}%`} />
+                    <div style={{ width: `${Math.min(100, Math.max(5, ctvStats.onboardRate))}%` }} className="bg-emerald-500 h-full transition-all" title={`Tỷ lệ trúng tuyển: ${ctvStats.onboardRate}%`} />
+                  </div>
+
+                  {/* Monthly Milestone Target */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-xs">
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px]">
+                      Mục tiêu tháng: <strong className="text-slate-800 dark:text-white">{ctvStats.onboard}/5 Onboard</strong> {ctvStats.onboard >= 5 ? '🎉 Hoàn thành xuất sắc!' : `(Còn ${Math.max(0, 5 - ctvStats.onboard)} CV để đạt mốc thưởng Bạc)`}
+                    </span>
+                    <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+                      Ước tính hoa hồng tích lũy: ~{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(ctvStats.estimatedEarnings)}
+                    </span>
+                  </div>
+                </div>
+              )}
 
             {/* Filter and Search Bar for this CTV */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -677,6 +818,33 @@ export default function CtvDashboardView({
           </div>
         )}
       </div>
+      )}
+
+      {/* 🧮 BẢNG TÍNH HOA HỒNG & THƯỞNG BẬC CỘNG TÁC VIÊN */}
+      {(activeSection === 'all' || activeSection === 'calculator') && (
+        <CtvEarningsCalculator
+          onOpenSubmitCv={() => {
+            setSelectedJobForSubmit(null);
+            setIsSubmitModalOpen(true);
+          }}
+        />
+      )}
+
+      {/* 🔗 BỘ CÔNG CỤ TIẾP THỊ & LINK GIỚI THIỆU CTV */}
+      {(activeSection === 'all' || activeSection === 'referral') && (
+        <CtvReferralKit
+          activeCtvCode={activeCtvCode}
+          currentCtv={currentCtv}
+        />
+      )}
+
+      {/* 🏆 BẢNG VINH DANH CỘNG TÁC VIÊN XUẤT SẮC */}
+      {(activeSection === 'all' || activeSection === 'leaderboard') && (
+        <CtvLeaderboard
+          leaderboard={ctvLeaderboard}
+          activeCtvCode={activeCtvCode}
+        />
+      )}
 
       {/* 🚀 4. QUY TRÌNH 3 BƯỚC HỢP TÁC KIẾM HOA HỒNG (Refined Aesthetics) */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs">
@@ -741,146 +909,150 @@ export default function CtvDashboardView({
       </div>
 
       {/* 🔥 5. TOP JOBS TUYỂN GẤP & HOA HỒNG CAO */}
-      <div>
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
-              <Flame className="w-5 h-5" />
+      {(activeSection === 'all' || activeSection === 'jobs') && (
+        <>
+          <div>
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
+                  <Flame className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    Việc Làm Tuyển Gấp & Hoa Hồng Cao Tuần Này
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                    Những vị trí đang cần gấp ứng viên với mức thưởng hấp dẫn nhất
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => onNavigateToJobs && onNavigateToJobs()}
+                className="text-xs sm:text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 flex items-center gap-1 cursor-pointer"
+              >
+                <span>Xem tất cả ({activeJobs.length})</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-                Việc Làm Tuyển Gấp & Hoa Hồng Cao Tuần Này
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                Những vị trí đang cần gấp ứng viên với mức thưởng hấp dẫn nhất
-              </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {highBonusJobs.map((job) => {
+                const isUrgent = (job.status || '').toLowerCase().includes('gấp');
+                return (
+                  <div
+                    key={job.id}
+                    className="group relative bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-lg hover:border-blue-400/50 transition-all duration-200 flex flex-col justify-between"
+                  >
+                    <div>
+                      {/* Top tags */}
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                          {job.industry || 'Ngành nghề'}
+                        </span>
+                        <span
+                          className={`text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                            isUrgent
+                              ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200/60'
+                              : 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200/60'
+                          }`}
+                        >
+                          {isUrgent && <Flame className="w-3 h-3 text-rose-500" />}
+                          <span>{job.status || 'Đang tuyển'}</span>
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h3
+                        onClick={() => onOpenJobDetail && onOpenJobDetail(job)}
+                        className="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 cursor-pointer"
+                      >
+                        {job.title}
+                      </h3>
+
+                      {/* Company & Location */}
+                      <div className="mt-2.5 space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center gap-1.5">
+                          <Building className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span className="truncate">{job.company || 'Doanh nghiệp đối tác'}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span className="truncate">{job.location || 'Toàn quốc'}</span>
+                        </div>
+                      </div>
+
+                      {/* Salary & Bonus Box */}
+                      <div className="mt-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/70 dark:border-slate-800">
+                        <div className="text-xs text-slate-600 dark:text-slate-300">
+                          <span className="text-slate-400">Mức lương: </span>
+                          <strong className="text-slate-800 dark:text-slate-200">{job.salary || 'Thỏa thuận'}</strong>
+                        </div>
+                        <div className="mt-1 flex items-center justify-between text-xs pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                          <span className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                            <DollarSign className="w-3.5 h-3.5" />
+                            <span>Hoa hồng CTV:</span>
+                          </span>
+                          <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
+                            {job.bonus || 'Thỏa thuận'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Action Buttons */}
+                    <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                      <button
+                        onClick={() => handleOpenSubmitForJob(job)}
+                        className="py-2 px-3 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all flex items-center justify-center gap-1 shadow-xs cursor-pointer"
+                        title="Nộp CV ứng viên cho vị trí này"
+                      >
+                        <FileUp className="w-3.5 h-3.5 text-white" />
+                        <span>Nộp CV</span>
+                      </button>
+                      <button
+                        onClick={() => onNavigateToContentGen && onNavigateToContentGen(job)}
+                        className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Zap className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Gen Bài Đăng</span>
+                      </button>
+                      <button
+                        onClick={() => onOpenJobDetail && onOpenJobDetail(job)}
+                        className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        title="Xem chi tiết JD"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          <button
-            onClick={() => onNavigateToJobs && onNavigateToJobs()}
-            className="text-xs sm:text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 flex items-center gap-1 cursor-pointer"
-          >
-            <span>Xem tất cả ({activeJobs.length})</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {highBonusJobs.map((job) => {
-            const isUrgent = (job.status || '').toLowerCase().includes('gấp');
-            return (
-              <div
-                key={job.id}
-                className="group relative bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-lg hover:border-blue-400/50 transition-all duration-200 flex flex-col justify-between"
-              >
-                <div>
-                  {/* Top tags */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                      {job.industry || 'Ngành nghề'}
-                    </span>
-                    <span
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                        isUrgent
-                          ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200/60'
-                          : 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200/60'
-                      }`}
-                    >
-                      {isUrgent && <Flame className="w-3 h-3 text-rose-500" />}
-                      <span>{job.status || 'Đang tuyển'}</span>
-                    </span>
-                  </div>
-
-                  {/* Title */}
-                  <h3
-                    onClick={() => onOpenJobDetail && onOpenJobDetail(job)}
-                    className="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 cursor-pointer"
-                  >
-                    {job.title}
-                  </h3>
-
-                  {/* Company & Location */}
-                  <div className="mt-2.5 space-y-1 text-xs text-slate-500 dark:text-slate-400">
-                    <div className="flex items-center gap-1.5">
-                      <Building className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="truncate">{job.company || 'Doanh nghiệp đối tác'}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="truncate">{job.location || 'Toàn quốc'}</span>
-                    </div>
-                  </div>
-
-                  {/* Salary & Bonus Box */}
-                  <div className="mt-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/70 dark:border-slate-800">
-                    <div className="text-xs text-slate-600 dark:text-slate-300">
-                      <span className="text-slate-400">Mức lương: </span>
-                      <strong className="text-slate-800 dark:text-slate-200">{job.salary || 'Thỏa thuận'}</strong>
-                    </div>
-                    <div className="mt-1 flex items-center justify-between text-xs pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
-                      <span className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                        <DollarSign className="w-3.5 h-3.5" />
-                        <span>Hoa hồng CTV:</span>
-                      </span>
-                      <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
-                        {job.bonus || 'Thỏa thuận'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom Action Buttons */}
-                <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
-                  <button
-                    onClick={() => handleOpenSubmitForJob(job)}
-                    className="py-2 px-3 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all flex items-center justify-center gap-1 shadow-xs cursor-pointer"
-                    title="Nộp CV ứng viên cho vị trí này"
-                  >
-                    <FileUp className="w-3.5 h-3.5 text-white" />
-                    <span>Nộp CV</span>
-                  </button>
-                  <button
-                    onClick={() => onNavigateToContentGen && onNavigateToContentGen(job)}
-                    className="flex-1 py-2 px-3 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <Zap className="w-3.5 h-3.5 text-amber-500" />
-                    <span>Gen Bài Đăng</span>
-                  </button>
-                  <button
-                    onClick={() => onOpenJobDetail && onOpenJobDetail(job)}
-                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                    title="Xem chi tiết JD"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 🏷️ 6. INDUSTRY DISTRIBUTION */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight mb-4">
-          Khám Phá Việc Làm Theo Nhóm Ngành
-        </h3>
-        <div className="flex flex-wrap gap-2.5">
-          {industryDistribution.map(([ind, count]) => (
-            <button
-              key={ind}
-              onClick={() => onNavigateToJobs && onNavigateToJobs(ind)}
-              className="px-4 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <span>{ind}</span>
-              <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                {count}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
+          {/* 🏷️ 6. INDUSTRY DISTRIBUTION */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight mb-4">
+              Khám Phá Việc Làm Theo Nhóm Ngành
+            </h3>
+            <div className="flex flex-wrap gap-2.5">
+              {industryDistribution.map(([ind, count]) => (
+                <button
+                  key={ind}
+                  onClick={() => onNavigateToJobs && onNavigateToJobs(ind)}
+                  className="px-4 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>{ind}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                    {count}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ── 7. POPUP MODAL NỘP CV TRỰC TIẾP (DIRECT IN-APP MODAL) ── */}
       <CtvSubmitCandidateModal
