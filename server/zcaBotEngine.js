@@ -46,7 +46,7 @@ export async function dispatchJobViaZca({ job, target, targetType, message, conf
 
   // In production, when 'zca-js' is installed via npm:
   // const { Zalo, ThreadType } = await import('zca-js');
-  // const zalo = new Zalo({ cookie: config.cookie, imei: config.imei, userAgent: config.userAgent });
+  // const zalo = new Zalo({ cookie: config.cookie, imei: config.imei, userAgent: config.userAgent, imageMetadataGetter: async (p) => ({ width: 800, height: 600, size: 1024 }) });
   // const api = await zalo.login();
   // await api.sendMessage({ msg: message }, target.id, targetType === 'GROUP' ? ThreadType.Group : ThreadType.User);
 

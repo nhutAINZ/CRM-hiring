@@ -473,12 +473,24 @@ export function generateZcaNodeRunnerCode(config = DEFAULT_ZCA_CONFIG, selectedJ
 // Run: node bot_dispatcher.js
 // ====================================================================
 
+import fs from "node:fs";
 import { Zalo, ThreadType } from "zca-js";
+
+// Helper imageMetadataGetter required by zca-js (v2+) when uploading image attachments
+async function imageMetadataGetter(filePath) {
+  try {
+    const stat = await fs.promises.stat(filePath);
+    return { width: 800, height: 600, size: stat.size };
+  } catch {
+    return { width: 800, height: 600, size: 1024 };
+  }
+}
 
 const zalo = new Zalo({
   cookie: "${config.cookie || 'PASTE_YOUR_ZALO_COOKIE_HERE'}",
   imei: "${config.imei || 'PASTE_YOUR_IMEI_HERE'}",
-  userAgent: "${config.userAgent || 'Mozilla/5.0'}"
+  userAgent: "${config.userAgent || 'Mozilla/5.0'}",
+  imageMetadataGetter
 });
 
 async function runRecruitmentBot() {
