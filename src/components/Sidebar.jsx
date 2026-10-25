@@ -49,10 +49,11 @@ export default function Sidebar({
   onOpenSettings,
   onOpenTemplates,
   onExportCsv,
-  onOpenUpdates,
   isAdmin = false,
   onOpenAdminAuth = () => {},
-  onAdminLogout = () => {}
+  onAdminLogout = () => {},
+  currentCtv = null,
+  onOpenCtvAuth = () => {}
 }) {
   const [expandedMenus, setExpandedMenus] = useState({
     ungVien: true,
@@ -141,16 +142,16 @@ export default function Sidebar({
                   ? 'bg-gradient-to-br from-emerald-500 to-teal-700'
                   : 'bg-gradient-to-br from-blue-500 to-indigo-600'
               }`}>
-                {isAdmin ? 'AD' : 'CTV'}
+                {isAdmin ? 'AD' : (currentCtv?.ctvCode ? currentCtv.ctvCode.slice(0, 3) : 'CTV')}
               </div>
               {(!collapsed || mobileOpen) && (
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                    {isAdmin ? 'Quản Trị Viên' : 'Cộng Tác Viên'}
+                    {isAdmin ? 'Quản Trị Viên' : (currentCtv ? currentCtv.name : 'Cộng Tác Viên')}
                   </p>
                   <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
                     <span className={`w-1.5 h-1.5 rounded-full ${isAdmin ? 'bg-emerald-500' : 'bg-blue-500'}`} />
-                    <span>{isAdmin ? 'Toàn quyền hệ thống' : 'Xem job & giới thiệu CV'}</span>
+                    <span>{isAdmin ? 'Toàn quyền hệ thống' : (currentCtv ? `Mã: ${currentCtv.ctvCode}` : 'Xem job & giới thiệu CV')}</span>
                   </p>
                 </div>
               )}
@@ -184,6 +185,28 @@ export default function Sidebar({
               {(!collapsed || mobileOpen) && (
                 <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-300">
                   HOT
+                </span>
+              )}
+            </button>
+
+            {/* Hồ Sơ CV Của Tôi */}
+            <button
+              onClick={() => {
+                handleNavClick('ctv-dashboard');
+                setTimeout(() => {
+                  const el = document.getElementById('my-candidates-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+            >
+              <div className="flex items-center gap-2.5">
+                <Users className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                {(!collapsed || mobileOpen) && <span>Hồ Sơ CV Của Tôi</span>}
+              </div>
+              {(!collapsed || mobileOpen) && currentCtv && (
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                  {currentCtv.ctvCode}
                 </span>
               )}
             </button>

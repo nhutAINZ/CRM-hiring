@@ -29,6 +29,7 @@ import MobileVerticalTaskbar from './components/MobileVerticalTaskbar';
 import MobileComponentSelector from './components/MobileComponentSelector';
 import MobileFAB from './components/MobileFAB';
 import AdminAuthModal from './components/AdminAuthModal';
+import CtvAuthModal from './components/CtvAuthModal';
 import CtvDashboardView from './components/CtvDashboardView';
 import RecruitmentContentGeneratorView from './components/RecruitmentContentGeneratorView';
 import RecruitmentGroupsView from './components/RecruitmentGroupsView';
@@ -123,6 +124,44 @@ export default function App() {
       localStorage.setItem('fasthunt_admin_pwd', newPwd);
     }
   };
+
+  // CTV Authentication State & Handlers
+  const [currentCtv, setCurrentCtv] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('fasthunt_current_ctv');
+        return stored ? JSON.parse(stored) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
+  const [isCtvAuthOpen, setIsCtvAuthOpen] = useState(false);
+
+  const handleCtvLogin = (ctvData) => {
+    setCurrentCtv(ctvData);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('fasthunt_current_ctv', JSON.stringify(ctvData));
+    }
+  };
+
+  const handleCtvLogout = () => {
+    setCurrentCtv(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('fasthunt_current_ctv');
+    }
+  };
+
+  const handleSubmitNewCandidate = (newCandidate) => {
+    setCandidates((prev) => [newCandidate, ...prev]);
+    try {
+      const localUvs = JSON.parse(localStorage.getItem('fasthunt_local_candidates') || '[]');
+      localUvs.unshift(newCandidate);
+      localStorage.setItem('fasthunt_local_candidates', JSON.stringify(localUvs));
+    } catch (e) {}
+  };
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
@@ -197,7 +236,11 @@ export default function App() {
         fetchIntergreatSheetData(config.intergreatSheetId || '1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4', config.intergreatSheetGid || '0')
       ]);
 
-      setCandidates(sheet1List);
+      let localCandidates = [];
+      try {
+        localCandidates = JSON.parse(localStorage.getItem('fasthunt_local_candidates') || '[]');
+      } catch (e) {}
+      setCandidates([...localCandidates, ...sheet1List]);
       setSheet2Items(sheet2List);
       setCtvItems(ctvList);
       setJobItems(jobList);
@@ -381,6 +424,8 @@ export default function App() {
         isAdmin={isAdmin}
         onOpenAdminAuth={() => setIsAdminAuthOpen(true)}
         onAdminLogout={handleAdminLogout}
+        currentCtv={currentCtv}
+        onOpenCtvAuth={() => setIsCtvAuthOpen(true)}
       />
 
       {/* ── Main Layout Content Container (Zero margin on mobile, padded on desktop) ── */}
@@ -413,6 +458,9 @@ export default function App() {
           isAdmin={isAdmin}
           onOpenAdminAuth={() => setIsAdminAuthOpen(true)}
           onAdminLogout={handleAdminLogout}
+          currentCtv={currentCtv}
+          onOpenCtvAuth={() => setIsCtvAuthOpen(true)}
+          onLogoutCtv={handleCtvLogout}
         />
 
         {/* ── Main Content Area (Optimized padding for phones and desktop) ── */}
@@ -436,6 +484,12 @@ export default function App() {
           {activeView === 'ctv-dashboard' && (
             <CtvDashboardView
               jobItems={jobItems}
+              candidates={candidates}
+              ctvItems={ctvItems}
+              currentCtv={currentCtv}
+              onOpenCtvAuth={() => setIsCtvAuthOpen(true)}
+              onLogoutCtv={handleCtvLogout}
+              onSubmitCandidate={handleSubmitNewCandidate}
               onNavigateToJobs={() => setActiveView('jobs')}
               onNavigateToContentGen={(job) => {
                 setSelectedJobForTools(job);
@@ -449,6 +503,7 @@ export default function App() {
                 setSelectedJob(job);
                 setIsJobDetailOpen(true);
               }}
+              onOpenCandidateDetail={handleOpenDetail}
             />
           )}
 
@@ -767,6 +822,17 @@ export default function App() {
         onLoginSuccess={handleLoginAdminSuccess}
         currentPassword={adminPassword}
         onChangePassword={handleChangeAdminPassword}
+      />
+
+      {/* ── CTV Authentication Modal ── */}
+      <CtvAuthModal
+        isOpen={isCtvAuthOpen}
+        onClose={() => setIsCtvAuthOpen(false)}
+        ctvItems={ctvItems}
+        candidates={candidates}
+        currentCtv={currentCtv}
+        onLoginCtv={handleCtvLogin}
+        onLogoutCtv={handleCtvLogout}
       />
 
       {/* ── CV Analysis Detail Modal ── */}

@@ -28,7 +28,8 @@ import {
   Lock,
   Unlock,
   ShieldCheck,
-  LogOut
+  LogOut,
+  UserCheck
 } from 'lucide-react';
 
 export default function Header({
@@ -48,7 +49,10 @@ export default function Header({
   onOpenMobileMenu,
   isAdmin = false,
   onOpenAdminAuth = () => {},
-  onAdminLogout = () => {}
+  onAdminLogout = () => {},
+  currentCtv = null,
+  onOpenCtvAuth = () => {},
+  onLogoutCtv = () => {}
 }) {
   const formatTime = (date) => {
     if (!date) return 'Chưa cập nhật';
@@ -208,8 +212,33 @@ export default function Header({
             </div>
           </div>
 
-          {/* ── Right: Admin Login / Logout + Compact Action Icons ── */}
+          {/* ── Right: CTV Auth + Admin Login / Logout + Compact Action Icons ── */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+            {/* 👤 CTV Login or Active CTV Chip */}
+            {!isAdmin && (
+              currentCtv ? (
+                <button
+                  onClick={onOpenCtvAuth}
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 border border-blue-200/80 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-bold text-xs transition-all cursor-pointer min-h-[40px]"
+                  title="Xem thông tin và hồ sơ CTV"
+                >
+                  <UserCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span className="hidden sm:inline truncate max-w-[110px]">{currentCtv.name}</span>
+                  <span className="px-1.5 py-0.5 rounded-md bg-blue-200/80 dark:bg-blue-900 text-[10px] font-mono font-extrabold">{currentCtv.ctvCode}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onOpenCtvAuth}
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all cursor-pointer min-h-[40px]"
+                  title="Đăng nhập tài khoản Cộng Tác Viên"
+                >
+                  <Users className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span className="hidden sm:inline">Đăng Nhập CTV</span>
+                  <span className="sm:hidden">CTV</span>
+                </button>
+              )
+            )}
+
             {/* 🔐 Admin Login / Logout Action Button */}
             {!isAdmin ? (
               <button
