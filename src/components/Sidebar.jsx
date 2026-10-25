@@ -31,7 +31,9 @@ import {
   Unlock,
   ShieldCheck,
   LogOut,
-  Bot
+  Bot,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function Sidebar({
@@ -53,7 +55,9 @@ export default function Sidebar({
   onOpenAdminAuth = () => {},
   onAdminLogout = () => {},
   currentCtv = null,
-  onOpenCtvAuth = () => {}
+  onOpenCtvAuth = () => {},
+  darkMode = false,
+  setDarkMode = () => {}
 }) {
   const [expandedMenus, setExpandedMenus] = useState({
     ungVien: true,
@@ -490,6 +494,34 @@ export default function Sidebar({
 
         {/* ── 4. Bottom Footer Actions ── */}
         <div className="p-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 space-y-2">
+          {/* Dark / Light Mode Switch in Sidebar */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold cursor-pointer transition-all border border-slate-200 dark:border-slate-800 ${
+              darkMode
+                ? 'bg-slate-850 hover:bg-slate-800 text-slate-200'
+                : 'bg-white hover:bg-slate-100 text-slate-700 shadow-2xs'
+            }`}
+            title={darkMode ? 'Chuyển sang Giao diện Sáng (Xanh Dương - Trắng)' : 'Chuyển sang Giao diện Tối (Dark Mode)'}
+          >
+            <div className="flex items-center gap-2">
+              {darkMode ? (
+                <Sun className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              ) : (
+                <Moon className="w-4 h-4 text-blue-600 flex-shrink-0" />
+              )}
+              {(!collapsed || mobileOpen) && (
+                <span>{darkMode ? 'Giao diện Tối' : 'Giao diện Sáng'}</span>
+              )}
+            </div>
+            {(!collapsed || mobileOpen) && (
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
+                darkMode ? 'bg-amber-400/20 text-amber-300' : 'bg-blue-100 text-blue-700'
+              }`}>
+                {darkMode ? 'Dark' : 'Light'}
+              </span>
+            )}
+          </button>
           {isAdmin ? (
             <button
               onClick={onAdminLogout}

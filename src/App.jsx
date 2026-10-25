@@ -63,8 +63,29 @@ import {
 } from './utils/dataNormalizer';
 
 export default function App() {
-  // Default to Light Mode for clean, high-contrast surfaces matching screenshot
-  const [darkMode, setDarkMode] = useState(false);
+  // Dark Mode State with localStorage persistence and system preference fallback
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const storedTheme = localStorage.getItem('fasthunt_theme');
+      if (storedTheme) return storedTheme === 'dark';
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+
+  // Sync Dark Mode with <html> tag and persist in localStorage
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (darkMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('fasthunt_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('fasthunt_theme', 'light');
+      }
+    }
+  }, [darkMode]);
+
   const [config, setConfig] = useState(getStoredConfig);
   
   // Admin & Auth State
@@ -403,7 +424,7 @@ export default function App() {
   const jobSheetUrl = getJobSheetViewUrl(config.jobSheetId, config.jobSheetGid);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#030712] text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 transition-colors">
       
       {/* ── Left Sidebar Navigation (Desktop Sticky + Mobile Slide-Over Drawer) ── */}
       <Sidebar
@@ -426,6 +447,8 @@ export default function App() {
         onAdminLogout={handleAdminLogout}
         currentCtv={currentCtv}
         onOpenCtvAuth={() => setIsCtvAuthOpen(true)}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
       />
 
       {/* ── Main Layout Content Container (Zero margin on mobile, padded on desktop) ── */}
@@ -504,6 +527,7 @@ export default function App() {
                 setIsJobDetailOpen(true);
               }}
               onOpenCandidateDetail={handleOpenDetail}
+              darkMode={darkMode}
             />
           )}
 

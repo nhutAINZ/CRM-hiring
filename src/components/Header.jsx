@@ -300,13 +300,23 @@ export default function Header({
               </button>
             )}
 
-            {/* Dark Mode Toggle */}
+            {/* Dark Mode Toggle Pill */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
-              title={darkMode ? 'Chuyển sang Giao diện Sáng' : 'Chuyển sang Giao diện Tối'}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer min-h-[40px] text-xs font-semibold shadow-2xs"
+              title={darkMode ? 'Chuyển sang Giao diện Sáng (Xanh Dương - Trắng)' : 'Chuyển sang Giao diện Tối (Dark Mode)'}
             >
-              {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
+              {darkMode ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span className="hidden xl:inline text-[11px] font-bold">Giao diện Sáng</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <span className="hidden xl:inline text-[11px] font-bold">Giao diện Tối</span>
+                </>
+              )}
             </button>
           </div>
         </div>

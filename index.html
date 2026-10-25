@@ -1,17 +1,64 @@
 <!doctype html>
-<html lang="vi" class="dark">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recruitment Pro Suite - Realtime Candidate Dashboard & Kanban</title>
-    <meta name="description" content="Hệ thống quản lý ứng viên và phân tích tuyển dụng thông minh kết nối Realtime Google Sheets. Hỗ trợ Kanban pipeline, phân tích phễu, tạo thư mời tự động và báo cáo hiệu suất CTV." />
+    <title>FastHunt CRM - Quản Lý Tuyển Dụng & Cổng CTV Thông Minh</title>
+    <meta name="description" content="Hệ thống quản lý ứng viên, phân tích tuyển dụng và cổng cộng tác viên (CTV) thông minh kết nối Realtime Google Sheets. Giao diện xanh dương trắng tinh gọn, hỗ trợ Dark Mode & nộp CV trực tiếp." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('fasthunt_theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-blue-600 selection:text-white font-sans">
+  <body class="bg-slate-50 text-slate-900 dark:bg-[#090d16] dark:text-slate-100 antialiased selection:bg-blue-600 selection:text-white font-sans">
     <div id="root"></div>
+    <script>
+      // Anti-Watermark / Floating Netlify Badge Removal Observer
+      (function() {
+        function removeWatermarks() {
+          var badgeSelectors = [
+            '#netlify-badge',
+            '.netlify-badge',
+            '[data-netlify-badge]',
+            'netlify-drawer',
+            'div[data-netlify-drawer]',
+            'iframe[src*="netlify"]',
+            'div[class*="netlify-feedback"]',
+            'a[href*="netlify.com"]'
+          ];
+          badgeSelectors.forEach(function(sel) {
+            document.querySelectorAll(sel).forEach(function(el) {
+              var parent = el.closest('div[style*="position: fixed"], div[style*="position: absolute"]');
+              if (parent && parent !== document.body && parent !== document.getElementById('root')) {
+                parent.remove();
+              } else {
+                el.remove();
+              }
+            });
+          });
+        }
+        removeWatermarks();
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', removeWatermarks);
+        }
+        window.addEventListener('load', removeWatermarks);
+        var obs = new MutationObserver(removeWatermarks);
+        obs.observe(document.documentElement, { childList: true, subtree: true });
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
