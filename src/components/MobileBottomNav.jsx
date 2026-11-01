@@ -12,7 +12,8 @@ import {
   Menu,
   Briefcase,
   Zap,
-  Share2
+  Share2,
+  FileText
 } from 'lucide-react';
 
 export default function MobileBottomNav({
@@ -30,6 +31,11 @@ export default function MobileBottomNav({
       id: 'ctv-dashboard',
       label: 'Cổng CTV',
       icon: LayoutDashboard
+    },
+    {
+      id: 'cv-builder',
+      label: 'Tạo CV',
+      icon: FileText
     },
     {
       id: 'jobs',

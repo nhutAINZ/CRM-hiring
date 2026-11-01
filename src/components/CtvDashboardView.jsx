@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Briefcase,
   Flame,
@@ -56,6 +56,7 @@ export default function CtvDashboardView({
   onNavigateToJobs,
   onNavigateToContentGen,
   onNavigateToGroupFinder,
+  onNavigateToCvBuilder,
   onOpenJobDetail,
   onOpenCandidateDetail
 }) {
@@ -66,6 +67,32 @@ export default function CtvDashboardView({
   const [myCandidateStageFilter, setMyCandidateStageFilter] = useState('all');
   const [manualLookupCode, setManualLookupCode] = useState('');
   const [activeSection, setActiveSection] = useState('all');
+
+  // Scroll reveal observer for progressive feature load on scroll
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    const elements = document.querySelectorAll('.scroll-reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('scroll-reveal-visible');
+          }
+        });
+      },
+      { threshold: 0.05, rootMargin: '0px 0px -20px 0px' }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [activeSection, jobItems, candidates]);
+
+  const scrollToSection = (sectionId) => {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   // Determine active CTV code for tracking
   const activeCtvCode = (currentCtv?.ctvCode || manualLookupCode || '').trim();
@@ -279,7 +306,7 @@ export default function CtvDashboardView({
             </p>
 
             {/* CTAs */}
-            <div className="pt-2 flex flex-wrap gap-3">
+            <div className="pt-2 flex flex-wrap gap-2.5 sm:gap-3">
               <button
                 onClick={() => {
                   setSelectedJobForSubmit(null);
@@ -294,24 +321,42 @@ export default function CtvDashboardView({
 
               <button
                 onClick={() => {
+                  if (onNavigateToCvBuilder) {
+                    onNavigateToCvBuilder();
+                  } else {
+                    scrollToSection('section-cv-builder');
+                  }
+                }}
+                className="px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
+                title="Tạo hồ sơ CV ứng viên đẹp mắt chuẩn ATS"
+              >
+                <FileText className="w-4 h-4 text-emerald-100" />
+                <span>Tạo CV Ứng Viên</span>
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-white text-emerald-700">
+                  MỚI
+                </span>
+              </button>
+
+              <button
+                onClick={() => {
                   if (activeCtvCode) {
                     scrollToMyCandidates();
                   } else {
                     onOpenCtvAuth();
                   }
                 }}
-                className="px-5 py-3 rounded-2xl bg-blue-800/70 hover:bg-blue-800 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-white dark:text-slate-200 border border-blue-400/30 dark:border-slate-700 font-semibold text-xs sm:text-sm transition-all transform hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer"
+                className="px-4 py-3 rounded-2xl bg-blue-800/70 hover:bg-blue-800 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-white dark:text-slate-200 border border-blue-400/30 dark:border-slate-700 font-semibold text-xs sm:text-sm transition-all transform hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer"
               >
                 <Users className="w-4 h-4 text-sky-300 dark:text-blue-400" />
-                <span>{activeCtvCode ? `Hồ Sơ CV Của Tôi (${myCandidates.length})` : 'Tra Cứu CV Của Tôi'}</span>
+                <span>{activeCtvCode ? `Hồ Sơ Của Tôi (${myCandidates.length})` : 'Tra Cứu CV'}</span>
               </button>
 
               <button
                 onClick={() => onNavigateToJobs && onNavigateToJobs()}
-                className="px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white dark:text-slate-300 border border-white/15 dark:border-white/10 font-medium text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white dark:text-slate-300 border border-white/15 dark:border-white/10 font-medium text-xs sm:text-sm transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <Briefcase className="w-4 h-4 text-blue-200 dark:text-slate-400" />
-                <span>Xem {activeJobs.length} Job Mở</span>
+                <span>{activeJobs.length} Jobs Mở</span>
                 <ArrowRight className="w-3.5 h-3.5 text-blue-200 dark:text-slate-400" />
               </button>
             </div>
@@ -411,7 +456,7 @@ export default function CtvDashboardView({
       </div>
 
       {/* 📊 2. CTV REALTIME METRICS (Soft, High-Contrast Light/Dark Cards) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div id="section-metrics" className="scroll-reveal grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-400/50 transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Việc làm đang mở</span>
@@ -479,47 +524,185 @@ export default function CtvDashboardView({
         </div>
       </div>
 
-      {/* 🧭 Quick CTV Dashboard Section Navigation Pills */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
-        {[
-          { id: 'all', label: 'Tất Cả Dashboard', icon: LayoutGrid },
-          { id: 'my-candidates', label: `Hồ Sơ Của Tôi (${myCandidates.length})`, icon: Users },
-          { id: 'interviews', label: `Lịch Phỏng Vấn (${upcomingInterviews.length})`, icon: Calendar },
-          { id: 'calculator', label: 'Bảng Tính Hoa Hồng', icon: Calculator },
-          { id: 'referral', label: 'Link Tiếp Thị & Mẫu Tin', icon: Share2 },
-          { id: 'leaderboard', label: 'Bảng Vinh Danh', icon: Trophy },
-          { id: 'jobs', label: `Việc Làm Mở (${activeJobs.length})`, icon: Briefcase }
-        ].map((sec) => {
-          const Icon = sec.icon;
-          const isActive = activeSection === sec.id;
-          return (
-            <button
-              key={sec.id}
-              onClick={() => setActiveSection(sec.id)}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer border ${
-                isActive
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5 shrink-0" />
-              <span>{sec.label}</span>
-            </button>
-          );
-        })}
+      {/* 🧭 Sticky Quick Scroll Navigator (Cuộn & Tải Tính Năng Mượt Mà) */}
+      <div className="sticky top-14 sm:top-16 z-30 py-2.5 bg-slate-50/95 dark:bg-[#090d16]/95 backdrop-blur-md -mx-3 px-3 sm:-mx-6 sm:px-6 border-y border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between gap-2 shadow-2xs">
+        <div className="flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar flex-1">
+          {[
+            { id: 'all', label: 'Cuộn Xem Tất Cả', icon: LayoutGrid },
+            { id: 'cv-builder', label: 'Tạo CV Ứng Viên', icon: FileText, badge: 'MỚI' },
+            { id: 'my-candidates', label: `Hồ Sơ Của Tôi (${myCandidates.length})`, icon: Users },
+            { id: 'interviews', label: `Lịch PV (${upcomingInterviews.length})`, icon: Calendar },
+            { id: 'calculator', label: 'Tính Hoa Hồng', icon: Calculator },
+            { id: 'referral', label: 'Link Tiếp Thị', icon: Share2 },
+            { id: 'leaderboard', label: 'Bảng Vinh Danh', icon: Trophy },
+            { id: 'jobs', label: `Việc Làm Mở (${activeJobs.length})`, icon: Briefcase }
+          ].map((sec) => {
+            const Icon = sec.icon;
+            const isActive = activeSection === sec.id;
+            return (
+              <button
+                key={sec.id}
+                onClick={() => {
+                  setActiveSection(sec.id);
+                  if (sec.id !== 'all') {
+                    setTimeout(() => {
+                      scrollToSection(`section-${sec.id}`);
+                    }, 50);
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                  isActive
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <span>{sec.label}</span>
+                {sec.badge && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-emerald-500 text-white">
+                    {sec.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {onNavigateToCvBuilder && (
+          <button
+            onClick={onNavigateToCvBuilder}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold text-xs border border-emerald-200 dark:border-emerald-800 shrink-0 cursor-pointer hover:bg-emerald-100"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Mở Studio Tạo CV</span>
+          </button>
+        )}
       </div>
+
+      {/* 📄 2.5 CHỨC NĂNG TẠO CV ỨNG VIÊN CHUYÊN NGHIỆP (SCROLL FEATURE) */}
+      {(activeSection === 'all' || activeSection === 'cv-builder') && (
+        <div
+          id="section-cv-builder"
+          className="scroll-reveal bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6"
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <div className="p-2.5 rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-500/20">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                      Trình Tạo CV Ứng Viên Chuẩn Doanh Nghiệp & ATS
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                      TÍNH NĂNG MỚI
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                    Tạo hồ sơ ứng viên chuyên nghiệp chỉ trong 2 phút, xuất file PDF A4 sắc nét và lưu thẳng vào hệ thống FastHunt
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => {
+                  if (onNavigateToCvBuilder) {
+                    onNavigateToCvBuilder();
+                  } else {
+                    scrollToSection('section-cv-builder');
+                  }
+                }}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20 flex items-center gap-2 cursor-pointer transition-all"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Mở Trình Tạo CV Toàn Màn Hình</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* 3 Quick Interactive Showcase Cards for instant CV Creation */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700/60 flex flex-col justify-between space-y-3 hover:border-emerald-500/40 transition-colors">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase">Khối Công Nghệ</span>
+                  <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[10px] font-extrabold">IT Senior</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mt-1.5">Mẫu CV Kỹ Sư Phần Mềm (React / Node)</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  Thiết kế chuyên sâu về Tech Stack, kiến trúc hệ thống, link GitHub và dự án nổi bật.
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigateToCvBuilder && onNavigateToCvBuilder()}
+                className="w-full py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                <span>Nạp Mẫu & Chỉnh Sửa CV Này</span>
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700/60 flex flex-col justify-between space-y-3 hover:border-emerald-500/40 transition-colors">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase">Khối Kinh Doanh</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[10px] font-extrabold">Sales B2B</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mt-1.5">Mẫu CV Quản Lý Kinh Doanh / Sales Manager</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  Tập trung vào chỉ số doanh số vượt KPI, kỹ năng chốt hợp đồng B2B và đào tạo đội nhóm.
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigateToCvBuilder && onNavigateToCvBuilder()}
+                className="w-full py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>Nạp Mẫu & Chỉnh Sửa CV Này</span>
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700/60 flex flex-col justify-between space-y-3 hover:border-emerald-500/40 transition-colors">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Khối Nhân Sự</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-extrabold">Talent Hunter</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mt-1.5">Mẫu CV Chuyên Viên Tuyển Dụng (HR)</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  Nổi bật năng lực sourcing ứng viên thụ động, phỏng vấn chuẩn STAR và tỷ lệ onboard.
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigateToCvBuilder && onNavigateToCvBuilder()}
+                className="w-full py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Nạp Mẫu & Chỉnh Sửa CV Này</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 📅 Lịch phỏng vấn sắp tới & Nhắc hẹn Zalo 1-Click */}
       {(activeSection === 'all' || activeSection === 'interviews') && (
-        <CtvUpcomingInterviews
-          upcomingInterviews={upcomingInterviews}
-          onOpenCandidateDetail={onOpenCandidateDetail}
-        />
+        <div id="section-interviews" className="scroll-reveal">
+          <CtvUpcomingInterviews
+            upcomingInterviews={upcomingInterviews}
+            onOpenCandidateDetail={onOpenCandidateDetail}
+          />
+        </div>
       )}
 
       {/* 📂 3. PERSONAL CANDIDATE TRACKER (COI CV THEO TỪNG CTV) */}
       {(activeSection === 'all' || activeSection === 'my-candidates') && (
-        <div id="my-candidates-section" className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+        <div id="section-my-candidates" className="scroll-reveal bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
               <div className="flex items-center gap-2">
@@ -822,32 +1005,38 @@ export default function CtvDashboardView({
 
       {/* 🧮 BẢNG TÍNH HOA HỒNG & THƯỞNG BẬC CỘNG TÁC VIÊN */}
       {(activeSection === 'all' || activeSection === 'calculator') && (
-        <CtvEarningsCalculator
-          onOpenSubmitCv={() => {
-            setSelectedJobForSubmit(null);
-            setIsSubmitModalOpen(true);
-          }}
-        />
+        <div id="section-calculator" className="scroll-reveal">
+          <CtvEarningsCalculator
+            onOpenSubmitCv={() => {
+              setSelectedJobForSubmit(null);
+              setIsSubmitModalOpen(true);
+            }}
+          />
+        </div>
       )}
 
       {/* 🔗 BỘ CÔNG CỤ TIẾP THỊ & LINK GIỚI THIỆU CTV */}
       {(activeSection === 'all' || activeSection === 'referral') && (
-        <CtvReferralKit
-          activeCtvCode={activeCtvCode}
-          currentCtv={currentCtv}
-        />
+        <div id="section-referral" className="scroll-reveal">
+          <CtvReferralKit
+            activeCtvCode={activeCtvCode}
+            currentCtv={currentCtv}
+          />
+        </div>
       )}
 
       {/* 🏆 BẢNG VINH DANH CỘNG TÁC VIÊN XUẤT SẮC */}
       {(activeSection === 'all' || activeSection === 'leaderboard') && (
-        <CtvLeaderboard
-          leaderboard={ctvLeaderboard}
-          activeCtvCode={activeCtvCode}
-        />
+        <div id="section-leaderboard" className="scroll-reveal">
+          <CtvLeaderboard
+            leaderboard={ctvLeaderboard}
+            activeCtvCode={activeCtvCode}
+          />
+        </div>
       )}
 
       {/* 🚀 4. QUY TRÌNH 3 BƯỚC HỢP TÁC KIẾM HOA HỒNG (Refined Aesthetics) */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs">
+      <div id="section-process" className="scroll-reveal bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800 gap-2">
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -910,7 +1099,7 @@ export default function CtvDashboardView({
 
       {/* 🔥 5. TOP JOBS TUYỂN GẤP & HOA HỒNG CAO */}
       {(activeSection === 'all' || activeSection === 'jobs') && (
-        <>
+        <div id="section-jobs" className="scroll-reveal space-y-6">
           <div>
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2.5">
@@ -1051,7 +1240,74 @@ export default function CtvDashboardView({
               ))}
             </div>
           </div>
-        </>
+        </div>
+      )}
+
+      {/* 🛠️ 6. BỘ CÔNG CỤ AI GEN CONTENT & TÌM GROUP ĐĂNG TIN */}
+      {(activeSection === 'all' || activeSection === 'tools') && (
+        <div id="section-tools" className="scroll-reveal bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="p-2.5 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                  Bộ Công Cụ Tuyển Dụng Thông Minh Đa Kênh
+                </h2>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Tự động tạo nội dung tuyển dụng thu hút và tra cứu nhanh hàng trăm nhóm việc làm Facebook & Zalo
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-50/60 to-white dark:from-slate-850 dark:to-slate-900 border border-amber-200/60 dark:border-slate-800 flex flex-col justify-between space-y-4">
+              <div>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300">
+                  AI ASSISTANT
+                </span>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mt-2">
+                  Trợ Lý Gen Content Tuyển Dụng Đa Phong Cách
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Tạo bài đăng Facebook chuyên nghiệp, tin nhắn Zalo ngắn gọn, hoặc bài đăng hài hước bắt trend chỉ với 1 click từ JD việc làm.
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigateToContentGen && onNavigateToContentGen()}
+                className="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+              >
+                <Zap className="w-4 h-4" />
+                <span>Mở Công Cụ Gen Content</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-50/60 to-white dark:from-slate-850 dark:to-slate-900 border border-emerald-200/60 dark:border-slate-800 flex flex-col justify-between space-y-4">
+              <div>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                  DATABASE
+                </span>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mt-2">
+                  Danh Bạ & Gợi Ý Group Tuyển Dụng
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Tra cứu hàng trăm nhóm Facebook, Zalo, diễn đàn sinh viên theo từng ngành nghề để đăng tin tiếp cận đúng đối tượng ứng viên.
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigateToGroupFinder && onNavigateToGroupFinder()}
+                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Mở Danh Bạ Group Đăng Tin</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── 7. POPUP MODAL NỘP CV TRỰC TIẾP (DIRECT IN-APP MODAL) ── */}

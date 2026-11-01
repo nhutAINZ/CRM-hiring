@@ -72,6 +72,18 @@ export default function MobileComponentSelector({
           type: 'view'
         },
         {
+          id: 'cv-builder',
+          title: 'Tạo CV Ứng Viên Chuyên Nghiệp',
+          subtitle: 'Thiết kế hồ sơ chuẩn ATS & doanh nghiệp, xuất PDF A4',
+          icon: FileText,
+          iconColor: 'text-emerald-600 dark:text-emerald-400',
+          bgColor: 'bg-emerald-50 dark:bg-emerald-950/50',
+          borderColor: 'border-emerald-200 dark:border-emerald-800/60',
+          stat: 'Mới & Miễn Phí',
+          statColor: 'text-emerald-600 font-bold',
+          type: 'view'
+        },
+        {
           id: 'table',
           title: 'Quản Lý Ứng Viên',
           subtitle: 'Danh sách hồ sơ, lọc nâng cao, chế độ Thẻ & Bảng',

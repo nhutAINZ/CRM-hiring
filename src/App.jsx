@@ -1,39 +1,59 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import TopBanner from './components/TopBanner';
-import DashboardOverview from './components/DashboardOverview';
+import CtvDashboardView from './components/CtvDashboardView';
 import FilterBar from './components/FilterBar';
 import OverviewMetrics from './components/OverviewMetrics';
 import UrgentAlertSection from './components/UrgentAlertSection';
-import AnalyticsCharts from './components/AnalyticsCharts';
-import CandidateTable from './components/CandidateTable';
-import ClientsView from './components/ClientsView';
-import CtvManagementView from './components/CtvManagementView';
-import JobsView from './components/JobsView';
-import KanbanBoard from './components/KanbanBoard';
-import CandidateDetailModal from './components/CandidateDetailModal';
-import JobDetailModal from './components/JobDetailModal';
-import EmailGeneratorModal from './components/EmailGeneratorModal';
-import TemplateEditorModal from './components/TemplateEditorModal';
-import SettingsModal from './components/SettingsModal';
-import UpdatesModal from './components/UpdatesModal';
-import AiRecruiterBot from './components/AiRecruiterBot';
-import ZaloAssistantView from './components/ZaloAssistantView';
-import ZaloBroadcastModal from './components/ZaloBroadcastModal';
-import CvAnalysisDetailModal from './components/CvAnalysisDetailModal';
-import ArchifyView from './components/ArchifyView';
-import MultiAgentHubView from './components/MultiAgentHubView';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileVerticalTaskbar from './components/MobileVerticalTaskbar';
 import MobileComponentSelector from './components/MobileComponentSelector';
 import MobileFAB from './components/MobileFAB';
-import AdminAuthModal from './components/AdminAuthModal';
-import CtvAuthModal from './components/CtvAuthModal';
-import CtvDashboardView from './components/CtvDashboardView';
-import RecruitmentContentGeneratorView from './components/RecruitmentContentGeneratorView';
-import RecruitmentGroupsView from './components/RecruitmentGroupsView';
 import { Lock, Unlock } from 'lucide-react';
+
+// Code-splitting / Lazy-loaded Views for lightning-fast initial load
+const DashboardOverview = lazy(() => import('./components/DashboardOverview'));
+const AnalyticsCharts = lazy(() => import('./components/AnalyticsCharts'));
+const CandidateTable = lazy(() => import('./components/CandidateTable'));
+const ClientsView = lazy(() => import('./components/ClientsView'));
+const CtvManagementView = lazy(() => import('./components/CtvManagementView'));
+const JobsView = lazy(() => import('./components/JobsView'));
+const KanbanBoard = lazy(() => import('./components/KanbanBoard'));
+const ZaloAssistantView = lazy(() => import('./components/ZaloAssistantView'));
+const ArchifyView = lazy(() => import('./components/ArchifyView'));
+const MultiAgentHubView = lazy(() => import('./components/MultiAgentHubView'));
+const RecruitmentContentGeneratorView = lazy(() => import('./components/RecruitmentContentGeneratorView'));
+const RecruitmentGroupsView = lazy(() => import('./components/RecruitmentGroupsView'));
+const CvBuilderView = lazy(() => import('./components/CvBuilderView'));
+
+// Lazy-loaded Modals
+const CandidateDetailModal = lazy(() => import('./components/CandidateDetailModal'));
+const JobDetailModal = lazy(() => import('./components/JobDetailModal'));
+const EmailGeneratorModal = lazy(() => import('./components/EmailGeneratorModal'));
+const TemplateEditorModal = lazy(() => import('./components/TemplateEditorModal'));
+const SettingsModal = lazy(() => import('./components/SettingsModal'));
+const UpdatesModal = lazy(() => import('./components/UpdatesModal'));
+const ZaloBroadcastModal = lazy(() => import('./components/ZaloBroadcastModal'));
+const AdminAuthModal = lazy(() => import('./components/AdminAuthModal'));
+const CtvAuthModal = lazy(() => import('./components/CtvAuthModal'));
+const CvAnalysisDetailModal = lazy(() => import('./components/CvAnalysisDetailModal'));
+const AiRecruiterBot = lazy(() => import('./components/AiRecruiterBot'));
+
+function ViewLoadingFallback({ title = 'Đang tải dữ liệu...' }) {
+  return (
+    <div className="min-h-[360px] flex flex-col items-center justify-center p-8 text-center animate-fade-in space-y-4 bg-white/70 dark:bg-slate-900/60 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs backdrop-blur-xs">
+      <div className="relative w-12 h-12 flex items-center justify-center">
+        <div className="absolute inset-0 rounded-full border-2 border-blue-500/20 animate-ping" />
+        <div className="w-10 h-10 rounded-full border-3 border-blue-600 border-t-transparent animate-spin" />
+      </div>
+      <div className="space-y-1">
+        <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{title}</p>
+        <p className="text-xs text-slate-400">Tối ưu hiệu năng & tải tức thì...</p>
+      </div>
+    </div>
+  );
+}
 
 
 
@@ -127,7 +147,7 @@ export default function App() {
     if (typeof window !== 'undefined' && window.location.hash) {
       const hash = window.location.hash.replace('#', '').split('?')[0];
       const validViews = [
-        'ctv-dashboard', 'jobs', 'content-gen', 'group-finder',
+        'ctv-dashboard', 'cv-builder', 'jobs', 'content-gen', 'group-finder',
         'multiagent', 'archify', 'table', 'dashboard', 'kanban', 'analytics', 'urgent', 'clients', 'ctv', 'zalo'
       ];
       if (validViews.includes(hash)) {
@@ -568,6 +588,7 @@ export default function App() {
                 setSelectedJobForTools(job);
                 setActiveView('group-finder');
               }}
+              onNavigateToCvBuilder={() => setActiveView('cv-builder')}
               onOpenJobDetail={(job) => {
                 setSelectedJob(job);
                 setIsJobDetailOpen(true);
@@ -577,28 +598,50 @@ export default function App() {
             />
           )}
 
+          {/* ── Trình Tạo CV Ứng Viên Chuyên Nghiệp (Công khai cho cả CTV & Admin) ── */}
+          {activeView === 'cv-builder' && (
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Trình Tạo CV Ứng Viên..." />}>
+              <CvBuilderView
+                onAddCandidateToSystem={handleSubmitNewCandidate}
+                jobItems={jobItems}
+                currentCtv={currentCtv}
+                onNavigateToTable={() => {
+                  if (!isAdmin) {
+                    setIsAdminAuthOpen(true);
+                    return;
+                  }
+                  setActiveView('table');
+                }}
+              />
+            </Suspense>
+          )}
+
           {/* ── Trợ Lý Gen Content Tuyển Dụng Đa Kênh ── */}
           {activeView === 'content-gen' && (
-            <RecruitmentContentGeneratorView
-              jobItems={jobItems}
-              selectedJobContext={selectedJobForTools}
-              onNavigateToGroupFinder={(job) => {
-                setSelectedJobForTools(job);
-                setActiveView('group-finder');
-              }}
-            />
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Trợ Lý Sáng Tạo Content..." />}>
+              <RecruitmentContentGeneratorView
+                jobItems={jobItems}
+                selectedJobContext={selectedJobForTools}
+                onNavigateToGroupFinder={(job) => {
+                  setSelectedJobForTools(job);
+                  setActiveView('group-finder');
+                }}
+              />
+            </Suspense>
           )}
 
           {/* ── Danh Bạ & Gợi Ý Group Tuyển Dụng ── */}
           {activeView === 'group-finder' && (
-            <RecruitmentGroupsView
-              jobItems={jobItems}
-              selectedJobContext={selectedJobForTools}
-              onNavigateToContentGen={(job) => {
-                setSelectedJobForTools(job);
-                setActiveView('content-gen');
-              }}
-            />
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Danh Bạ Group Tuyển Dụng..." />}>
+              <RecruitmentGroupsView
+                jobItems={jobItems}
+                selectedJobContext={selectedJobForTools}
+                onNavigateToContentGen={(job) => {
+                  setSelectedJobForTools(job);
+                  setActiveView('content-gen');
+                }}
+              />
+            </Suspense>
           )}
 
           {/* ── Khóa Bảo Mật Cho Các Tính Năng Quản Trị Viên (Admin Lock Guard) ── */}
@@ -631,302 +674,326 @@ export default function App() {
             </div>
           )}
 
-          {/* ── 1. Candidate Management Table View (Trang Mặc Định theo Screenshot) ── */}
+          {/* ── 1. Candidate Management Table View ── */}
           {activeView === 'table' && isAdmin && (
-            <div className="space-y-4 animate-fade-in">
-              <FilterBar
-                filters={filters}
-                setFilters={setFilters}
-                ctvOptions={ctvOptions}
-                positionOptions={positionOptions}
-                onResetFilters={handleResetFilters}
-                totalResults={filteredCandidates.length}
-              />
-              <CandidateTable
-                candidates={filteredCandidates}
-                onOpenDetail={handleOpenDetail}
-                onOpenEmail={handleOpenEmail}
-                sheet2ViewUrl={sheet2ViewUrl}
-                sheet2Items={sheet2Items}
-                jobItems={jobItems}
-              />
-            </div>
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Dữ Liệu Ứng Viên..." />}>
+              <div className="space-y-4 animate-fade-in">
+                <FilterBar
+                  filters={filters}
+                  setFilters={setFilters}
+                  ctvOptions={ctvOptions}
+                  positionOptions={positionOptions}
+                  onResetFilters={handleResetFilters}
+                  totalResults={filteredCandidates.length}
+                />
+                <CandidateTable
+                  candidates={filteredCandidates}
+                  onOpenDetail={handleOpenDetail}
+                  onOpenEmail={handleOpenEmail}
+                  sheet2ViewUrl={sheet2ViewUrl}
+                  sheet2Items={sheet2Items}
+                  jobItems={jobItems}
+                />
+              </div>
+            </Suspense>
           )}
 
-          {/* ── 2. Bảng Tin & Link Jobs Tuyển Dụng View (Công khai cho cả CTV & Admin) ── */}
+          {/* ── 2. Bảng Tin & Link Jobs Tuyển Dụng View ── */}
           {activeView === 'jobs' && (
-            <JobsView
-              jobItems={jobItems}
-              candidates={candidates}
-              jobSheetUrl={jobSheetUrl}
-              onNavigateToCandidateJob={(jobTitle) => {
-                if (!isAdmin) {
-                  setIsAdminAuthOpen(true);
-                  return;
-                }
-                setFilters((prev) => ({ ...prev, position: jobTitle }));
-                setActiveView('table');
-              }}
-              onOpenJobDetail={(job) => {
-                setSelectedJob(job);
-                setIsJobDetailOpen(true);
-              }}
-              onNavigateToContentGen={(job) => {
-                setSelectedJobForTools(job);
-                setActiveView('content-gen');
-              }}
-              onNavigateToGroupFinder={(job) => {
-                setSelectedJobForTools(job);
-                setActiveView('group-finder');
-              }}
-            />
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Danh Sách Việc Làm..." />}>
+              <JobsView
+                jobItems={jobItems}
+                candidates={candidates}
+                jobSheetUrl={jobSheetUrl}
+                onNavigateToCandidateJob={(jobTitle) => {
+                  if (!isAdmin) {
+                    setIsAdminAuthOpen(true);
+                    return;
+                  }
+                  setFilters((prev) => ({ ...prev, position: jobTitle }));
+                  setActiveView('table');
+                }}
+                onOpenJobDetail={(job) => {
+                  setSelectedJob(job);
+                  setIsJobDetailOpen(true);
+                }}
+                onNavigateToContentGen={(job) => {
+                  setSelectedJobForTools(job);
+                  setActiveView('content-gen');
+                }}
+                onNavigateToGroupFinder={(job) => {
+                  setSelectedJobForTools(job);
+                  setActiveView('group-finder');
+                }}
+              />
+            </Suspense>
           )}
 
           {/* ── 3. Executive CRM Dashboard Overview ── */}
           {activeView === 'dashboard' && isAdmin && (
-            <DashboardOverview
-              candidates={candidates}
-              metrics={globalMetrics}
-              sheet2Items={sheet2Items}
-              sheet2ViewUrl={sheet2ViewUrl}
-              jobItems={jobItems}
-              onNavigateTab={(tab) => setActiveView(tab)}
-              onOpenDetail={handleOpenDetail}
-              onOpenEmail={handleOpenEmail}
-              darkMode={darkMode}
-            />
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Dashboard CRM..." />}>
+              <DashboardOverview
+                candidates={candidates}
+                metrics={globalMetrics}
+                sheet2Items={sheet2Items}
+                sheet2ViewUrl={sheet2ViewUrl}
+                jobItems={jobItems}
+                onNavigateTab={(tab) => setActiveView(tab)}
+                onOpenDetail={handleOpenDetail}
+                onOpenEmail={handleOpenEmail}
+                darkMode={darkMode}
+              />
+            </Suspense>
           )}
 
           {/* ── 4. Kanban Pipeline View ── */}
           {activeView === 'kanban' && isAdmin && (
-            <div className="animate-fade-in space-y-4">
-              <KanbanBoard
-                candidates={filteredCandidates}
-                onOpenDetail={handleOpenDetail}
-                onOpenEmail={handleOpenEmail}
-                sheet2ViewUrl={sheet2ViewUrl}
-              />
-            </div>
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Kanban Pipeline..." />}>
+              <div className="animate-fade-in space-y-4">
+                <KanbanBoard
+                  candidates={filteredCandidates}
+                  onOpenDetail={handleOpenDetail}
+                  onOpenEmail={handleOpenEmail}
+                  sheet2ViewUrl={sheet2ViewUrl}
+                />
+              </div>
+            </Suspense>
           )}
 
           {/* ── 5. Analytics & Deep-dive Reporting View ── */}
           {activeView === 'analytics' && isAdmin && (
-            <div className="animate-fade-in space-y-6">
-              <OverviewMetrics
-                metrics={metrics}
-                onSelectUrgent={() => setActiveView('urgent')}
-              />
-              <AnalyticsCharts
-                candidates={filteredCandidates}
-                metrics={metrics}
-                darkMode={darkMode}
-              />
-            </div>
+            <Suspense fallback={<ViewLoadingFallback title="Đang tính toán Báo Cáo Tuyển Dụng..." />}>
+              <div className="animate-fade-in space-y-6">
+                <OverviewMetrics
+                  metrics={metrics}
+                  onSelectUrgent={() => setActiveView('urgent')}
+                />
+                <AnalyticsCharts
+                  candidates={filteredCandidates}
+                  metrics={metrics}
+                  darkMode={darkMode}
+                />
+              </div>
+            </Suspense>
           )}
 
           {/* ── 6. Urgent Action Queue View ── */}
           {activeView === 'urgent' && isAdmin && (
-            <div className="space-y-6 animate-fade-in">
-              <UrgentAlertSection
-                urgentCandidates={globalMetrics.urgentCandidates}
-                onOpenEmail={handleOpenEmail}
-                onOpenDetail={handleOpenDetail}
-                sheet2ViewUrl={sheet2ViewUrl}
-              />
-              <CandidateTable
-                candidates={globalMetrics.urgentCandidates}
-                onOpenDetail={handleOpenDetail}
-                onOpenEmail={handleOpenEmail}
-                sheet2ViewUrl={sheet2ViewUrl}
-                sheet2Items={sheet2Items}
-                jobItems={jobItems}
-              />
-            </div>
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Hồ Sơ Cần Xử Lý Gấp..." />}>
+              <div className="space-y-6 animate-fade-in">
+                <UrgentAlertSection
+                  urgentCandidates={globalMetrics.urgentCandidates}
+                  onOpenEmail={handleOpenEmail}
+                  onOpenDetail={handleOpenDetail}
+                  sheet2ViewUrl={sheet2ViewUrl}
+                />
+                <CandidateTable
+                  candidates={globalMetrics.urgentCandidates}
+                  onOpenDetail={handleOpenDetail}
+                  onOpenEmail={handleOpenEmail}
+                  sheet2ViewUrl={sheet2ViewUrl}
+                  sheet2Items={sheet2Items}
+                  jobItems={jobItems}
+                />
+              </div>
+            </Suspense>
           )}
 
           {/* ── 7. Khách Hàng & Connect Jobs Portal View ── */}
           {activeView === 'clients' && isAdmin && (
-            <ClientsView
-              candidates={candidates}
-              sheet2Items={sheet2Items}
-              sheet2ViewUrl={sheet2ViewUrl}
-              intergreatItems={intergreatItems}
-              intergreatSheetUrl={getIntergreatSheetViewUrl(config.intergreatSheetId, config.intergreatSheetGid)}
-              onNavigateToJob={(jobTitle) => {
-                setFilters((prev) => ({ ...prev, position: jobTitle }));
-                setActiveView('table');
-              }}
-            />
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Cổng Khách Hàng..." />}>
+              <ClientsView
+                candidates={candidates}
+                sheet2Items={sheet2Items}
+                sheet2ViewUrl={sheet2ViewUrl}
+                intergreatItems={intergreatItems}
+                intergreatSheetUrl={getIntergreatSheetViewUrl(config.intergreatSheetId, config.intergreatSheetGid)}
+                onNavigateToJob={(jobTitle) => {
+                  setFilters((prev) => ({ ...prev, position: jobTitle }));
+                  setActiveView('table');
+                }}
+              />
+            </Suspense>
           )}
 
           {/* ── 8. Quản Lý & Hỗ Trợ Mã CTV View ── */}
           {activeView === 'ctv' && isAdmin && (
-            <CtvManagementView
-              ctvItems={ctvItems}
-              candidates={candidates}
-              ctvSheetUrl={getCtvSheetViewUrl(config.ctvSheetId, config.ctvSheetGid)}
-              onFilterByCtv={(ctvCode) => {
-                setFilters((prev) => ({ ...prev, ctv: ctvCode }));
-                setActiveView('table');
-              }}
-            />
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Danh Sách Mã CTV..." />}>
+              <CtvManagementView
+                ctvItems={ctvItems}
+                candidates={candidates}
+                ctvSheetUrl={getCtvSheetViewUrl(config.ctvSheetId, config.ctvSheetGid)}
+                onFilterByCtv={(ctvCode) => {
+                  setFilters((prev) => ({ ...prev, ctv: ctvCode }));
+                  setActiveView('table');
+                }}
+              />
+            </Suspense>
           )}
 
-          {/* ── 9. Trợ Lý Tuyển Dụng Zalo Cá Nhân (Nick Thường) ── */}
+          {/* ── 9. Trợ Lý Tuyển Dụng Zalo Cá Nhân ── */}
           {activeView === 'zalo' && isAdmin && (
-            <ZaloAssistantView
-              jobItems={jobItems}
-              candidates={candidates}
-              onOpenCandidateDetail={handleOpenDetail}
-              onOpenEmail={handleOpenEmail}
-              onOpenBroadcastModal={(job) => {
-                setBroadcastJob(job || jobItems[0]);
-                setIsBroadcastOpen(true);
-              }}
-              onOpenAnalysisModal={(analysis) => {
-                setCvAnalysisData(analysis);
-                setIsCvAnalysisOpen(true);
-              }}
-            />
+            <Suspense fallback={<ViewLoadingFallback title="Đang kết nối Trợ Lý Zalo..." />}>
+              <ZaloAssistantView
+                jobItems={jobItems}
+                candidates={candidates}
+                onOpenCandidateDetail={handleOpenDetail}
+                onOpenEmail={handleOpenEmail}
+                onOpenBroadcastModal={(job) => {
+                  setBroadcastJob(job || jobItems[0]);
+                  setIsBroadcastOpen(true);
+                }}
+                onOpenAnalysisModal={(analysis) => {
+                  setCvAnalysisData(analysis);
+                  setIsCvAnalysisOpen(true);
+                }}
+              />
+            </Suspense>
           )}
 
           {/* ── 10. Multi-Agent Swarm Command Center View ── */}
           {activeView === 'multiagent' && isAdmin && (
-            <MultiAgentHubView
-              candidates={candidates}
-              jobItems={jobItems}
-              ctvItems={ctvItems}
-              onOpenEmail={handleOpenEmail}
-              onOpenDetail={handleOpenDetail}
-              onOpenJobDetail={handleOpenJobDetail}
-              onOpenBroadcast={(job) => {
-                setBroadcastJob(job || jobItems[0]);
-                setIsBroadcastOpen(true);
-              }}
-              darkMode={darkMode}
-            />
+            <Suspense fallback={<ViewLoadingFallback title="Đang khởi động Multi-Agent Swarm Hub..." />}>
+              <MultiAgentHubView
+                candidates={candidates}
+                jobItems={jobItems}
+                ctvItems={ctvItems}
+                onOpenEmail={handleOpenEmail}
+                onOpenDetail={handleOpenDetail}
+                onOpenJobDetail={handleOpenJobDetail}
+                onOpenBroadcast={(job) => {
+                  setBroadcastJob(job || jobItems[0]);
+                  setIsBroadcastOpen(true);
+                }}
+                darkMode={darkMode}
+              />
+            </Suspense>
           )}
 
           {/* ── 11. Archify System Architecture & UML Studio ── */}
           {activeView === 'archify' && isAdmin && (
-            <ArchifyView onExportMarkdown={handleDownloadArchitectureMarkdown} />
+            <Suspense fallback={<ViewLoadingFallback title="Đang nạp Bản Vẽ Kiến Trúc UML Archify..." />}>
+              <ArchifyView onExportMarkdown={handleDownloadArchitectureMarkdown} />
+            </Suspense>
           )}
         </main>
       </div>
 
-      {/* Modals */}
-      {isDetailOpen && (
-        <CandidateDetailModal
-          candidate={selectedCandidate}
-          candidatesList={filteredCandidates}
-          jobItems={jobItems}
-          onClose={() => setIsDetailOpen(false)}
-          onOpenEmail={handleOpenEmail}
-          sheet2ViewUrl={sheet2ViewUrl}
-          onNavigateCandidate={(nextC) => setSelectedCandidate(nextC)}
-        />
-      )}
+      {/* Modals wrapped in Suspense */}
+      <Suspense fallback={null}>
+        {isDetailOpen && (
+          <CandidateDetailModal
+            candidate={selectedCandidate}
+            candidatesList={filteredCandidates}
+            jobItems={jobItems}
+            onClose={() => setIsDetailOpen(false)}
+            onOpenEmail={handleOpenEmail}
+            sheet2ViewUrl={sheet2ViewUrl}
+            onNavigateCandidate={(nextC) => setSelectedCandidate(nextC)}
+          />
+        )}
 
-      {isJobDetailOpen && (
-        <JobDetailModal
-          job={selectedJob}
+        {isJobDetailOpen && (
+          <JobDetailModal
+            job={selectedJob}
+            candidates={candidates}
+            onClose={() => setIsJobDetailOpen(false)}
+            onNavigateToCandidateJob={(jobTitle) => {
+              setFilters((prev) => ({ ...prev, position: jobTitle }));
+              setActiveView('table');
+            }}
+            onOpenEmailCandidate={handleOpenEmail}
+          />
+        )}
+
+        {isEmailOpen && (
+          <EmailGeneratorModal
+            candidate={selectedCandidate}
+            onClose={() => setIsEmailOpen(false)}
+            onOpenEditor={() => {
+              setIsEmailOpen(false);
+              setIsTemplateEditorOpen(true);
+            }}
+          />
+        )}
+
+        {isTemplateEditorOpen && (
+          <TemplateEditorModal onClose={() => setIsTemplateEditorOpen(false)} />
+        )}
+
+        {isSettingsOpen && (
+          <SettingsModal
+            config={config}
+            onSaveConfig={(newConfig) => {
+              setConfig(newConfig);
+            }}
+            onClose={() => setIsSettingsOpen(false)}
+            onRefreshData={loadAllData}
+          />
+        )}
+
+        {isUpdatesOpen && (
+          <UpdatesModal
+            onClose={() => setIsUpdatesOpen(false)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+          />
+        )}
+
+        {/* ── Zalo Personal Broadcast & CTV Group Push Modal ── */}
+        {isBroadcastOpen && (
+          <ZaloBroadcastModal
+            job={broadcastJob || jobItems[0]}
+            jobsList={jobItems}
+            onClose={() => setIsBroadcastOpen(false)}
+            onApproveAndSend={() => {
+              setIsBroadcastOpen(false);
+            }}
+          />
+        )}
+
+        {/* ── Admin Authentication Modal ── */}
+        <AdminAuthModal
+          isOpen={isAdminAuthOpen}
+          onClose={() => setIsAdminAuthOpen(false)}
+          onLoginSuccess={handleLoginAdminSuccess}
+          currentPassword={adminPassword}
+          onChangePassword={handleChangeAdminPassword}
+        />
+
+        {/* ── CTV Authentication Modal ── */}
+        <CtvAuthModal
+          isOpen={isCtvAuthOpen}
+          onClose={() => setIsCtvAuthOpen(false)}
+          ctvItems={ctvItems}
           candidates={candidates}
-          onClose={() => setIsJobDetailOpen(false)}
-          onNavigateToCandidateJob={(jobTitle) => {
-            setFilters((prev) => ({ ...prev, position: jobTitle }));
-            setActiveView('table');
-          }}
-          onOpenEmailCandidate={handleOpenEmail}
+          currentCtv={currentCtv}
+          onLoginCtv={handleCtvLogin}
+          onLogoutCtv={handleCtvLogout}
         />
-      )}
 
-      {isEmailOpen && (
-        <EmailGeneratorModal
-          candidate={selectedCandidate}
-          onClose={() => setIsEmailOpen(false)}
-          onOpenEditor={() => {
-            setIsEmailOpen(false);
-            setIsTemplateEditorOpen(true);
-          }}
-        />
-      )}
+        {/* ── CV Analysis Detail Modal ── */}
+        {isCvAnalysisOpen && (
+          <CvAnalysisDetailModal
+            analysisData={cvAnalysisData}
+            onClose={() => setIsCvAnalysisOpen(false)}
+            onOpenCandidateDetail={handleOpenDetail}
+            onOpenEmail={handleOpenEmail}
+          />
+        )}
 
-      {isTemplateEditorOpen && (
-        <TemplateEditorModal onClose={() => setIsTemplateEditorOpen(false)} />
-      )}
-
-      {isSettingsOpen && (
-        <SettingsModal
-          config={config}
-          onSaveConfig={(newConfig) => {
-            setConfig(newConfig);
-          }}
-          onClose={() => setIsSettingsOpen(false)}
-          onRefreshData={loadAllData}
-        />
-      )}
-
-      {isUpdatesOpen && (
-        <UpdatesModal
-          onClose={() => setIsUpdatesOpen(false)}
-          onOpenSettings={() => setIsSettingsOpen(true)}
-        />
-      )}
-
-      {/* ── Zalo Personal Broadcast & CTV Group Push Modal ── */}
-      {isBroadcastOpen && (
-        <ZaloBroadcastModal
-          job={broadcastJob || jobItems[0]}
-          jobsList={jobItems}
-          onClose={() => setIsBroadcastOpen(false)}
-          onApproveAndSend={() => {
-            setIsBroadcastOpen(false);
-          }}
-        />
-      )}
-
-      {/* ── Admin Authentication Modal ── */}
-      <AdminAuthModal
-        isOpen={isAdminAuthOpen}
-        onClose={() => setIsAdminAuthOpen(false)}
-        onLoginSuccess={handleLoginAdminSuccess}
-        currentPassword={adminPassword}
-        onChangePassword={handleChangeAdminPassword}
-      />
-
-      {/* ── CTV Authentication Modal ── */}
-      <CtvAuthModal
-        isOpen={isCtvAuthOpen}
-        onClose={() => setIsCtvAuthOpen(false)}
-        ctvItems={ctvItems}
-        candidates={candidates}
-        currentCtv={currentCtv}
-        onLoginCtv={handleCtvLogin}
-        onLogoutCtv={handleCtvLogout}
-      />
-
-      {/* ── CV Analysis Detail Modal ── */}
-      {isCvAnalysisOpen && (
-        <CvAnalysisDetailModal
-          analysisData={cvAnalysisData}
-          onClose={() => setIsCvAnalysisOpen(false)}
-          onOpenCandidateDetail={handleOpenDetail}
+        {/* ── FastHunt AI Recruitment Chatbot Assistant ── */}
+        <AiRecruiterBot
+          candidates={candidates}
+          sheet2Items={sheet2Items}
+          jobItems={jobItems}
+          sheet2ViewUrl={sheet2ViewUrl}
+          jobSheetUrl={jobSheetUrl}
           onOpenEmail={handleOpenEmail}
+          onOpenDetail={handleOpenDetail}
+          externalIsOpen={isAiBotOpen}
+          setExternalIsOpen={setIsAiBotOpen}
         />
-      )}
-
-      {/* ── FastHunt AI Recruitment Chatbot Assistant ── */}
-      <AiRecruiterBot
-        candidates={candidates}
-        sheet2Items={sheet2Items}
-        jobItems={jobItems}
-        sheet2ViewUrl={sheet2ViewUrl}
-        jobSheetUrl={jobSheetUrl}
-        onOpenEmail={handleOpenEmail}
-        onOpenDetail={handleOpenDetail}
-        externalIsOpen={isAiBotOpen}
-        setExternalIsOpen={setIsAiBotOpen}
-      />
+      </Suspense>
 
       {/* ── Mobile Vertical Floating Taskbar (Thanh task bar dọc di động) ── */}
       <MobileVerticalTaskbar

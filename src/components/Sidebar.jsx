@@ -198,7 +198,7 @@ export default function Sidebar({
               onClick={() => {
                 handleNavClick('ctv-dashboard');
                 setTimeout(() => {
-                  const el = document.getElementById('my-candidates-section');
+                  const el = document.getElementById('section-my-candidates') || document.getElementById('my-candidates-section');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }, 100);
               }}
@@ -211,6 +211,26 @@ export default function Sidebar({
               {(!collapsed || mobileOpen) && currentCtv && (
                 <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
                   {currentCtv.ctvCode}
+                </span>
+              )}
+            </button>
+
+            {/* Tạo CV Ứng Viên (MỚI) */}
+            <button
+              onClick={() => handleNavClick('cv-builder')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                activeView === 'cv-builder'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 shadow-2xs font-bold'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                {(!collapsed || mobileOpen) && <span>Tạo CV Ứng Viên</span>}
+              </div>
+              {(!collapsed || mobileOpen) && (
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-emerald-500 text-white">
+                  MỚI
                 </span>
               )}
             </button>
@@ -374,6 +394,19 @@ export default function Sidebar({
                       }`}
                     >
                       Bảng dữ liệu ứng viên
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('cv-builder')}
+                      className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer ${
+                        activeView === 'cv-builder'
+                          ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 font-bold'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <span>Tạo CV ứng viên</span>
+                      <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-500 text-white">
+                        MỚI
+                      </span>
                     </button>
                     <button
                       onClick={() => handleNavClick('kanban')}

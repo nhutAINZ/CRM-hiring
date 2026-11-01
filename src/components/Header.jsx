@@ -61,6 +61,7 @@ export default function Header({
 
   const viewTitles = {
     'ctv-dashboard': 'Cổng Thông Tin CTV',
+    'cv-builder': 'Trình Tạo CV Ứng Viên Chuyên Nghiệp',
     'content-gen': 'Tạo Content Tuyển Dụng',
     'group-finder': 'Danh Bạ Group Tuyển Dụng',
     dashboard: 'Trang Chủ Quản Trị',
@@ -85,6 +86,12 @@ export default function Header({
       label: 'CTV Dashboard',
       icon: LayoutDashboard,
       badge: 'Hot'
+    },
+    {
+      id: 'cv-builder',
+      label: 'Tạo CV Ứng Viên',
+      icon: FileText,
+      badge: 'Mới'
     },
     {
       id: 'jobs',
@@ -122,6 +129,12 @@ export default function Header({
       label: 'Quản Lý Ứng Viên',
       icon: Users,
       badge: candidateCount ? String(candidateCount) : null
+    },
+    {
+      id: 'cv-builder',
+      label: 'Tạo CV Ứng Viên',
+      icon: FileText,
+      badge: 'Mới'
     },
     {
       id: 'kanban',

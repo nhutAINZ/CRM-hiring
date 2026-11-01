@@ -8,6 +8,20 @@ export default defineConfig({
   build: {
     target: 'esnext',
     cssMinify: true,
-    chunkSizeWarningLimit: 1200
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('recharts')) return 'vendor-charts';
+            if (id.includes('lucide-react')) return 'vendor-icons';
+            if (id.includes('react') || id.includes('react-dom')) return 'vendor-react';
+            if (id.includes('papaparse') || id.includes('canvas-confetti')) return 'vendor-utils';
+            return 'vendor';
+          }
+        }
+      }
+    }
   }
 });
+
