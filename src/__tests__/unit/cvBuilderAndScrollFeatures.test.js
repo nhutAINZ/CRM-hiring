@@ -112,5 +112,73 @@ test('Unit Tests: CV Builder & Scroll-Driven Feature Suite', async (t) => {
     });
     assert.equal(expectedSectionIds.length, 10, 'Expected 10 scroll feature sections');
   });
+
+  await t.test('CV-04: Standalone HTML Generator & Watermark Removal Verification', async () => {
+    const { generateStandaloneHtml, generateCvMarkdown } = await import('../../services/cvExportService.js');
+
+    const sampleCv = {
+      personal: {
+        fullName: 'Nguyễn Văn Minh',
+        title: 'Senior Frontend Engineer',
+        email: 'minh.nguyen@gmail.com',
+        phone: '0987 654 321',
+        location: 'Hà Nội',
+        expectedSalary: '35.000.000₫',
+        availability: 'Nhận việc ngay',
+        avatarUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRg=='
+      },
+      summary: 'Lập trình viên giàu kinh nghiệm với kiến trúc React và Node.js.',
+      experiences: [
+        {
+          id: 'exp-1',
+          company: 'FastHunt Tech',
+          role: 'Lead Developer',
+          period: '2022 - Hiện tại',
+          description: 'Xây dựng web app'
+        }
+      ],
+      education: [
+        {
+          id: 'edu-1',
+          school: 'Đại Học Bách Khoa',
+          degree: 'Kỹ sư CNTT',
+          year: '2018 - 2022'
+        }
+      ],
+      skills: ['React', 'TypeScript', 'Node.js'],
+      languages: [{ name: 'Tiếng Anh', level: 'IELTS 7.0' }],
+      endorsement: 'Ứng viên xuất sắc'
+    };
+
+    const htmlOutput = generateStandaloneHtml(sampleCv, 'modern', '#2563eb');
+
+    // 1. Watermark banner MUST NOT be in the generated CV document
+    assert.ok(!htmlOutput.includes('FASTHUNT RECRUITMENT VERIFIED PROFILE'), 'Branding watermark banner must be removed');
+    assert.ok(!htmlOutput.includes('MÃ HỒ SƠ: FH-'), 'Internal tracking profile code must be removed');
+
+    // 2. Candidate content & avatar MUST be present
+    assert.ok(htmlOutput.includes('Nguyễn Văn Minh'), 'Full name must be present in HTML');
+    assert.ok(htmlOutput.includes('Senior Frontend Engineer'), 'Job title must be present in HTML');
+    assert.ok(htmlOutput.includes('data:image/jpeg;base64,/9j/4AAQSkZJRg=='), 'Avatar image URL must be rendered in HTML');
+    assert.ok(htmlOutput.includes('window.print()'), '1-Click PDF print trigger must be included');
+    assert.ok(htmlOutput.includes('@media print'), 'Print stylesheet must be embedded');
+
+    // 3. Markdown generator verification
+    const mdOutput = generateCvMarkdown(sampleCv);
+    assert.ok(mdOutput.includes('# Nguyễn Văn Minh'), 'Markdown must have candidate heading');
+    assert.ok(mdOutput.includes('Senior Frontend Engineer'), 'Markdown must contain title');
+    assert.ok(mdOutput.includes('Lead Developer — FastHunt Tech'), 'Markdown must contain experience');
+  });
+
+  await t.test('JD-01: JD Poster Image Attachment Key Mapping', () => {
+    const jobWithId = { id: 'JOB-99', rowIndex: 15, title: 'Trưởng Phòng Nhân Sự' };
+    const jobWithoutId = { rowIndex: 22, title: 'Kế Toán Tổng Hợp' };
+
+    const key1 = `fasthunt_jd_image_${jobWithId.id || jobWithId.rowIndex}`;
+    const key2 = `fasthunt_jd_image_${jobWithoutId.id || jobWithoutId.rowIndex}`;
+
+    assert.equal(key1, 'fasthunt_jd_image_JOB-99');
+    assert.equal(key2, 'fasthunt_jd_image_22');
+  });
 });
 

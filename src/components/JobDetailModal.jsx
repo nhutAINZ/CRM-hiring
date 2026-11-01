@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   X,
   Briefcase,
@@ -16,7 +16,13 @@ import {
   Sparkles,
   Share2,
   ChevronRight,
-  Info
+  Info,
+  Image as ImageIcon,
+  Upload,
+  Trash2,
+  Maximize2,
+  Download,
+  Plus
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
@@ -32,6 +38,21 @@ export default function JobDetailModal({
   const [copied, setCopied] = useState(false);
   const [copiedJdLink, setCopiedJdLink] = useState(false);
 
+  // JD Poster Image State
+  const storageKey = `fasthunt_jd_image_${job?.id || job?.rowIndex || 'temp'}`;
+  const [jdImage, setJdImage] = useState(() => {
+    try {
+      return localStorage.getItem(storageKey) || job?.imageUrl || job?.posterUrl || '';
+    } catch {
+      return job?.imageUrl || job?.posterUrl || '';
+    }
+  });
+  const [isZoomImage, setIsZoomImage] = useState(false);
+  const [uploadNotice, setUploadNotice] = useState('');
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlInputValue, setUrlInputValue] = useState('');
+  const fileInputRef = useRef(null);
+
   if (!job) return null;
 
   // Matching candidates from Sheet 1
@@ -40,6 +61,88 @@ export default function JobDetailModal({
     const jobTitle = (job.title || '').toLowerCase().trim();
     return pos.includes(jobTitle) || jobTitle.includes(pos);
   });
+
+  const handleImageFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Vui lòng chọn tệp hình ảnh hợp lệ (PNG, JPG, JPEG, WEBP).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Compress to max 1200px dimension with 0.82 quality to respect browser localStorage
+        const maxDim = 1200;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+        try {
+          localStorage.setItem(storageKey, compressedDataUrl);
+          setJdImage(compressedDataUrl);
+          setUploadNotice('Đã đính kèm ảnh poster JD thành công!');
+          confetti({ particleCount: 25, spread: 50, origin: { y: 0.7 } });
+          setTimeout(() => setUploadNotice(''), 3000);
+        } catch {
+          alert('Không thể lưu ảnh do vượt quá dung lượng lưu trữ của trình duyệt.');
+        }
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleApplyUrl = () => {
+    if (!urlInputValue.trim()) return;
+    try {
+      localStorage.setItem(storageKey, urlInputValue.trim());
+      setJdImage(urlInputValue.trim());
+      setUrlInputValue('');
+      setShowUrlInput(false);
+      setUploadNotice('Đã lưu liên kết ảnh JD thành công!');
+      confetti({ particleCount: 20, spread: 45, origin: { y: 0.7 } });
+      setTimeout(() => setUploadNotice(''), 3000);
+    } catch {}
+  };
+
+  const handleRemoveImage = () => {
+    if (window.confirm('Bạn có chắc muốn xóa ảnh poster đính kèm của JD này không?')) {
+      try {
+        localStorage.removeItem(storageKey);
+      } catch {}
+      setJdImage('');
+      setUploadNotice('Đã gỡ ảnh poster JD.');
+      setTimeout(() => setUploadNotice(''), 2500);
+    }
+  };
+
+  const handleDownloadImage = () => {
+    if (!jdImage) return;
+    const a = document.createElement('a');
+    a.href = jdImage;
+    a.download = `JD_Poster_${(job.title || 'Vị_trí').replace(/\s+/g, '_')}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
 
   const handleCopyShare = () => {
     const text = `🔥 [THÔNG TIN TUYỂN DỤNG & HOA HỒNG CTV FASTHUNT] 🔥
@@ -51,8 +154,7 @@ export default function JobDetailModal({
 🎁 HOA HỒNG (BONUS) CTV: ${job.bonus}
 🎯 Số lượng cần tuyển: ${job.headcount} chỉ tiêu
 🛡️ Thời gian bảo hành: ${job.warrantyPeriod}
-${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${job.jdFile ? `📄 File JD: ${job.jdFile}\n` : ''}
-🔗 Link Dòng Google Sheet: ${job.sheetRowUrl}
+${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${job.jdFile ? `📄 File JD: ${job.jdFile}\n` : ''}${jdImage ? `🖼️ [ĐÃ ĐÍNH KÈM HÌNH ẢNH / POSTER TUYỂN DỤNG]\n` : ''}🔗 Link Dòng Google Sheet: ${job.sheetRowUrl}
 ⚡ Nhanh tay giới thiệu ứng viên phù hợp để nhận thưởng hoa hồng!`;
 
     navigator.clipboard.writeText(text);
@@ -205,6 +307,136 @@ ${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${jo
             )}
           </div>
 
+          {/* ── ATTACHED JD POSTER / RECRUITMENT IMAGE SECTION ── */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5">
+                <ImageIcon className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <h4 className="text-xs font-black uppercase text-slate-700 dark:text-slate-200 tracking-wider">
+                  Hình Ảnh & Poster JD Tuyển Dụng
+                </h4>
+                {jdImage && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                    Đã đính kèm
+                  </span>
+                )}
+              </div>
+
+              {/* Upload & Link Controls */}
+              <div className="flex items-center gap-1.5">
+                {uploadNotice && (
+                  <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 animate-fade-in">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>{uploadNotice}</span>
+                  </span>
+                )}
+                
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageFileUpload}
+                  className="hidden"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-[11px] border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                  title="Tải ảnh poster JD từ máy tính"
+                >
+                  <Upload className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                  <span>{jdImage ? 'Đổi ảnh' : 'Tải ảnh JD'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowUrlInput((v) => !v)}
+                  className="px-2 py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 font-semibold text-[11px] transition-colors cursor-pointer"
+                  title="Nhập URL liên kết ảnh"
+                >
+                  Link URL
+                </button>
+              </div>
+            </div>
+
+            {/* Optional URL input expander */}
+            {showUrlInput && (
+              <div className="flex items-center gap-2 pt-1 animate-fade-in">
+                <input
+                  type="url"
+                  value={urlInputValue}
+                  onChange={(e) => setUrlInputValue(e.target.value)}
+                  placeholder="Dán đường dẫn ảnh trực tiếp (https://...)"
+                  className="flex-1 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs outline-none focus:border-purple-500 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyUrl}
+                  className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs cursor-pointer"
+                >
+                  Lưu
+                </button>
+              </div>
+            )}
+
+            {/* Image Preview or Upload Prompt */}
+            {jdImage ? (
+              <div className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-900/5 dark:bg-slate-950 flex flex-col items-center">
+                <img
+                  src={jdImage}
+                  alt={`JD Poster ${job.title}`}
+                  className="w-full max-h-72 object-contain rounded-xl cursor-pointer hover:opacity-95 transition-opacity"
+                  onClick={() => setIsZoomImage(true)}
+                  title="Bấm để xem phóng to"
+                />
+
+                {/* Floating Quick Actions Bar */}
+                <div className="absolute top-2 right-2 flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/70 backdrop-blur-md shadow-md opacity-90 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={() => setIsZoomImage(true)}
+                    className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors"
+                    title="Phóng to ảnh"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDownloadImage}
+                    className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors"
+                    title="Tải ảnh về máy"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="p-1.5 rounded-lg text-rose-300 hover:bg-rose-500/30 transition-colors"
+                    title="Xóa ảnh poster này"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="p-5 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-purple-500 dark:hover:border-purple-400 bg-white/50 dark:bg-slate-900/50 hover:bg-purple-50/30 dark:hover:bg-purple-950/20 text-center cursor-pointer transition-all space-y-1.5 group"
+              >
+                <div className="w-10 h-10 mx-auto rounded-full bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <ImageIcon className="w-5 h-5" />
+                </div>
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Thêm hình ảnh poster / banner cho vị trí tuyển dụng này
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Bấm để chọn tệp hình ảnh (PNG, JPG, WEBP) từ thiết bị của bạn
+                </p>
+              </div>
+            )}
+          </div>
+
           {/* Matching Applicants from Sheet 1 */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -309,6 +541,43 @@ ${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${jo
           </div>
         </div>
       </div>
+
+      {/* ── FULLSCREEN IMAGE LIGHTBOX MODAL ── */}
+      {isZoomImage && jdImage && (
+        <div className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
+          <div className="w-full max-w-4xl flex items-center justify-between text-white pb-3">
+            <div className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-purple-400" />
+              <span className="text-sm font-bold truncate">Poster JD: {job.title}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleDownloadImage}
+                className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>Tải ảnh về máy</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsZoomImage(false)}
+                className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors cursor-pointer"
+                title="Đóng (Esc)"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+          <div className="max-w-4xl max-h-[85vh] overflow-hidden rounded-2xl flex items-center justify-center bg-black/40 border border-white/10 shadow-2xl">
+            <img
+              src={jdImage}
+              alt={`Full size ${job.title}`}
+              className="max-h-[85vh] max-w-full object-contain"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

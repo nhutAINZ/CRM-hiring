@@ -29,7 +29,8 @@ import {
   LayoutGrid,
   List,
   FileUp,
-  Upload
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
@@ -553,11 +554,19 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
                     {getStatusBadge(job.status)}
                   </div>
 
-                  {/* Job Title */}
+                  {/* Job Title & Poster Tag */}
                   <div>
-                    <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                      {job.title}
-                    </h3>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex-1">
+                        {job.title}
+                      </h3>
+                      {(job.imageUrl || job.posterUrl || (typeof window !== 'undefined' && localStorage.getItem(`fasthunt_jd_image_${job.id || job.rowIndex}`))) && (
+                        <span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex items-center gap-1" title="Vị trí có đính kèm ảnh poster JD">
+                          <ImageIcon className="w-2.5 h-2.5" />
+                          <span>Poster</span>
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Compensation & CTV Bonus Box */}
@@ -737,9 +746,16 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
                         #{job.rowIndex}
                       </td>
                       <td className="py-3.5 px-4 max-w-xs">
-                        <p className="font-extrabold text-slate-900 dark:text-white text-xs">
-                          {job.title}
-                        </p>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="font-extrabold text-slate-900 dark:text-white text-xs">
+                            {job.title}
+                          </p>
+                          {(job.imageUrl || job.posterUrl || (typeof window !== 'undefined' && localStorage.getItem(`fasthunt_jd_image_${job.id || job.rowIndex}`))) && (
+                            <span className="px-1.5 py-0.2 rounded bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 font-bold text-[9px] border border-purple-200 dark:border-purple-800">
+                              Poster
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400">
                           {job.company}
                         </p>

@@ -28,8 +28,18 @@ import {
   CheckCircle2,
   Save,
   ArrowRight,
-  Code2
+  Code2,
+  Camera,
+  Image as ImageIcon,
+  Upload,
+  X,
+  Maximize2,
+  ChevronDown,
+  FileDown
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { generateCvMarkdown, generateStandaloneHtml } from '../services/cvExportService';
+export { generateCvMarkdown, generateStandaloneHtml };
 
 // Preset sample resumes for quick 1-click loading
 const CV_PRESETS = {
@@ -218,10 +228,19 @@ export default function CvBuilderView({
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState('');
 
+  // Download & Modal states
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [showPostSaveModal, setShowPostSaveModal] = useState(false);
+  const [showAvatarUrlInput, setShowAvatarUrlInput] = useState(false);
+  const [avatarUrlInputValue, setAvatarUrlInputValue] = useState('');
+  const [jdPosterZoom, setJdPosterZoom] = useState(false);
+
   // CV Data State
   const [cvData, setCvData] = useState(() => CV_PRESETS.it_developer);
 
   const previewRef = useRef(null);
+  const avatarFileInputRef = useRef(null);
+  const jdPosterInputRef = useRef(null);
 
   // Theme color presets
   const COLOR_OPTIONS = [
@@ -238,6 +257,149 @@ export default function CvBuilderView({
       ...prev,
       personal: { ...prev.personal, [field]: val }
     }));
+  };
+
+  // Avatar upload and compression
+  const handleAvatarFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Vui lòng chọn tệp hình ảnh (PNG, JPG, JPEG, WEBP).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 400;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+        updatePersonal('avatarUrl', dataUrl);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleApplyAvatarUrl = () => {
+    if (!avatarUrlInputValue.trim()) return;
+    updatePersonal('avatarUrl', avatarUrlInputValue.trim());
+    setAvatarUrlInputValue('');
+    setShowAvatarUrlInput(false);
+  };
+
+  const handleRemoveAvatar = () => {
+    updatePersonal('avatarUrl', '');
+  };
+
+  // Matched job & Attached JD Poster
+  const matchedJob = jobItems.find(
+    (j) => String(j.id) === String(selectedJobId) || String(j.rowIndex) === String(selectedJobId)
+  );
+
+  const selectedJobPoster = selectedJobId
+    ? (localStorage.getItem(`fasthunt_jd_image_${selectedJobId}`) || matchedJob?.imageUrl || matchedJob?.posterUrl || '')
+    : '';
+
+  const handleJdPosterUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedJobId) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1200;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.82);
+        try {
+          localStorage.setItem(`fasthunt_jd_image_${selectedJobId}`, compressed);
+          // trigger state refresh
+          setSelectedJobId((v) => String(v));
+          confetti({ particleCount: 20, spread: 50, origin: { y: 0.6 } });
+        } catch {
+          alert('Không thể lưu ảnh JD do dung lượng trình duyệt.');
+        }
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Comprehensive Download CV handler (HTML standalone, PDF print, Markdown, JSON)
+  const handleDownloadCv = (format = 'html') => {
+    const candidateName = (cvData.personal.fullName || 'Ung_Vien').replace(/\s+/g, '_');
+
+    if (format === 'pdf') {
+      window.print();
+      return;
+    }
+
+    if (format === 'html') {
+      const htmlContent = generateStandaloneHtml(cvData, templateStyle, themeColor);
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CV_${candidateName}_FastHunt.html`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      confetti({ particleCount: 35, spread: 60, origin: { y: 0.7 } });
+      return;
+    }
+
+    if (format === 'md') {
+      const mdContent = generateCvMarkdown(cvData);
+      const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CV_${candidateName}.md`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      return;
+    }
+
+    if (format === 'json') {
+      handleExportJson();
+      return;
+    }
   };
 
   const handleLoadPreset = (key) => {
@@ -430,6 +592,8 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
 
     onAddCandidateToSystem(newCandidate);
     setSavedSuccess(true);
+    setShowPostSaveModal(true);
+    confetti({ particleCount: 45, spread: 70, origin: { y: 0.6 } });
     setTimeout(() => setSavedSuccess(false), 3000);
   };
 
@@ -471,42 +635,122 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Print / PDF Button */}
+          {/* Prominent Download CV Button with Dropdown */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowDownloadMenu((v) => !v)}
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all cursor-pointer"
+              title="Tải CV xuống máy tính"
+            >
+              <Download className="w-4 h-4 text-emerald-100" />
+              <span>TẢI CV XUỐNG NGAY</span>
+              <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+            </button>
+
+            {showDownloadMenu && (
+              <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-50 animate-fade-in space-y-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDownloadCv('html');
+                    setShowDownloadMenu(false);
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer"
+                >
+                  <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-blue-600 dark:text-blue-400">File HTML Chuẩn In (.html)</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Mở offline mọi máy, có nút In PDF 1-chạm</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDownloadCv('pdf');
+                    setShowDownloadMenu(false);
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer"
+                >
+                  <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600">
+                    <Printer className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-emerald-600 dark:text-emerald-400">Xuất File PDF (In ấn ngay)</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Hộp thoại In / Lưu PDF trình duyệt</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDownloadCv('md');
+                    setShowDownloadMenu(false);
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer"
+                >
+                  <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-600">
+                    <FileDown className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-purple-600 dark:text-purple-400">Văn Bản Markdown (.md)</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Định dạng markdown cho Notion/Docs</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDownloadCv('json');
+                    setShowDownloadMenu(false);
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer border-t border-slate-100 dark:border-slate-800"
+                >
+                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    <Download className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-700 dark:text-slate-300">Sao Lưu Dữ Liệu (.json)</p>
+                    <p className="text-[10px] text-slate-400">File dữ liệu gốc để khôi phục</p>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Direct Print / PDF Button */}
           <button
+            type="button"
             onClick={handlePrint}
-            className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+            className="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
             title="In hoặc lưu dạng PDF (Ctrl+P)"
           >
             <Printer className="w-4 h-4 text-blue-500" />
-            <span>In / Xuất PDF</span>
+            <span>In / PDF</span>
           </button>
 
           {/* Copy Summary */}
           <button
+            type="button"
             onClick={handleCopySummary}
-            className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+            className="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
             title="Sao chép tóm tắt gửi Zalo / Khách hàng"
           >
             {copiedSummary ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-blue-500" />}
-            <span>{copiedSummary ? 'Đã Sao Chép!' : 'Copy Gửi Zalo'}</span>
+            <span>{copiedSummary ? 'Đã Copy!' : 'Copy Zalo'}</span>
           </button>
 
           {/* Save directly to FastHunt System */}
           <button
+            type="button"
             onClick={handleSaveToFastHuntSystem}
             className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
           >
             {savedSuccess ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
             <span>{savedSuccess ? 'Đã Lưu Vào Hệ Thống!' : 'Lưu Vào CRM Tuyển Dụng'}</span>
-          </button>
-
-          {/* Export JSON */}
-          <button
-            onClick={handleExportJson}
-            className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer"
-            title="Tải file dữ liệu JSON"
-          >
-            <Download className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -546,9 +790,9 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
           </button>
         </div>
 
-        {/* Optional Target Job Matcher */}
+        {/* Optional Target Job Matcher & JD Poster Attachment */}
         {jobItems.length > 0 && (
-          <div className="flex items-center gap-1.5 text-xs">
+          <div className="flex items-center gap-2 text-xs flex-wrap">
             <span className="font-bold text-slate-500 dark:text-slate-400">Ứng tuyển Job:</span>
             <select
               value={selectedJobId}
@@ -561,7 +805,7 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
                   if (matched.salary) updatePersonal('expectedSalary', matched.salary);
                 }
               }}
-              className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none focus:border-blue-500 max-w-[220px] truncate"
+              className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none focus:border-blue-500 max-w-[210px] truncate"
             >
               <option value="">-- Chọn vị trí đang tuyển --</option>
               {jobItems.map((j) => (
@@ -570,6 +814,41 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
                 </option>
               ))}
             </select>
+
+            {/* Quick JD Poster preview / upload */}
+            {selectedJobId && (
+              <div className="flex items-center gap-1.5">
+                <input
+                  ref={jdPosterInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleJdPosterUpload}
+                  className="hidden"
+                />
+
+                {selectedJobPoster ? (
+                  <button
+                    type="button"
+                    onClick={() => setJdPosterZoom(true)}
+                    className="px-2.5 py-1 rounded-xl bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer border border-purple-200 dark:border-purple-800"
+                    title="Bấm để xem ảnh poster của JD này"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Xem Poster JD</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => jdPosterInputRef.current?.click()}
+                    className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
+                    title="Đính kèm hình ảnh poster cho JD này"
+                  >
+                    <Upload className="w-3 h-3 text-purple-500" />
+                    <span>+ Thêm ảnh JD</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -653,6 +932,93 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
               <User className="w-4 h-4 text-blue-600" />
               <span>1. Thông Tin Ứng Viên</span>
             </h2>
+
+            {/* Candidate Photo / Avatar Uploader */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="relative group shrink-0">
+                  {cvData.personal.avatarUrl ? (
+                    <img
+                      src={cvData.personal.avatarUrl}
+                      alt="Avatar Preview"
+                      className="w-14 h-14 rounded-2xl object-cover border-2 shadow-xs"
+                      style={{ borderColor: themeColor }}
+                    />
+                  ) : (
+                    <div className="w-14 h-14 rounded-2xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500">
+                      <Camera className="w-6 h-6" />
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Ảnh chân dung ứng viên
+                  </p>
+                  <p className="text-[11px] text-slate-400">
+                    {cvData.personal.avatarUrl ? 'Đã tải ảnh chân dung' : 'Ảnh chuẩn kích thước A4 (PNG, JPG)'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <input
+                  ref={avatarFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarFileUpload}
+                  className="hidden"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => avatarFileInputRef.current?.click()}
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                >
+                  <Upload className="w-3.5 h-3.5 text-blue-600" />
+                  <span>{cvData.personal.avatarUrl ? 'Đổi ảnh' : 'Tải ảnh lên'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowAvatarUrlInput((v) => !v)}
+                  className="px-2.5 py-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 text-xs transition-colors cursor-pointer"
+                  title="Nhập URL ảnh"
+                >
+                  Link
+                </button>
+
+                {cvData.personal.avatarUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    className="p-1.5 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                    title="Xóa ảnh chân dung"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {showAvatarUrlInput && (
+              <div className="flex items-center gap-2 animate-fade-in">
+                <input
+                  type="url"
+                  value={avatarUrlInputValue}
+                  onChange={(e) => setAvatarUrlInputValue(e.target.value)}
+                  placeholder="Dán link ảnh trực tiếp (https://...)"
+                  className="flex-1 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs outline-none focus:border-blue-500 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyAvatarUrl}
+                  className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer"
+                >
+                  Lưu
+                </button>
+              </div>
+            )}
 
             <div className="space-y-3 text-xs">
               <div>
@@ -955,7 +1321,26 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
                 <Eye className="w-3.5 h-3.5 text-blue-500" />
                 Bản xem trước A4 chuẩn in ấn
               </span>
-              <span>Kích thước tỉ lệ chuẩn 210mm x 297mm</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleDownloadCv('html')}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer border border-emerald-200 dark:border-emerald-800"
+                  title="Tải CV dạng tệp HTML độc lập"
+                >
+                  <Download className="w-3 h-3 text-emerald-600" />
+                  <span>Tải CV HTML</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDownloadCv('pdf')}
+                  className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
+                  title="In hoặc xuất sang PDF"
+                >
+                  <Printer className="w-3 h-3 text-blue-500" />
+                  <span>In / PDF</span>
+                </button>
+              </div>
             </div>
 
             {/* ── A4 CV DOCUMENT CONTAINER (Target for Print & Live Review) ── */}
@@ -965,33 +1350,31 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
               className="cv-print-area bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-8 sm:p-10 font-sans transition-all overflow-hidden"
               style={{ minHeight: '842px' }}
             >
-              {/* Header Branding watermark */}
-              <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-200 text-[11px] text-slate-400 font-mono tracking-wider">
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: themeColor }}
-                  />
-                  <span className="font-bold text-slate-700">FASTHUNT RECRUITMENT VERIFIED PROFILE</span>
-                </div>
-                <span>MÃ HỒ SƠ: {cvData.personal.fullName ? `FH-${cvData.personal.fullName.replace(/\s+/g, '').slice(0, 6).toUpperCase()}` : 'FH-CANDIDATE'}</span>
-              </div>
-
               {/* ── TEMPLATE VARIANT 1: MODERN TECH (Default) ── */}
               {templateStyle === 'modern' && (
                 <div className="space-y-6">
                   {/* Personal Header */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-                    <div className="space-y-1">
-                      <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                        {cvData.personal.fullName || 'Họ Tên Ứng Viên'}
-                      </h1>
-                      <p
-                        className="text-base sm:text-lg font-bold"
-                        style={{ color: themeColor }}
-                      >
-                        {cvData.personal.title || 'Vị Trí Ứng Tuyển'}
-                      </p>
+                    <div className="flex items-center gap-4">
+                      {cvData.personal.avatarUrl && (
+                        <img
+                          src={cvData.personal.avatarUrl}
+                          alt={cvData.personal.fullName}
+                          className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 shadow-xs shrink-0"
+                          style={{ borderColor: themeColor }}
+                        />
+                      )}
+                      <div className="space-y-1">
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                          {cvData.personal.fullName || 'Họ Tên Ứng Viên'}
+                        </h1>
+                        <p
+                          className="text-base sm:text-lg font-bold"
+                          style={{ color: themeColor }}
+                        >
+                          {cvData.personal.title || 'Vị Trí Ứng Tuyển'}
+                        </p>
+                      </div>
                     </div>
 
                     <div className="text-xs text-slate-600 space-y-1 sm:text-right shrink-0">
@@ -1177,7 +1560,16 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
               {/* ── TEMPLATE VARIANT 2: CLASSIC EXECUTIVE ── */}
               {templateStyle === 'classic' && (
                 <div className="space-y-5">
-                  <div className="text-center pb-5 border-b-2 border-slate-900 space-y-1">
+                  <div className="text-center pb-5 border-b-2 border-slate-900 space-y-2">
+                    {cvData.personal.avatarUrl && (
+                      <div className="flex justify-center mb-1">
+                        <img
+                          src={cvData.personal.avatarUrl}
+                          alt={cvData.personal.fullName}
+                          className="w-20 h-20 rounded-full object-cover border-2 border-slate-900 shadow-xs"
+                        />
+                      </div>
+                    )}
                     <h1 className="text-2xl sm:text-3xl font-serif font-black tracking-wider uppercase text-slate-900">
                       {cvData.personal.fullName || 'Họ Tên Ứng Viên'}
                     </h1>
@@ -1246,12 +1638,21 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
               {/* ── TEMPLATE VARIANT 3: ATS-FRIENDLY (Single Column) ── */}
               {templateStyle === 'ats' && (
                 <div className="space-y-4 font-sans text-xs">
-                  <div className="border-b border-slate-900 pb-3">
-                    <h1 className="text-2xl font-bold uppercase text-slate-900">{cvData.personal.fullName}</h1>
-                    <p className="font-semibold text-slate-700">{cvData.personal.title}</p>
-                    <p className="text-slate-500 pt-0.5">
-                      {cvData.personal.phone} | {cvData.personal.email} | {cvData.personal.location}
-                    </p>
+                  <div className="border-b border-slate-900 pb-3 flex items-center justify-between gap-4">
+                    <div>
+                      <h1 className="text-2xl font-bold uppercase text-slate-900">{cvData.personal.fullName}</h1>
+                      <p className="font-semibold text-slate-700">{cvData.personal.title}</p>
+                      <p className="text-slate-500 pt-0.5">
+                        {cvData.personal.phone} | {cvData.personal.email} | {cvData.personal.location}
+                      </p>
+                    </div>
+                    {cvData.personal.avatarUrl && (
+                      <img
+                        src={cvData.personal.avatarUrl}
+                        alt={cvData.personal.fullName}
+                        className="w-16 h-16 rounded-xl object-cover border border-slate-300 shrink-0"
+                      />
+                    )}
                   </div>
 
                   <div>
@@ -1304,19 +1705,28 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
               {templateStyle === 'creative' && (
                 <div className="space-y-5">
                   <div
-                    className="p-6 rounded-2xl text-white space-y-2 shadow-sm"
+                    className="p-6 rounded-2xl text-white space-y-2 shadow-sm flex items-center justify-between gap-4"
                     style={{ background: `linear-gradient(135deg, ${themeColor}, #0f172a)` }}
                   >
-                    <span className="text-[10px] uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full font-bold">
-                      Hồ Sơ Năng Lực
-                    </span>
-                    <h1 className="text-3xl font-black">{cvData.personal.fullName}</h1>
-                    <p className="text-sm font-semibold opacity-90">{cvData.personal.title}</p>
-                    <div className="pt-2 text-xs flex flex-wrap gap-3 opacity-80 border-t border-white/20">
-                      <span>📱 {cvData.personal.phone}</span>
-                      <span>✉️ {cvData.personal.email}</span>
-                      <span>📍 {cvData.personal.location}</span>
+                    <div className="space-y-2">
+                      <span className="text-[10px] uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full font-bold">
+                        Hồ Sơ Năng Lực
+                      </span>
+                      <h1 className="text-3xl font-black">{cvData.personal.fullName}</h1>
+                      <p className="text-sm font-semibold opacity-90">{cvData.personal.title}</p>
+                      <div className="pt-2 text-xs flex flex-wrap gap-3 opacity-80 border-t border-white/20">
+                        <span>📱 {cvData.personal.phone}</span>
+                        <span>✉️ {cvData.personal.email}</span>
+                        <span>📍 {cvData.personal.location}</span>
+                      </div>
                     </div>
+                    {cvData.personal.avatarUrl && (
+                      <img
+                        src={cvData.personal.avatarUrl}
+                        alt={cvData.personal.fullName}
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-white/80 shadow-md shrink-0"
+                      />
+                    )}
                   </div>
 
                   {cvData.summary && (
@@ -1358,16 +1768,122 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
                   </div>
                 </div>
               )}
-
-              {/* Footer Stamp */}
-              <div className="mt-10 pt-4 border-t border-slate-200 text-center text-[10px] text-slate-400 font-mono">
-                Tạo bởi Hệ Thống FastHunt Recruitment Agent • Bảo mật thông tin ứng viên • www.fasthunt.vn
-              </div>
             </div>
           </div>
         </div>
 
       </div>
+
+      {/* ── POST-SAVE SUCCESS & INSTANT DOWNLOAD MODAL ── */}
+      {showPostSaveModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-fade-in">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-7 space-y-5">
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-inner">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl font-black text-slate-900 dark:text-white">
+                Tạo Hồ Sơ CV Thành Công!
+              </h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                Ứng viên <strong className="text-slate-900 dark:text-white font-black">{cvData.personal.fullName}</strong> đã được thêm trực tiếp vào hệ thống quản lý tuyển dụng CRM FastHunt.
+              </p>
+            </div>
+
+            {/* Download Prompt Banner */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-slate-800 border border-emerald-200 dark:border-emerald-800/60 space-y-3">
+              <div className="flex items-center gap-2">
+                <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-xs font-black text-emerald-900 dark:text-emerald-300 uppercase tracking-wider">
+                  Tải CV Xuống Ngay
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Bạn có thể tải ngay tệp CV HTML độc lập (tự chạy offline trên máy tính, điện thoại và hỗ trợ in/xuất PDF chuẩn 1-chạm) hoặc mở hộp thoại in PDF ngay lập tức:
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => handleDownloadCv('html')}
+                  className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all cursor-pointer"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>TẢI CV HTML (.html)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDownloadCv('pdf')}
+                  className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 font-black text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                >
+                  <Printer className="w-4 h-4 text-blue-500" />
+                  <span>XUẤT FILE PDF</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Navigation / Dismiss actions */}
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowPostSaveModal(false)}
+                className="px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Tiếp tục chỉnh sửa
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPostSaveModal(false);
+                  onNavigateToTable();
+                }}
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <span>Xem Bảng Ứng Viên</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── JD POSTER LIGHTBOX ZOOM MODAL ── */}
+      {jdPosterZoom && selectedJobPoster && (
+        <div className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
+          <div className="w-full max-w-4xl flex items-center justify-between text-white pb-3">
+            <div className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-purple-400" />
+              <span className="text-sm font-bold">Poster JD: {matchedJob?.title || 'Vị trí tuyển dụng'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href={selectedJobPoster}
+                download={`JD_Poster_${(matchedJob?.title || 'Vi_tri').replace(/\s+/g, '_')}.jpg`}
+                className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>Tải ảnh về máy</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setJdPosterZoom(false)}
+                className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+          <div className="max-w-4xl max-h-[85vh] overflow-hidden rounded-2xl flex items-center justify-center bg-black/40 border border-white/10 shadow-2xl">
+            <img
+              src={selectedJobPoster}
+              alt="JD Poster Preview"
+              className="max-h-[85vh] max-w-full object-contain"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
