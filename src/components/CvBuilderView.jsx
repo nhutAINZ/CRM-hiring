@@ -610,292 +610,274 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* ── TOP HEADER & QUICK TOOLBAR ── */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-2xl bg-blue-600 text-white shadow-md shadow-blue-500/20">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                  Trình Tạo CV Ứng Viên Chuyên Nghiệp
-                </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                  MỚI & MIỄN PHÍ
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Thiết kế hồ sơ chuẩn ATS & doanh nghiệp, xuất file PDF in ấn và lưu trực tiếp vào danh sách tuyển dụng
-              </p>
-            </div>
+      {/* ── TOOLBAR: ACTIONS & PRESET SELECTOR & STYLES ── */}
+      <div className="no-print cv-builder-toolbar bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+        {/* Top Action Row: Presets & Action Buttons */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+          {/* Sample Presets */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              Nạp mẫu nhanh:
+            </span>
+            <button
+              onClick={() => handleLoadPreset('it_developer')}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-all cursor-pointer"
+            >
+              💻 Lập Trình Viên IT
+            </button>
+            <button
+              onClick={() => handleLoadPreset('sales_manager')}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-all cursor-pointer"
+            >
+              📈 Quản Lý Kinh Doanh
+            </button>
+            <button
+              onClick={() => handleLoadPreset('hr_recruiter')}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-all cursor-pointer"
+            >
+              🎯 Chuyên Viên Tuyển Dụng
+            </button>
+            <button
+              onClick={handleReset}
+              className="px-3 py-1.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-semibold text-xs transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <RotateCcw className="w-3 h-3" />
+              Làm mới
+            </button>
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Prominent Download CV Button with Dropdown */}
-          <div className="relative">
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Prominent Download CV Button with Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowDownloadMenu((v) => !v)}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all cursor-pointer"
+                title="Tải CV xuống máy tính"
+              >
+                <Download className="w-4 h-4 text-emerald-100" />
+                <span>TẢI CV XUỐNG NGAY</span>
+                <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+              </button>
+
+              {showDownloadMenu && (
+                <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-50 animate-fade-in space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDownloadCv('html');
+                      setShowDownloadMenu(false);
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer"
+                  >
+                    <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-blue-600 dark:text-blue-400">File HTML Chuẩn In (.html)</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Mở offline mọi máy, có nút In PDF 1-chạm</p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDownloadCv('pdf');
+                      setShowDownloadMenu(false);
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer"
+                  >
+                    <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600">
+                      <Printer className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-emerald-600 dark:text-emerald-400">Xuất File PDF (In ấn ngay)</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Hộp thoại In / Lưu PDF trình duyệt</p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDownloadCv('md');
+                      setShowDownloadMenu(false);
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer"
+                  >
+                    <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-600">
+                      <FileDown className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-purple-600 dark:text-purple-400">Văn Bản Markdown (.md)</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Định dạng markdown cho Notion/Docs</p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDownloadCv('json');
+                      setShowDownloadMenu(false);
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer border-t border-slate-100 dark:border-slate-800"
+                  >
+                    <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                      <Download className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-700 dark:text-slate-300">Sao Lưu Dữ Liệu (.json)</p>
+                      <p className="text-[10px] text-slate-400">File dữ liệu gốc để khôi phục</p>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Direct Print / PDF Button */}
             <button
               type="button"
-              onClick={() => setShowDownloadMenu((v) => !v)}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all cursor-pointer"
-              title="Tải CV xuống máy tính"
+              onClick={handlePrint}
+              className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+              title="In hoặc lưu dạng PDF (Ctrl+P)"
             >
-              <Download className="w-4 h-4 text-emerald-100" />
-              <span>TẢI CV XUỐNG NGAY</span>
-              <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+              <Printer className="w-4 h-4 text-blue-500" />
+              <span>In / PDF</span>
             </button>
 
-            {showDownloadMenu && (
-              <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-50 animate-fade-in space-y-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleDownloadCv('html');
-                    setShowDownloadMenu(false);
-                  }}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                >
-                  <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600">
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="font-extrabold text-blue-600 dark:text-blue-400">File HTML Chuẩn In (.html)</p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Mở offline mọi máy, có nút In PDF 1-chạm</p>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleDownloadCv('pdf');
-                    setShowDownloadMenu(false);
-                  }}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                >
-                  <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600">
-                    <Printer className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="font-extrabold text-emerald-600 dark:text-emerald-400">Xuất File PDF (In ấn ngay)</p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Hộp thoại In / Lưu PDF trình duyệt</p>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleDownloadCv('md');
-                    setShowDownloadMenu(false);
-                  }}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                >
-                  <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-600">
-                    <FileDown className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="font-extrabold text-purple-600 dark:text-purple-400">Văn Bản Markdown (.md)</p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Định dạng markdown cho Notion/Docs</p>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleDownloadCv('json');
-                    setShowDownloadMenu(false);
-                  }}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 flex items-center gap-2.5 transition-colors cursor-pointer border-t border-slate-100 dark:border-slate-800"
-                >
-                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    <Download className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-700 dark:text-slate-300">Sao Lưu Dữ Liệu (.json)</p>
-                    <p className="text-[10px] text-slate-400">File dữ liệu gốc để khôi phục</p>
-                  </div>
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Direct Print / PDF Button */}
-          <button
-            type="button"
-            onClick={handlePrint}
-            className="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
-            title="In hoặc lưu dạng PDF (Ctrl+P)"
-          >
-            <Printer className="w-4 h-4 text-blue-500" />
-            <span>In / PDF</span>
-          </button>
-
-          {/* Copy Summary */}
-          <button
-            type="button"
-            onClick={handleCopySummary}
-            className="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
-            title="Sao chép tóm tắt gửi Zalo / Khách hàng"
-          >
-            {copiedSummary ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-blue-500" />}
-            <span>{copiedSummary ? 'Đã Copy!' : 'Copy Zalo'}</span>
-          </button>
-
-          {/* Save directly to FastHunt System */}
-          <button
-            type="button"
-            onClick={handleSaveToFastHuntSystem}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
-          >
-            {savedSuccess ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-            <span>{savedSuccess ? 'Đã Lưu Vào Hệ Thống!' : 'Lưu Vào CRM Tuyển Dụng'}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ── TOOLBAR: PRESET SELECTOR & STYLES ── */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-4">
-        {/* Sample Presets */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            Nạp mẫu nhanh:
-          </span>
-          <button
-            onClick={() => handleLoadPreset('it_developer')}
-            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-all cursor-pointer"
-          >
-            💻 Lập Trình Viên IT
-          </button>
-          <button
-            onClick={() => handleLoadPreset('sales_manager')}
-            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-all cursor-pointer"
-          >
-            📈 Quản Lý Kinh Doanh
-          </button>
-          <button
-            onClick={() => handleLoadPreset('hr_recruiter')}
-            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-all cursor-pointer"
-          >
-            🎯 Chuyên Viên Tuyển Dụng
-          </button>
-          <button
-            onClick={handleReset}
-            className="px-3 py-1.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-semibold text-xs transition-all flex items-center gap-1 cursor-pointer"
-          >
-            <RotateCcw className="w-3 h-3" />
-            Làm mới
-          </button>
-        </div>
-
-        {/* Optional Target Job Matcher & JD Poster Attachment */}
-        {jobItems.length > 0 && (
-          <div className="flex items-center gap-2 text-xs flex-wrap">
-            <span className="font-bold text-slate-500 dark:text-slate-400">Ứng tuyển Job:</span>
-            <select
-              value={selectedJobId}
-              onChange={(e) => {
-                const jId = e.target.value;
-                setSelectedJobId(jId);
-                const matched = jobItems.find((j) => String(j.id) === String(jId) || String(j.rowIndex) === String(jId));
-                if (matched) {
-                  updatePersonal('title', matched.title || '');
-                  if (matched.salary) updatePersonal('expectedSalary', matched.salary);
-                }
-              }}
-              className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none focus:border-blue-500 max-w-[210px] truncate"
+            {/* Copy Summary */}
+            <button
+              type="button"
+              onClick={handleCopySummary}
+              className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              title="Sao chép tóm tắt gửi Zalo / Khách hàng"
             >
-              <option value="">-- Chọn vị trí đang tuyển --</option>
-              {jobItems.map((j) => (
-                <option key={j.id || j.rowIndex} value={j.id || j.rowIndex}>
-                  {j.title} {j.company ? `(${j.company})` : ''}
-                </option>
-              ))}
-            </select>
+              {copiedSummary ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-blue-500" />}
+              <span>{copiedSummary ? 'Đã Copy!' : 'Copy Zalo'}</span>
+            </button>
 
-            {/* Quick JD Poster preview / upload */}
-            {selectedJobId && (
-              <div className="flex items-center gap-1.5">
-                <input
-                  ref={jdPosterInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleJdPosterUpload}
-                  className="hidden"
-                />
-
-                {selectedJobPoster ? (
-                  <button
-                    type="button"
-                    onClick={() => setJdPosterZoom(true)}
-                    className="px-2.5 py-1 rounded-xl bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer border border-purple-200 dark:border-purple-800"
-                    title="Bấm để xem ảnh poster của JD này"
-                  >
-                    <ImageIcon className="w-3.5 h-3.5 text-purple-600" />
-                    <span>Xem Poster JD</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => jdPosterInputRef.current?.click()}
-                    className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
-                    title="Đính kèm hình ảnh poster cho JD này"
-                  >
-                    <Upload className="w-3 h-3 text-purple-500" />
-                    <span>+ Thêm ảnh JD</span>
-                  </button>
-                )}
-              </div>
-            )}
+            {/* Save directly to FastHunt System */}
+            <button
+              type="button"
+              onClick={handleSaveToFastHuntSystem}
+              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+            >
+              {savedSuccess ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+              <span>{savedSuccess ? 'Đã Lưu Vào Hệ Thống!' : 'Lưu Vào CRM Tuyển Dụng'}</span>
+            </button>
           </div>
-        )}
+        </div>
 
-        {/* Template Style & Color Palette */}
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Template layout */}
-          <div className="flex items-center gap-1.5 text-xs">
-            <span className="font-bold text-slate-500 dark:text-slate-400">Kiểu mẫu:</span>
-            {[
-              { id: 'modern', label: 'Hiện Đại' },
-              { id: 'classic', label: 'Thanh Lịch' },
-              { id: 'ats', label: 'Chuẩn ATS' },
-              { id: 'creative', label: 'Sáng Tạo' }
-            ].map((tpl) => (
-              <button
-                key={tpl.id}
-                onClick={() => setTemplateStyle(tpl.id)}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                  templateStyle === tpl.id
-                    ? 'bg-blue-600 text-white shadow-2xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
-                }`}
+        {/* Bottom Config Row: Job Target, Template Styles & Theme Palette */}
+        <div className="flex flex-wrap items-center justify-between gap-4 text-xs">
+          {/* Optional Target Job Matcher & JD Poster Attachment */}
+          {jobItems.length > 0 ? (
+            <div className="flex items-center gap-2 text-xs flex-wrap">
+              <span className="font-bold text-slate-500 dark:text-slate-400">Ứng tuyển Job:</span>
+              <select
+                value={selectedJobId}
+                onChange={(e) => {
+                  const jId = e.target.value;
+                  setSelectedJobId(jId);
+                  const matched = jobItems.find((j) => String(j.id) === String(jId) || String(j.rowIndex) === String(jId));
+                  if (matched) {
+                    updatePersonal('title', matched.title || '');
+                    if (matched.salary) updatePersonal('expectedSalary', matched.salary);
+                  }
+                }}
+                className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none focus:border-blue-500 max-w-[210px] truncate"
               >
-                {tpl.label}
-              </button>
-            ))}
-          </div>
+                <option value="">-- Chọn vị trí đang tuyển --</option>
+                {jobItems.map((j) => (
+                  <option key={j.id || j.rowIndex} value={j.id || j.rowIndex}>
+                    {j.title} {j.company ? `(${j.company})` : ''}
+                  </option>
+                ))}
+              </select>
 
-          {/* Color theme dots */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Màu:</span>
-            {COLOR_OPTIONS.map((c) => (
-              <button
-                key={c.hex}
-                onClick={() => setThemeColor(c.hex)}
-                className={`w-6 h-6 rounded-full transition-transform cursor-pointer border-2 ${
-                  themeColor === c.hex ? 'border-slate-900 dark:border-white scale-110 shadow-sm' : 'border-transparent hover:scale-105'
-                } ${c.bgClass}`}
-                title={c.name}
-              />
-            ))}
+              {/* Quick JD Poster preview / upload */}
+              {selectedJobId && (
+                <div className="flex items-center gap-1.5">
+                  <input
+                    ref={jdPosterInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleJdPosterUpload}
+                    className="hidden"
+                  />
+
+                  {selectedJobPoster ? (
+                    <button
+                      type="button"
+                      onClick={() => setJdPosterZoom(true)}
+                      className="px-2.5 py-1 rounded-xl bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer border border-purple-200 dark:border-purple-800"
+                      title="Bấm để xem ảnh poster của JD này"
+                    >
+                      <ImageIcon className="w-3.5 h-3.5 text-purple-600" />
+                      <span>Xem Poster JD</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => jdPosterInputRef.current?.click()}
+                      className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
+                      title="Đính kèm hình ảnh poster cho JD này"
+                    >
+                      <Upload className="w-3 h-3 text-purple-500" />
+                      <span>+ Thêm ảnh JD</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : <div />}
+
+          {/* Template Style & Color Palette */}
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Template layout */}
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="font-bold text-slate-500 dark:text-slate-400">Kiểu mẫu:</span>
+              {[
+                { id: 'modern', label: 'Hiện Đại' },
+                { id: 'classic', label: 'Thanh Lịch' },
+                { id: 'ats', label: 'Chuẩn ATS' },
+                { id: 'creative', label: 'Sáng Tạo' }
+              ].map((tpl) => (
+                <button
+                  key={tpl.id}
+                  onClick={() => setTemplateStyle(tpl.id)}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                    templateStyle === tpl.id
+                      ? 'bg-blue-600 text-white shadow-2xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                  }`}
+                >
+                  {tpl.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Color theme dots */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Màu:</span>
+              {COLOR_OPTIONS.map((c) => (
+                <button
+                  key={c.hex}
+                  onClick={() => setThemeColor(c.hex)}
+                  className={`w-6 h-6 rounded-full transition-transform cursor-pointer border-2 ${
+                    themeColor === c.hex ? 'border-slate-900 dark:border-white scale-110 shadow-sm' : 'border-transparent hover:scale-105'
+                  } ${c.bgClass}`}
+                  title={c.name}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* ── MOBILE VIEW TOGGLE TABS ── */}
-      <div className="lg:hidden flex items-center p-1 bg-slate-200/80 dark:bg-slate-800 rounded-2xl text-xs font-bold">
+      <div className="no-print lg:hidden flex items-center p-1 bg-slate-200/80 dark:bg-slate-800 rounded-2xl text-xs font-bold">
         <button
           onClick={() => setActiveTab('editor')}
           className={`flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
@@ -924,7 +906,7 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* ── LEFT: FORM EDITOR (Columns 1 to 5) ── */}
-        <div className={`lg:col-span-5 space-y-5 ${activeTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
+        <div className={`no-print cv-editor-panel lg:col-span-5 space-y-5 ${activeTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
           
           {/* Section 1: Thông tin cá nhân */}
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
@@ -1316,7 +1298,7 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
         <div className={`lg:col-span-7 ${activeTab === 'editor' ? 'hidden lg:block' : 'block'}`}>
           <div className="sticky top-20 space-y-3">
             
-            <div className="flex items-center justify-between px-2 text-xs text-slate-500 dark:text-slate-400">
+            <div className="no-print flex items-center justify-between px-2 text-xs text-slate-500 dark:text-slate-400">
               <span className="font-semibold flex items-center gap-1.5">
                 <Eye className="w-3.5 h-3.5 text-blue-500" />
                 Bản xem trước A4 chuẩn in ấn
@@ -1776,7 +1758,7 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
 
       {/* ── POST-SAVE SUCCESS & INSTANT DOWNLOAD MODAL ── */}
       {showPostSaveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-fade-in">
+        <div className="no-print fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-fade-in">
           <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-7 space-y-5">
             <div className="text-center space-y-2">
               <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-inner">

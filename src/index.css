@@ -665,14 +665,17 @@ html {
     margin: 0 !important;
   }
 
-  /* Hide navigation, toolbars, buttons during print */
+  /* Hide navigation, toolbars, buttons and UI panels during print */
   aside,
   header,
   footer,
   nav,
   button,
   .no-print,
-  .scroll-spy-nav {
+  .scroll-spy-nav,
+  .cv-builder-header,
+  .cv-builder-toolbar,
+  .cv-editor-panel {
     display: none !important;
   }
 
@@ -682,7 +685,10 @@ html {
     max-width: 100% !important;
   }
 
+  /* Only printable CV document is visible and scaled to A4 */
+  #cv-printable-document,
   .cv-print-area {
+    display: block !important;
     box-shadow: none !important;
     border: none !important;
     padding: 0 !important;

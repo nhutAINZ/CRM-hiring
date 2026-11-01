@@ -177,7 +177,7 @@ export default function Header({
   const currentNavTabs = isAdmin ? adminNavTabs : ctvNavTabs;
 
   return (
-    <header className="sticky top-0 z-40 transition-all bg-white/95 dark:bg-[#060b18]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-2xs">
+    <header className="no-print sticky top-0 z-40 transition-all bg-white/95 dark:bg-[#060b18]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-2xs">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* ── Top Navbar Row ── */}
         <div className="py-2.5 sm:py-3 flex items-center justify-between gap-2">

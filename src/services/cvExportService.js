@@ -392,3 +392,4 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
 </body>
 </html>`;
 }
+

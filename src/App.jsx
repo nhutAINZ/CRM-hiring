@@ -521,12 +521,14 @@ export default function App() {
       <div className={`transition-all duration-300 min-h-screen flex flex-col ml-0 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
         
         {/* ── Top Red Banner Announcement ("Tuyển nhiều tiền nhiều...") ── */}
-        <TopBanner
-          collapsed={sidebarCollapsed}
-          setCollapsed={setSidebarCollapsed}
-          onOpenRewards={() => setIsSettingsOpen(true)}
-          onOpenMobileMenu={() => setMobileDrawerOpen(true)}
-        />
+        {activeView !== 'cv-builder' && (
+          <TopBanner
+            collapsed={sidebarCollapsed}
+            setCollapsed={setSidebarCollapsed}
+            onOpenRewards={() => setIsSettingsOpen(true)}
+            onOpenMobileMenu={() => setMobileDrawerOpen(true)}
+          />
+        )}
 
         {/* ── Top Auxiliary CRM Header Bar ── */}
         <Header
