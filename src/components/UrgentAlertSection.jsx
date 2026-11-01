@@ -11,6 +11,7 @@ import {
   Eye,
   Zap
 } from 'lucide-react';
+import { sanitizeUrl, isSafeUrl } from '../utils/dataNormalizer';
 
 export default function UrgentAlertSection({
   urgentCandidates,
@@ -178,9 +179,9 @@ Link CV: ${c.cvUrl || 'N/A'}`;
                     <Eye className="w-3.5 h-3.5" />
                   </button>
 
-                  {c.cvUrl && (
+                  {isSafeUrl(c.cvUrl) && (
                     <a
-                      href={c.cvUrl}
+                      href={sanitizeUrl(c.cvUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 hover:bg-blue-100 border border-blue-200/60 dark:border-blue-500/25 transition-all"

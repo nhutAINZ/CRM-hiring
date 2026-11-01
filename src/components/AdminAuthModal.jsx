@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Lock,
   Unlock,
@@ -28,11 +28,30 @@ export default function AdminAuthModal({
   const [newPwd, setNewPwd] = useState('');
   const [confirmPwd, setConfirmPwd] = useState('');
   const [changeSuccess, setChangeSuccess] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutTimer, setLockoutTimer] = useState(0);
+
+  useEffect(() => {
+    let interval = null;
+    if (lockoutTimer > 0) {
+      interval = setInterval(() => {
+        setLockoutTimer((t) => (t <= 1 ? 0 : t - 1));
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [lockoutTimer]);
 
   if (!isOpen) return null;
 
   const handleLogin = (e) => {
     if (e && e.preventDefault) e.preventDefault();
+    if (lockoutTimer > 0) {
+      setErrorMsg(`Quá nhiều lần thử sai. Vui lòng chờ ${lockoutTimer} giây.`);
+      return;
+    }
+
     const cleanInput = (inputPassword || '').trim();
     const cleanCurrent = (currentPassword || 'nhut2206').trim();
 
@@ -41,9 +60,11 @@ export default function AdminAuthModal({
       return;
     }
 
-    // Accept matching current password or master key 'nhut2206'
-    if (cleanInput === cleanCurrent || cleanInput === 'nhut2206') {
+    // Accept matching configured password
+    if (cleanInput === cleanCurrent) {
       setErrorMsg('');
+      setFailedAttempts(0);
+      setLockoutTimer(0);
       setChangeSuccess(true);
       try {
         confetti({
@@ -61,7 +82,15 @@ export default function AdminAuthModal({
         if (onClose) onClose();
       }, 400);
     } else {
-      setErrorMsg('Mật khẩu không chính xác! Vui lòng thử lại.');
+      const nextFailed = failedAttempts + 1;
+      setFailedAttempts(nextFailed);
+      if (nextFailed >= 5) {
+        setLockoutTimer(30);
+        setFailedAttempts(0);
+        setErrorMsg('Bạn đã nhập sai 5 lần! Hệ thống tạm khóa đăng nhập 30 giây để bảo vệ bảo mật.');
+      } else {
+        setErrorMsg(`Mật khẩu không chính xác! (Còn ${5 - nextFailed} lần thử)`);
+      }
     }
   };
 
@@ -215,10 +244,15 @@ export default function AdminAuthModal({
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                  disabled={lockoutTimer > 0}
+                  className={`flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl text-white shadow-md transition-all flex items-center justify-center gap-2 ${
+                    lockoutTimer > 0
+                      ? 'bg-slate-400 dark:bg-slate-700 cursor-not-allowed shadow-none'
+                      : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-500/25 cursor-pointer'
+                  }`}
                 >
                   <Unlock className="w-4 h-4" />
-                  <span>Mở Khóa Quản Trị</span>
+                  <span>{lockoutTimer > 0 ? `Tạm khóa (${lockoutTimer}s)` : 'Mở Khóa Quản Trị'}</span>
                 </button>
               </div>
             </form>

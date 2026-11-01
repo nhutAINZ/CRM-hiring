@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
+import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import TopBanner from './components/TopBanner';
@@ -556,6 +557,7 @@ export default function App() {
 
         {/* ── Main Content Area (Optimized padding for phones and desktop) ── */}
         <main className="flex-1 p-3 sm:p-6 pb-24 md:pb-8 max-w-[1600px] w-full mx-auto space-y-4 sm:space-y-6">
+          <ErrorBoundary>
 
           
           {/* Error Notification Banner */}
@@ -878,6 +880,7 @@ export default function App() {
               <ArchifyView onExportMarkdown={handleDownloadArchitectureMarkdown} />
             </Suspense>
           )}
+          </ErrorBoundary>
         </main>
       </div>
 

@@ -21,7 +21,9 @@ import {
   normalizeCvResult,
   normalizePvResult,
   getStoredNotes,
-  saveCandidateNote
+  saveCandidateNote,
+  sanitizeUrl,
+  isSafeUrl
 } from '../utils/dataNormalizer';
 
 export default function CandidateDetailModal({
@@ -338,9 +340,9 @@ Link CV: ${candidate.cvUrl || 'Không có'}`;
               <span>Copy Gửi Khách</span>
             </button>
 
-            {candidate.cvUrl && (
+            {isSafeUrl(candidate.cvUrl) && (
               <a
-                href={candidate.cvUrl}
+                href={sanitizeUrl(candidate.cvUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-shiny flex items-center gap-1 px-3 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-500/30 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 cursor-pointer"

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
+import { isSafeUrl, sanitizeUrl } from '../utils/dataNormalizer';
 
 export default function CtvSubmitCandidateModal({
   isOpen,
@@ -86,6 +87,10 @@ export default function CtvSubmitCandidateModal({
       setErrorMsg('Vui lòng nhập Link CV của ứng viên (Google Drive, Dropbox, TopCV...)');
       return;
     }
+    if (!isSafeUrl(cvUrl) || !/^https?:\/\//i.test(cvUrl.trim())) {
+      setErrorMsg('Link CV không an toàn hoặc không hợp lệ. Vui lòng nhập link bắt đầu bằng https:// hoặc http://');
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -102,7 +107,7 @@ export default function CtvSubmitCandidateModal({
       company: selectedJob?.company || 'FastHunt Partner',
       desiredSalary: desiredSalary.trim() || selectedJob?.salary || 'Thỏa thuận',
       startTime: startTime.trim() || 'Sẵn sàng ngay',
-      cvUrl: cvUrl.trim(),
+      cvUrl: sanitizeUrl(cvUrl.trim()),
       email: email.trim(),
       notes: notes.trim(),
       cvResultRaw: 'Mới tiếp nhận',

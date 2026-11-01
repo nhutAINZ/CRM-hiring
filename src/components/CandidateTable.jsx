@@ -22,7 +22,7 @@ import {
   LayoutGrid,
   List
 } from 'lucide-react';
-import { normalizeCvResult, normalizePvResult, getStoredNotes, saveCandidateNote, exportCandidatesToCsv, fastSortCandidates } from '../utils/dataNormalizer';
+import { normalizeCvResult, normalizePvResult, getStoredNotes, saveCandidateNote, exportCandidatesToCsv, fastSortCandidates, sanitizeUrl, isSafeUrl } from '../utils/dataNormalizer';
 import confetti from 'canvas-confetti';
 import CandidateMobileCard from './CandidateMobileCard';
 
@@ -358,9 +358,9 @@ export default function CandidateTable({
                           {c.name}
                         </button>
                         <div className="flex items-center gap-2 mt-0.5">
-                          {c.cvUrl && (
+                          {isSafeUrl(c.cvUrl) && (
                             <a
-                              href={c.cvUrl}
+                              href={sanitizeUrl(c.cvUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5 font-semibold"

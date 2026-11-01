@@ -6,7 +6,6 @@
 import React, { useState } from 'react';
 import {
   Search,
-  SlidersHorizontal,
   RotateCcw,
   X,
   Filter,
@@ -23,7 +22,6 @@ export default function FilterBar({
   totalResults
 }) {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
-  const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
 
   const activeFilterCount =
     (filters.datePreset !== 'all' ? 1 : 0) +

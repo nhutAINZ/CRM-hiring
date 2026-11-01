@@ -389,10 +389,56 @@ export const toggleCandidateTag = (candidateId, tag) => {
 };
 
 /**
+ * Security: Validates whether a URL is safe to render in <a href> or <img src>
+ * Blocks dangerous schemes: javascript:, vbscript:, data: (except safe data:image/), file:
+ */
+export const isSafeUrl = (url) => {
+  if (!url || typeof url !== 'string') return false;
+  // Normalize by trimming and stripping ASCII control characters & whitespace
+  const sanitized = url.trim().replace(/[\u0000-\u001f\s]+/g, '').toLowerCase();
+  if (
+    sanitized.startsWith('javascript:') ||
+    sanitized.startsWith('vbscript:') ||
+    sanitized.startsWith('file:')
+  ) {
+    return false;
+  }
+  // If data: scheme, only allow image mime types (png, jpeg, webp, gif)
+  if (sanitized.startsWith('data:')) {
+    return /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(sanitized);
+  }
+  return true;
+};
+
+/**
+ * Sanitizes a URL and returns a safe fallback if unsafe.
+ */
+export const sanitizeUrl = (url, fallback = '') => {
+  if (!url || typeof url !== 'string') return fallback;
+  const trimmed = url.trim();
+  if (!isSafeUrl(trimmed)) return fallback;
+  return trimmed;
+};
+
+/**
+ * Security: Mitigates CSV Formula Injection (CWE-1236)
+ * If cell starts with dangerous formula prefixes (=, +, -, @, \t, \r), prefix with single quote '
+ */
+export const escapeCsvField = (field) => {
+  if (field === null || field === undefined) return '""';
+  let str = String(field);
+  if (/^[=+\-@\t\r]/.test(str)) {
+    str = `'${str}`;
+  }
+  return `"${str.replace(/"/g, '""')}"`;
+};
+
+/**
  * Export candidates to CSV with UTF-8 BOM for perfect Excel compatibility
+ * Includes CSV Formula Injection mitigation and memory leak prevention.
  */
 export const exportCandidatesToCsv = (candidates = [], filename = 'danh_sach_ung_vien.csv') => {
-  if (!candidates || candidates.length === 0) return;
+  if (!candidates || candidates.length === 0) return '';
 
   const headers = [
     'Mã CTV',
@@ -416,20 +462,20 @@ export const exportCandidatesToCsv = (candidates = [], filename = 'danh_sach_ung
   const rows = candidates.map((c) => {
     const note = notesMap[c.id]?.text || '';
     return [
-      `"${(c.ctvCode || '').replace(/"/g, '""')}"`,
-      `"${(c.name || '').replace(/"/g, '""')}"`,
-      `"${(c.timestamp || '').replace(/"/g, '""')}"`,
-      `"${(c.positionCompany || '').replace(/"/g, '""')}"`,
-      `"${(c.desiredSalary || '').replace(/"/g, '""')}"`,
-      `"${(c.startTime || '').replace(/"/g, '""')}"`,
-      `"${(c.cvResultRaw || '').replace(/"/g, '""')}"`,
-      `"${(c.interviewDate || '').replace(/"/g, '""')}"`,
-      `"${(c.interviewTime || '').replace(/"/g, '""')}"`,
-      `"${(c.pvResultRaw || '').replace(/"/g, '""')}"`,
-      `"${(c.onboardingDate || '').replace(/"/g, '""')}"`,
-      `"${(c.cvUrl || '').replace(/"/g, '""')}"`,
-      `"${(c.email || '').replace(/"/g, '""')}"`,
-      `"${note.replace(/"/g, '""')}"`
+      escapeCsvField(c.ctvCode || ''),
+      escapeCsvField(c.name || ''),
+      escapeCsvField(c.timestamp || ''),
+      escapeCsvField(c.positionCompany || ''),
+      escapeCsvField(c.desiredSalary || ''),
+      escapeCsvField(c.startTime || ''),
+      escapeCsvField(c.cvResultRaw || ''),
+      escapeCsvField(c.interviewDate || ''),
+      escapeCsvField(c.interviewTime || ''),
+      escapeCsvField(c.pvResultRaw || ''),
+      escapeCsvField(c.onboardingDate || ''),
+      escapeCsvField(sanitizeUrl(c.cvUrl || '')),
+      escapeCsvField(c.email || ''),
+      escapeCsvField(note)
     ].join(',');
   });
 
@@ -443,6 +489,7 @@ export const exportCandidatesToCsv = (candidates = [], filename = 'danh_sach_ung
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   return csvContent;
 };

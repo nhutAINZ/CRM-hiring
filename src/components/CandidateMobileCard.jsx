@@ -19,7 +19,7 @@ import {
   XCircle,
   Gift
 } from 'lucide-react';
-import { normalizeCvResult, normalizePvResult } from '../utils/dataNormalizer';
+import { normalizeCvResult, normalizePvResult, sanitizeUrl, isSafeUrl } from '../utils/dataNormalizer';
 import { generateCandidateEmailFromName } from '../utils/cvEmailExtractor';
 
 function CandidateMobileCardComponent({
@@ -256,9 +256,9 @@ function CandidateMobileCardComponent({
           </div>
 
           <div className="flex items-center gap-1.5">
-            {candidate.cvUrl && (
+            {isSafeUrl(candidate.cvUrl) && (
               <a
-                href={candidate.cvUrl}
+                href={sanitizeUrl(candidate.cvUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}

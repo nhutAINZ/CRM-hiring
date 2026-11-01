@@ -64,10 +64,8 @@ import { extractTextFromFile } from '../services/cvExtractor.js';
 import { analyzeAndMatchCv } from '../services/aiMatchingService.js';
 import {
   getStoredZcaConfig,
-  saveZcaConfig,
   getStoredZcaLogs,
   addZcaLog,
-  formatZcaJobPitch,
   formatGroupBroadcastPost,
   formatPersonalMemberPitch,
   calculateAntiSpamDelay,
@@ -77,7 +75,6 @@ import {
   getDirectJdUrl,
   FASTHUNT_GROUP_MEMBERS,
   sendZcaJobMessage,
-  generateZcaNodeRunnerCode,
   FASTHUNT_SUBMIT_FORM_URL,
   FASTHUNT_WEB_URL,
   ZCA_DOCS_URL

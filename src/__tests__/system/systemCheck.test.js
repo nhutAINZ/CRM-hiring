@@ -4,9 +4,6 @@ import {
   DEFAULT_TEMPLATES,
   renderTemplate
 } from '../../utils/emailTemplates.js';
-import {
-  exportCandidatesToCsv
-} from '../../utils/dataNormalizer.js';
 
 describe('System Tests: End-to-End System Check', () => {
 

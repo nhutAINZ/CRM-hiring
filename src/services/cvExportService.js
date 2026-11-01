@@ -5,6 +5,7 @@
 
 export function generateCvMarkdown(cvData) {
   const p = cvData?.personal || {};
+  const safeWebsite = p.website && !p.website.toLowerCase().trim().startsWith('javascript:') ? p.website.trim() : '';
   return `# ${p.fullName || 'HỒ SƠ ỨNG VIÊN'}
 **${p.title || 'Vị trí ứng tuyển'}**
 
@@ -13,7 +14,7 @@ export function generateCvMarkdown(cvData) {
 - **Địa chỉ:** ${p.location || 'N/A'}
 - **Mức lương kỳ vọng:** ${p.expectedSalary || 'Thỏa thuận'}
 - **Thời gian nhận việc:** ${p.availability || 'Sẵn sàng'}
-${p.website ? `- **Portfolio / LinkedIn:** ${p.website}\n` : ''}
+${safeWebsite ? `- **Portfolio / LinkedIn:** ${safeWebsite}\n` : ''}
 ---
 
 ## 🎯 TÓM TẮT NĂNG LỰC
@@ -63,18 +64,54 @@ ${
 `;
 }
 
+/**
+ * HTML Escaper to prevent Stored XSS attacks in standalone HTML CV exports.
+ * Sanitizes &, <, >, ", '
+ */
+export function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * Validates that an avatar image URL is a safe http(s) URL or base64 image data URI.
+ */
+function isSafeAvatarUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  return (
+    /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(trimmed) ||
+    /^https?:\/\//i.test(trimmed)
+  );
+}
+
 export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeColor = '#2563eb') {
   const p = cvData?.personal || {};
   const experiences = cvData?.experiences || [];
   const education = cvData?.education || [];
   const skills = cvData?.skills || [];
   const languages = cvData?.languages || [];
-  const summary = cvData?.summary || '';
-  const endorsement = cvData?.endorsement || '';
-  const candidateName = p.fullName || 'Ứng Viên';
+  const summary = escapeHtml(cvData?.summary || '');
+  const endorsement = escapeHtml(cvData?.endorsement || '');
+  const candidateName = escapeHtml(p.fullName || 'Ứng Viên');
+  const safeTitle = escapeHtml(p.title || 'Vị trí ứng tuyển');
+  const safePhone = escapeHtml(p.phone || '');
+  const safeEmail = escapeHtml(p.email || '');
+  const safeLocation = escapeHtml(p.location || '');
+  const safeWebsite = escapeHtml(p.website || '');
+  const safeSalary = escapeHtml(p.expectedSalary || 'Thương lượng');
+  const safeAvailability = escapeHtml(p.availability || 'Sẵn sàng');
 
-  const avatarImgTag = p.avatarUrl
-    ? `<img src="${p.avatarUrl}" alt="${candidateName}" class="avatar-img" />`
+  // Sanitize theme color (allow valid hex color or fallback)
+  const safeThemeColor = /^#[0-9a-fA-F]{3,8}$/.test(String(themeColor).trim()) ? themeColor : '#2563eb';
+
+  const avatarImgTag = isSafeAvatarUrl(p.avatarUrl)
+    ? `<img src="${escapeHtml(p.avatarUrl.trim())}" alt="${candidateName}" class="avatar-img" />`
     : '';
 
   return `<!DOCTYPE html>
@@ -277,25 +314,25 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
         ${avatarImgTag}
         <div class="header-info">
           <h1>${candidateName}</h1>
-          <p class="job-title">${p.title || 'Vị trí ứng tuyển'}</p>
+          <p class="job-title">${safeTitle}</p>
         </div>
       </div>
       <div class="contact-info">
-        ${p.phone ? `<div>📞 ${p.phone}</div>` : ''}
-        ${p.email ? `<div>✉️ ${p.email}</div>` : ''}
-        ${p.location ? `<div>📍 ${p.location}</div>` : ''}
-        ${p.website ? `<div>🌐 ${p.website}</div>` : ''}
+        ${safePhone ? `<div>📞 ${safePhone}</div>` : ''}
+        ${safeEmail ? `<div>✉️ ${safeEmail}</div>` : ''}
+        ${safeLocation ? `<div>📍 ${safeLocation}</div>` : ''}
+        ${safeWebsite ? `<div>🌐 ${safeWebsite}</div>` : ''}
       </div>
     </div>
 
     <div class="info-strip">
       <div>
         <div class="label">Mức lương kỳ vọng</div>
-        <div class="value">${p.expectedSalary || 'Thương lượng'}</div>
+        <div class="value">${safeSalary}</div>
       </div>
       <div>
         <div class="label">Thời gian nhận việc</div>
-        <div class="value">${p.availability || 'Sẵn sàng'}</div>
+        <div class="value">${safeAvailability}</div>
       </div>
       <div>
         <div class="label">Tình trạng hồ sơ</div>
@@ -319,11 +356,11 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
           (exp) => `
         <div class="exp-item">
           <div class="exp-header">
-            <span>${exp.role || 'Chức danh'}</span>
-            <span class="period">${exp.period || ''}</span>
+            <span>${escapeHtml(exp.role || 'Chức danh')}</span>
+            <span class="period">${escapeHtml(exp.period || '')}</span>
           </div>
-          <div class="exp-company">${exp.company || 'Doanh nghiệp'}</div>
-          ${exp.description ? `<div class="exp-desc">${exp.description}</div>` : ''}
+          <div class="exp-company">${escapeHtml(exp.company || 'Doanh nghiệp')}</div>
+          ${exp.description ? `<div class="exp-desc">${escapeHtml(exp.description)}</div>` : ''}
         </div>
       `
         )
@@ -336,7 +373,7 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
       skills.length > 0
         ? `<div class="section-title">🛠️ Kỹ Năng Chuyên Môn</div>
     <div class="skills-wrap">
-      ${skills.map((s) => `<span class="skill-pill">${s}</span>`).join('')}
+      ${skills.map((s) => `<span class="skill-pill">${escapeHtml(s)}</span>`).join('')}
     </div>`
         : ''
     }
@@ -350,9 +387,9 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
           .map(
             (edu) => `
           <div class="edu-item">
-            <div class="edu-school">${edu.school || ''}</div>
-            <div class="edu-deg">${edu.degree || ''}</div>
-            <div class="edu-yr">${edu.year || ''}</div>
+            <div class="edu-school">${escapeHtml(edu.school || '')}</div>
+            <div class="edu-deg">${escapeHtml(edu.degree || '')}</div>
+            <div class="edu-yr">${escapeHtml(edu.year || '')}</div>
           </div>
         `
           )
@@ -369,8 +406,8 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
           .map(
             (l) => `
           <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
-            <span style="font-weight:700;">${l.name}:</span>
-            <span style="color:#475569;">${l.level}</span>
+            <span style="font-weight:700;">${escapeHtml(l.name)}:</span>
+            <span style="color:#475569;">${escapeHtml(l.level)}</span>
           </div>
         `
           )

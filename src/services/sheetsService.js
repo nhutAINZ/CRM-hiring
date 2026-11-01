@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+import { sanitizeUrl } from '../utils/dataNormalizer.js';
 
 export const DEFAULT_CONFIG = {
   sheet1Id: '1ij2ivwCd4-hI69XBGIhkhb_jPWbkc5J1oAGtlKwjLXc',
@@ -70,7 +71,9 @@ export const getJobSheetViewUrl = (
   jobSheetId = DEFAULT_CONFIG.jobSheetId,
   jobSheetGid = DEFAULT_CONFIG.jobSheetGid
 ) => {
-  return `https://docs.google.com/spreadsheets/d/${jobSheetId}/edit?gid=${jobSheetGid}#gid=${jobSheetGid}`;
+  const safeId = encodeURIComponent(String(jobSheetId || '').trim());
+  const safeGid = encodeURIComponent(String(jobSheetGid || '0').trim());
+  return `https://docs.google.com/spreadsheets/d/${safeId}/edit?gid=${safeGid}#gid=${safeGid}`;
 };
 
 // Helper to get CTV Submit CV Google Form URL
@@ -142,7 +145,8 @@ export const fetchSheet1Data = async (sheet1Id, sheet1Gid) => {
             const positionCompany = extractField(row, ['vị trí ứng tuyển_doanh nghiệp', 'vị trí ứng tuyển', 'vị trí']);
             const desiredSalary = extractField(row, ['mức lương mong muốn', 'lương mong muốn']);
             const startTime = extractField(row, ['thời gian bắt đầu làm việc', 'thời gian bắt đầu']);
-            const cvUrl = extractField(row, ['update cv', 'link cv', 'cv']);
+            const rawCvUrl = extractField(row, ['update cv', 'link cv', 'cv']);
+            const cvUrl = sanitizeUrl(rawCvUrl);
             const notes = extractField(row, ['ghi chú thêm về ứng viên', 'ghi chú thêm']);
             let email = extractField(row, [
               'địa chỉ email',

@@ -2,9 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import {
   calculateMetrics,
-  isWithinDateRange,
-  normalizeCvResult,
-  normalizePvResult
+  normalizeCvResult
 } from '../../utils/dataNormalizer.js';
 
 describe('Integration Tests: Filters & Metrics Pipeline', () => {
