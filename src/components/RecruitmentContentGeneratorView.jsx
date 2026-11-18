@@ -20,9 +20,11 @@ import {
   ShieldCheck,
   EyeOff,
   Eye,
-  Lock
+  Lock,
+  Scale
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { auditJobDescription, generateCompliantRewrite } from '../services/vnLaborLawService';
 
 // Custom Social SVG Icons
 const FacebookIcon = ({ className = 'w-4 h-4' }) => (
@@ -61,6 +63,7 @@ export default function RecruitmentContentGeneratorView({
 
   const [copied, setCopied] = useState(false);
   const [variationIndex, setVariationIndex] = useState(0);
+  const [copiedRewriteNotice, setCopiedRewriteNotice] = useState(false);
 
   // Custom job fields if 'custom' selected
   const [customJob, setCustomJob] = useState({
@@ -278,6 +281,9 @@ Ai đang tìm việc hoặc bạn bè đang thất nghiệp thì tag gấp vô �
   const handleNextVariation = () => {
     setVariationIndex((prev) => prev + 1);
   };
+
+  // VN Law Advisor Legal Compliance Check for generated post
+  const legalAudit = useMemo(() => auditJobDescription(generatedContent), [generatedContent]);
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
@@ -613,6 +619,45 @@ Ai đang tìm việc hoặc bạn bè đang thất nghiệp thì tag gấp vô �
                   <span>{copied ? 'Đã Sao Chép!' : 'Sao Chép Nội Dung'}</span>
                 </button>
               </div>
+            </div>
+
+            {/* ⚖️ BLLĐ 2019 Legal Compliance Status Bar */}
+            <div className={`px-5 py-2.5 border-b flex flex-wrap items-center justify-between gap-2 text-xs ${
+              legalAudit.isFullyCompliant
+                ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-200/80 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-300'
+                : 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-200/80 dark:border-rose-800/50 text-rose-800 dark:text-rose-300'
+            }`}>
+              <div className="flex items-center gap-2">
+                <Scale className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="font-bold">
+                  {legalAudit.isFullyCompliant
+                    ? '100% Hợp chuẩn Bộ luật Lao động 2019'
+                    : `Cảnh báo pháp lý (${legalAudit.violations.length + legalAudit.warnings.length} điểm cần sửa)`}
+                </span>
+                {!legalAudit.isFullyCompliant && (
+                  <span className="text-[11px] text-rose-600 dark:text-rose-400">
+                    • {legalAudit.violations[0]?.title || legalAudit.warnings[0]?.title}
+                  </span>
+                )}
+              </div>
+
+              {!legalAudit.isFullyCompliant && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const cleaned = generateCompliantRewrite(generatedContent, legalAudit);
+                    navigator.clipboard.writeText(cleaned);
+                    setCopiedRewriteNotice(true);
+                    confetti({ particleCount: 20, spread: 45, origin: { y: 0.6 } });
+                    setTimeout(() => setCopiedRewriteNotice(false), 2000);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                  title="Sao chép bản nội dung đã sửa theo đúng Bộ luật Lao động 2019"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  <span>{copiedRewriteNotice ? 'Đã Copy Bản Sửa!' : 'Copy Bản Sửa Đúng Luật'}</span>
+                </button>
+              )}
             </div>
 
             {/* Simulated Post Surface */}

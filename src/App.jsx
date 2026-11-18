@@ -27,6 +27,7 @@ const MultiAgentHubView = lazy(() => import('./components/MultiAgentHubView'));
 const RecruitmentContentGeneratorView = lazy(() => import('./components/RecruitmentContentGeneratorView'));
 const RecruitmentGroupsView = lazy(() => import('./components/RecruitmentGroupsView'));
 const CvBuilderView = lazy(() => import('./components/CvBuilderView'));
+const VnLawAdvisorView = lazy(() => import('./components/VnLawAdvisorView'));
 
 // Lazy-loaded Modals
 const CandidateDetailModal = lazy(() => import('./components/CandidateDetailModal'));
@@ -148,7 +149,7 @@ export default function App() {
     if (typeof window !== 'undefined' && window.location.hash) {
       const hash = window.location.hash.replace('#', '').split('?')[0];
       const validViews = [
-        'ctv-dashboard', 'cv-builder', 'jobs', 'content-gen', 'group-finder',
+        'ctv-dashboard', 'cv-builder', 'jobs', 'content-gen', 'group-finder', 'vn-law',
         'multiagent', 'archify', 'table', 'dashboard', 'kanban', 'analytics', 'urgent', 'clients', 'ctv', 'zalo'
       ];
       if (validViews.includes(hash)) {
@@ -640,6 +641,20 @@ export default function App() {
               <RecruitmentGroupsView
                 jobItems={jobItems}
                 selectedJobContext={selectedJobForTools}
+                onNavigateToContentGen={(job) => {
+                  setSelectedJobForTools(job);
+                  setActiveView('content-gen');
+                }}
+              />
+            </Suspense>
+          )}
+
+          {/* ── Cố Vấn Luật Lao Động & Tuân Thủ Tuyển Dụng (VN Law Advisor) ── */}
+          {activeView === 'vn-law' && (
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Cố Vấn Luật Lao Động & Tuân Thủ..." />}>
+              <VnLawAdvisorView
+                jobItems={jobItems}
+                onNavigateToJobs={() => setActiveView('jobs')}
                 onNavigateToContentGen={(job) => {
                   setSelectedJobForTools(job);
                   setActiveView('content-gen');

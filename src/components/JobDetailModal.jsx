@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   X,
   Briefcase,
@@ -22,11 +22,15 @@ import {
   Trash2,
   Maximize2,
   Download,
-  Plus
+  Plus,
+  Scale,
+  AlertOctagon,
+  AlertTriangle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
 import { getDirectJdUrl } from '../services/zcaBotService';
+import { auditJobDescription, generateCompliantRewrite } from '../services/vnLaborLawService';
 
 export default function JobDetailModal({
   job,
@@ -52,6 +56,11 @@ export default function JobDetailModal({
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlInputValue, setUrlInputValue] = useState('');
   const fileInputRef = useRef(null);
+
+  // VN Law Advisor Legal Compliance Audit
+  const combinedJdText = `${job?.title || ''}\n${job?.salary || ''}\n${job?.requirements || ''}`;
+  const legalAudit = useMemo(() => auditJobDescription(combinedJdText), [combinedJdText]);
+  const [copiedRewrite, setCopiedRewrite] = useState(false);
 
   if (!job) return null;
 
@@ -303,6 +312,80 @@ ${job.requirements ? `📝 Ghi chú yêu cầu: ${job.requirements}\n` : ''}${jo
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── VIETNAM LABOR LAW COMPLIANCE AUDIT (VN LAW ADVISOR) ── */}
+          <div className={`p-4 rounded-2xl border space-y-3 ${
+            legalAudit.isFullyCompliant
+              ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200/80 dark:border-emerald-800/60'
+              : legalAudit.violations.length > 0
+              ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-200/80 dark:border-rose-800/60'
+              : 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-200/80 dark:border-amber-800/60'
+          }`}>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Scale className={`w-4 h-4 ${
+                  legalAudit.isFullyCompliant
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : legalAudit.violations.length > 0
+                    ? 'text-rose-600 dark:text-rose-400'
+                    : 'text-amber-600 dark:text-amber-400'
+                }`} />
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                  Kiểm Định Pháp Lý Tuyển Dụng (BLLĐ 2019)
+                </h4>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                  legalAudit.isFullyCompliant
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200'
+                    : legalAudit.violations.length > 0
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-200'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200'
+                }`}>
+                  {legalAudit.complianceScore}/100 • {legalAudit.isFullyCompliant ? 'Hợp Chuẩn' : 'Cần Chỉnh Sửa'}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              {legalAudit.statusLabel}
+            </p>
+
+            {/* Findings list if any */}
+            {(legalAudit.violations.length > 0 || legalAudit.warnings.length > 0) && (
+              <div className="space-y-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                {[...legalAudit.violations, ...legalAudit.warnings].map((issue, idx) => (
+                  <div key={idx} className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-bold">
+                      <span className="text-rose-600 dark:text-rose-400">{issue.title}</span>
+                      <span className="text-slate-400 font-mono text-[10px]">{issue.article}</span>
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-400 text-[11px]">
+                      {issue.description}
+                    </p>
+                    <p className="text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold">
+                      💡 Khuyến nghị: {issue.replacement}
+                    </p>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const cleaned = generateCompliantRewrite(job.requirements || '', legalAudit);
+                    navigator.clipboard.writeText(cleaned);
+                    setCopiedRewrite(true);
+                    confetti({ particleCount: 20, spread: 45, origin: { y: 0.6 } });
+                    setTimeout(() => setCopiedRewrite(false), 2000);
+                  }}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                >
+                  {copiedRewrite ? <Check className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  <span>{copiedRewrite ? 'Đã Sao Chép JD Sửa Chuẩn Luật!' : 'Sao Chép Yêu Cầu Đã Chuẩn Hóa Theo BLLĐ 2019'}</span>
+                </button>
               </div>
             )}
           </div>

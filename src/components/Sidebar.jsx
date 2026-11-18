@@ -33,7 +33,8 @@ import {
   LogOut,
   Bot,
   Sun,
-  Moon
+  Moon,
+  Scale
 } from 'lucide-react';
 
 export default function Sidebar({
@@ -288,6 +289,26 @@ export default function Sidebar({
                 <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                 {(!collapsed || mobileOpen) && <span>Tìm Group Đăng Tin</span>}
               </div>
+            </button>
+
+            {/* Cố Vấn Luật Lao Động & Tuân Thủ (VN Law Advisor) */}
+            <button
+              onClick={() => handleNavClick('vn-law')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+                activeView === 'vn-law'
+                  ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/50 shadow-2xs font-bold'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Scale className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                {(!collapsed || mobileOpen) && <span>Cố Vấn Luật Lao Động</span>}
+              </div>
+              {(!collapsed || mobileOpen) && (
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50">
+                  BLLĐ
+                </span>
+              )}
             </button>
 
             {/* Gửi CV Ứng Viên Về Doanh Nghiệp Form */}

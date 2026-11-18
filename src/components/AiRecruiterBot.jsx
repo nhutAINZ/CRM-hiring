@@ -16,7 +16,8 @@ import {
   Share2,
   ChevronUp,
   Settings,
-  Flame
+  Flame,
+  Scale
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { calculateMetrics, normalizeCvResult, normalizePvResult } from '../utils/dataNormalizer';
@@ -184,9 +185,24 @@ Top các vị trí tuyển dụng tiêu biểu & hoa hồng hấp dẫn:
 *(Copy nội dung trên để gửi ngay qua Zalo hoặc bấm nút "Gửi Telegram" bên dưới)*`;
     }
 
-    return `🤖 **FastHunt AI:** Tôi đã ghi nhận câu hỏi "${query}". 
+    if (q.includes('luật') || q.includes('pháp lý') || q.includes('bllđ') || q.includes('thử việc') || q.includes('lương tối thiểu') || q.includes('đặt cọc') || q.includes('phạt')) {
+      return `⚖️ **CỐ VẤN PHÁP LUẬT LAO ĐỘNG (BLLĐ 2019 & NGHỊ ĐỊNH 12/2022/NĐ-CP)**
+
+1. **Phân biệt đối xử (Điều 8 BLLĐ):** Nghiêm cấm phân biệt giới tính ("chỉ tuyển nam/nữ"), tình trạng hôn nhân trong tuyển dụng. Mức phạt: 5 - 10 triệu đồng.
+2. **Giữ bằng gốc & Đặt cọc (Điều 17 BLLĐ):** Tuyệt đối cấm giữ bằng cấp gốc, CCCD hoặc thu tiền cọc của ứng viên. Mức phạt: 20 - 25 triệu đồng.
+3. **Thời gian & Lương thử việc (Điều 25, 26 BLLĐ):** Thử việc tối đa 60 ngày cho trình độ CĐ/ĐH. Tiền lương thử việc bảo đảm tối thiểu 85% mức lương chính thức.
+4. **Lương tối thiểu vùng (Nghị định 74/2024/NĐ-CP):**
+   • Vùng I: 4.960.000đ/tháng (23.800đ/giờ)
+   • Vùng II: 4.410.000đ/tháng (21.200đ/giờ)
+   • Vùng III: 3.860.000đ/tháng (18.600đ/giờ)
+   • Vùng IV: 3.450.000đ/tháng (16.600đ/giờ)
+
+💡 *Bạn có thể chọn mục **Cố Vấn Luật Lao Động** trên thanh menu để quét văn bản JD tự động.*`;
+    }
+
+    return `🤖 **FastHunt Assistant:** Tôi đã ghi nhận yêu cầu "${query}". 
 Hiện tại hệ thống đã tổng hợp **${candidates.length} hồ sơ** ứng viên với **${metrics.cvPass} CV Pass**.
-Bạn có thể thử các lệnh gợi ý bên dưới để xem phân tích chi tiết!`;
+Bạn có thể chọn các thao tác nhanh bên dưới để xem báo cáo hoặc tra cứu luật lao động!`;
   };
 
   const handleSendMessage = (textToSend) => {
@@ -229,13 +245,11 @@ Bạn có thể thử các lệnh gợi ý bên dưới để xem phân tích ch
       {/* ── 1. Floating Action Button ── */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-18 md:bottom-5 right-4 sm:right-5 z-40 px-3.5 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-bold text-xs sm:text-sm cursor-pointer border border-blue-400/40 group"
+        className="fixed bottom-18 md:bottom-5 right-4 sm:right-5 z-40 px-3.5 sm:px-4 py-2 sm:py-2.5 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 font-bold text-xs sm:text-sm cursor-pointer border border-slate-700 dark:border-blue-500 group"
+        title="Trợ lý điều hành & cố vấn CRM"
       >
-        <div className="relative">
-          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform" />
-          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-yellow-400 animate-ping" />
-        </div>
-        <span>FastHunt AI Bot</span>
+        <Bot className="w-4 h-4 text-blue-400 dark:text-white" />
+        <span>Trợ Lý Điều Hành</span>
       </button>
 
       {/* ── 2. AI Chatbot Drawer Modal ── */}
@@ -243,17 +257,17 @@ Bạn có thể thử các lệnh gợi ý bên dưới để xem phân tích ch
         <div className="fixed bottom-20 right-4 sm:right-6 z-50 w-[92vw] sm:w-[420px] h-[580px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up">
           
           {/* Top Header */}
-          <div className="p-3.5 bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 text-white flex items-center justify-between shadow-xs">
+          <div className="p-3.5 bg-slate-900 dark:bg-slate-850 text-white flex items-center justify-between border-b border-slate-750">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center font-bold">
-                <Bot className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-xl bg-blue-600/30 border border-blue-500/40 flex items-center justify-center font-bold">
+                <Bot className="w-5 h-5 text-blue-400" />
               </div>
               <div>
                 <h3 className="font-extrabold text-sm tracking-tight flex items-center gap-1.5">
-                  <span>FastHunt AI Assistant</span>
-                  <span className="px-1.5 py-0.2 rounded text-[9px] bg-white/25 font-bold uppercase">v2.5</span>
+                  <span>FastHunt Recruiter Ops</span>
+                  <span className="px-1.5 py-0.2 rounded text-[9px] bg-slate-700 font-bold uppercase">CRM PRO</span>
                 </h3>
-                <p className="text-[10px] text-white/80 font-medium">Phân tích tiến độ & Dispatch Zalo/Telegram</p>
+                <p className="text-[10px] text-slate-300 font-medium">Báo cáo tuyển dụng, rà soát pháp lý & dispatch kênh</p>
               </div>
             </div>
 
@@ -344,6 +358,13 @@ Bạn có thể thử các lệnh gợi ý bên dưới để xem phân tích ch
             >
               <Share2 className="w-3 h-3 text-blue-500" />
               <span>Báo cáo Zalo/Telegram</span>
+            </button>
+            <button
+              onClick={() => handleSendMessage('Tư vấn luật lao động BLLĐ 2019')}
+              className="flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-200 rounded-full text-[11px] font-bold border border-slate-200 dark:border-slate-700 whitespace-nowrap cursor-pointer transition-colors"
+            >
+              <Scale className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
+              <span>Cố vấn luật BLLĐ</span>
             </button>
           </div>
 

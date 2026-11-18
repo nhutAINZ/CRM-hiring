@@ -29,7 +29,8 @@ import {
   Unlock,
   ShieldCheck,
   LogOut,
-  UserCheck
+  UserCheck,
+  Scale
 } from 'lucide-react';
 
 export default function Header({
@@ -64,6 +65,7 @@ export default function Header({
     'cv-builder': 'Trình Tạo CV Ứng Viên Chuyên Nghiệp',
     'content-gen': 'Tạo Content Tuyển Dụng',
     'group-finder': 'Danh Bạ Group Tuyển Dụng',
+    'vn-law': 'Cố Vấn Luật Lao Động (VN Law Advisor)',
     dashboard: 'Trang Chủ Quản Trị',
     table: 'Danh Sách Ứng Viên',
     multiagent: 'Multi-Agent Swarm Command Center',
@@ -109,6 +111,12 @@ export default function Header({
       id: 'group-finder',
       label: 'Tìm Group Đăng Tin',
       icon: Share2
+    },
+    {
+      id: 'vn-law',
+      label: 'Cố Vấn Luật',
+      icon: Scale,
+      badge: 'BLLĐ'
     }
   ];
 
@@ -160,6 +168,12 @@ export default function Header({
       id: 'group-finder',
       label: 'Tìm Group',
       icon: Share2
+    },
+    {
+      id: 'vn-law',
+      label: 'Kiểm Tra Pháp Lý BLLĐ',
+      icon: Scale,
+      badge: 'Luật VN'
     },
     {
       id: 'analytics',
