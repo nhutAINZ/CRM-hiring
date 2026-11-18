@@ -35,10 +35,13 @@ import {
   X,
   Maximize2,
   ChevronDown,
-  FileDown
+  FileDown,
+  Scale,
+  ShieldCheck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { generateCvMarkdown, generateStandaloneHtml } from '../services/cvExportService';
+import { auditJobDescription } from '../services/vnLaborLawService';
 export { generateCvMarkdown, generateStandaloneHtml };
 
 // Preset sample resumes for quick 1-click loading
@@ -828,6 +831,20 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
                       <span>+ Thêm ảnh JD</span>
                     </button>
                   )}
+                  {/* Legal compliance badge for selected job */}
+                  {matchedJob && (() => {
+                    const audit = auditJobDescription(`${matchedJob.title || ''}\n${matchedJob.salary || ''}\n${matchedJob.requirements || ''}`);
+                    return (
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-xl text-[10px] font-bold ${
+                        audit.isFullyCompliant
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                          : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                      }`} title={audit.statusLabel}>
+                        <Scale className="w-3 h-3" />
+                        <span>{audit.isFullyCompliant ? 'BLLĐ Hợp Chuẩn' : 'BLLĐ Cần Rà Soát'}</span>
+                      </span>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -1095,6 +1112,14 @@ ${cvData.endorsement || 'Hồ sơ đã được thẩm định sơ bộ, tác ph
                   placeholder="linkedin.com/in/ten-ung-vien"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-blue-500 outline-none"
                 />
+              </div>
+
+              {/* ⚖️ Legal & Privacy Assurance Note */}
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 text-[11px] text-slate-500 dark:text-slate-400 flex items-start gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <p className="leading-relaxed">
+                  <strong>Bảo vệ quyền riêng tư & Tuân thủ BLLĐ:</strong> Theo Điều 8 Bộ luật Lao động 2019 và Nghị định 13/2023/NĐ-CP, hồ sơ tuyển dụng không bắt buộc khai báo tình trạng hôn nhân, tôn giáo hay giữ giấy tờ tùy thân gốc.
+                </p>
               </div>
             </div>
           </div>

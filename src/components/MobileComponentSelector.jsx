@@ -29,7 +29,8 @@ import {
   Lock,
   Unlock,
   ShieldCheck,
-  LogOut
+  LogOut,
+  Scale
 } from 'lucide-react';
 
 export default function MobileComponentSelector({
@@ -81,6 +82,18 @@ export default function MobileComponentSelector({
           borderColor: 'border-emerald-200 dark:border-emerald-800/60',
           stat: 'Mới & Miễn Phí',
           statColor: 'text-emerald-600 font-bold',
+          type: 'view'
+        },
+        {
+          id: 'vn-law',
+          title: 'Cố Vấn Luật Lao Động (VN Law Advisor)',
+          subtitle: 'Kiểm định JD, tự động sửa vi phạm BLLĐ 2019 & NĐ 74/2024',
+          icon: Scale,
+          iconColor: 'text-indigo-600 dark:text-indigo-400',
+          bgColor: 'bg-indigo-50 dark:bg-indigo-950/50',
+          borderColor: 'border-indigo-200 dark:border-indigo-800/60',
+          stat: 'BLLĐ 2019',
+          statColor: 'text-indigo-600 font-bold',
           type: 'view'
         },
         {

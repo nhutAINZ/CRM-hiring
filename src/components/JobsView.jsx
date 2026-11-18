@@ -30,11 +30,13 @@ import {
   List,
   FileUp,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Scale
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
 import { getDirectJdUrl } from '../services/zcaBotService';
+import { auditJobDescription } from '../services/vnLaborLawService';
 
 export default function JobsView({
   jobItems = [],
@@ -604,6 +606,26 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
                     </span>
                   </div>
 
+                  {/* BLLĐ 2019 Legal Compliance Status Pill */}
+                  {(() => {
+                    const audit = auditJobDescription(`${job.title || ''}\n${job.salary || ''}\n${job.requirements || ''}`);
+                    return (
+                      <div className="flex items-center justify-between text-[11px] pt-1">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-bold ${
+                          audit.isFullyCompliant
+                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50'
+                            : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50'
+                        }`}>
+                          <Scale className="w-3 h-3" />
+                          <span>{audit.isFullyCompliant ? 'Hợp Chuẩn BLLĐ' : 'Lưu Ý BLLĐ'}</span>
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-medium">
+                          Điểm: <strong className={audit.isFullyCompliant ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}>{audit.complianceScore}/100</strong>
+                        </span>
+                      </div>
+                    );
+                  })()}
+
                   {/* Requirements / Notes Snippet */}
                   {job.requirements && (
                     <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 border border-slate-100 dark:border-slate-800">
@@ -756,9 +778,24 @@ ${jobItems.slice(0, 10).map((j, i) => `${i + 1}. [${j.company}] ${j.title} - Lư
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400">
-                          {job.company}
-                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400">
+                            {job.company}
+                          </p>
+                          {(() => {
+                            const audit = auditJobDescription(`${job.title || ''}\n${job.salary || ''}\n${job.requirements || ''}`);
+                            return (
+                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold ${
+                                audit.isFullyCompliant
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                  : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                              }`}>
+                                <Scale className="w-2.5 h-2.5" />
+                                <span>{audit.isFullyCompliant ? 'BLLĐ Đạt' : 'Lưu ý luật'}</span>
+                              </span>
+                            );
+                          })()}
+                        </div>
                       </td>
                       <td className="py-3.5 px-4">
                         <p className="font-semibold text-slate-800 dark:text-slate-200">{job.location}</p>

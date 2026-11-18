@@ -35,9 +35,11 @@ import {
   Calculator,
   Trophy,
   Target,
-  LayoutGrid
+  LayoutGrid,
+  Scale
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { auditJobDescription } from '../services/vnLaborLawService';
 import { CTV_SUBMIT_CV_FORM_URL } from '../services/sheetsService';
 import CtvSubmitCandidateModal from './CtvSubmitCandidateModal';
 import CtvEarningsCalculator from './CtvEarningsCalculator';
@@ -1169,6 +1171,22 @@ export default function CtvDashboardView({
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <span className="truncate">{job.location || 'Toàn quốc'}</span>
                         </div>
+                        {/* Legal compliance badge */}
+                        {(() => {
+                          const audit = auditJobDescription(`${job.title || ''}\n${job.salary || ''}\n${job.requirements || ''}`);
+                          return (
+                            <div className="pt-1">
+                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold ${
+                                audit.isFullyCompliant
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60'
+                                  : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60'
+                              }`}>
+                                <Scale className="w-2.5 h-2.5" />
+                                <span>{audit.isFullyCompliant ? 'Hợp chuẩn BLLĐ' : 'Lưu ý BLLĐ'}</span>
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       {/* Salary & Bonus Box */}
