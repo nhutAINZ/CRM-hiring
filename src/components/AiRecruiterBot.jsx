@@ -56,8 +56,12 @@ Tôi có thể giúp bạn:
   
   // Telegram & Integration Channel state
   const [telegramConfig, setTelegramConfig] = useState(() => {
-    const saved = localStorage.getItem('fasthunt_telegram_config');
-    return saved ? JSON.parse(saved) : { botToken: '', chatId: '', autoReport: false };
+    try {
+      const saved = localStorage.getItem('fasthunt_telegram_config');
+      return saved ? JSON.parse(saved) : { botToken: '', chatId: '', autoReport: false };
+    } catch {
+      return { botToken: '', chatId: '', autoReport: false };
+    }
   });
   const [showConfig, setShowConfig] = useState(false);
   const [configSaved, setConfigSaved] = useState(false);

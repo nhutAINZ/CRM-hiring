@@ -147,7 +147,7 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
     }
     .no-print-bar .brand { font-weight: 700; display: flex; items-center; gap: 8px; }
     .no-print-bar button {
-      background: ${themeColor};
+      background: ${safeThemeColor};
       color: #fff;
       border: none;
       padding: 8px 16px;
@@ -185,7 +185,7 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
     .header-info .job-title {
       font-size: 16px;
       font-weight: 700;
-      color: ${themeColor};
+      color: ${safeThemeColor};
       margin-top: 2px;
     }
     .avatar-img {
@@ -193,7 +193,7 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
       height: 84px;
       border-radius: 16px;
       object-fit: cover;
-      border: 2px solid ${themeColor};
+      border: 2px solid ${safeThemeColor};
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .contact-info {
@@ -221,7 +221,7 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: ${themeColor};
+      color: ${safeThemeColor};
       margin-bottom: 12px;
       display: flex;
       align-items: center;
@@ -248,7 +248,7 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: ${themeColor};
+      background: ${safeThemeColor};
     }
     .exp-header {
       display: flex;
@@ -279,11 +279,11 @@ export function generateStandaloneHtml(cvData, templateStyle = 'modern', themeCo
       margin-top: 24px;
       padding: 14px 18px;
       border-radius: 12px;
-      background: ${themeColor}12;
-      border: 1px solid ${themeColor}35;
+      background: ${safeThemeColor}12;
+      border: 1px solid ${safeThemeColor}35;
       font-size: 12px;
     }
-    .endorsement-title { font-weight: 800; color: ${themeColor}; margin-bottom: 4px; }
+    .endorsement-title { font-weight: 800; color: ${safeThemeColor}; margin-bottom: 4px; }
     .endorsement-text { font-style: italic; color: #334155; line-height: 1.6; }
 
     @media print {

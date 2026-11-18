@@ -387,9 +387,9 @@ export function openPersonalZaloChat(phone, messageText = '') {
     navigator.clipboard.writeText(messageText).catch(() => {});
   }
   if (cleaned) {
-    window.open(`https://zalo.me/${cleaned}`, '_blank');
+    window.open(`https://zalo.me/${cleaned}`, '_blank', 'noopener,noreferrer');
   } else {
-    window.open('https://chat.zalo.me', '_blank');
+    window.open('https://chat.zalo.me', '_blank', 'noopener,noreferrer');
   }
 }
 
@@ -406,7 +406,7 @@ export function openZaloGroup(groupUrl, messageText = '') {
   if (!targetUrl || targetUrl.includes('fasthunt_ctv_recruitment') || !targetUrl.startsWith('http')) {
     targetUrl = 'https://chat.zalo.me';
   }
-  window.open(targetUrl, '_blank');
+  window.open(targetUrl, '_blank', 'noopener,noreferrer');
 }
 
 /**

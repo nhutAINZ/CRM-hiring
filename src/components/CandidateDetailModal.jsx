@@ -83,7 +83,7 @@ Link CV: ${candidate.cvUrl || 'Không có'}`;
     const phone = candidate.phone || candidate.sdt || '';
     if (phone) {
       const cleanPhone = phone.replace(/[^\d+]/g, '');
-      window.open(`https://zalo.me/${cleanPhone}`, '_blank');
+      window.open(`https://zalo.me/${cleanPhone}`, '_blank', 'noopener,noreferrer');
     }
     setCopiedId('zalo');
     setTimeout(() => setCopiedId(null), 2000);

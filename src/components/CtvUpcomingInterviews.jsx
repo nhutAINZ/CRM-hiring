@@ -24,7 +24,7 @@ export default function CtvUpcomingInterviews({
     const msg = encodeURIComponent(
       `Chào ${candidate.name}, mình là CTV phụ trách hồ sơ của bạn tại FastHunt. Xin nhắc bạn lịch phỏng vấn sắp tới cho vị trí "${candidate.position || 'công việc'}" tại ${candidate.company || 'Doanh nghiệp đối tác'}. Bạn nhớ chuẩn bị chu đáo trang phục, đường truyền và tự tin nhé! Chúc bạn đạt kết quả thật tốt! Cần hỗ trợ gì cứ nhắn mình nha.`
     );
-    window.open(`https://zalo.me/${cleanPhone}`, '_blank');
+    window.open(`https://zalo.me/${cleanPhone}`, '_blank', 'noopener,noreferrer');
   };
 
   return (

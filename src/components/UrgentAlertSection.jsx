@@ -38,7 +38,7 @@ Link CV: ${c.cvUrl || 'N/A'}`;
     const phone = c.phone || c.sdt || '';
     if (phone) {
       const cleanPhone = phone.replace(/[^\d+]/g, '');
-      window.open(`https://zalo.me/${cleanPhone}`, '_blank');
+      window.open(`https://zalo.me/${cleanPhone}`, '_blank', 'noopener,noreferrer');
     }
     setCopiedId(c.id);
     setTimeout(() => setCopiedId(null), 2000);

@@ -113,7 +113,7 @@ export default function AdminAuthModal({
     const cleanNew = (newPwd || '').trim();
     const cleanConfirm = (confirmPwd || '').trim();
 
-    if (cleanOld !== cleanCurrent && cleanOld !== 'nhut2206') {
+    if (cleanOld !== cleanCurrent) {
       setErrorMsg('Mật khẩu cũ không đúng');
       return;
     }
