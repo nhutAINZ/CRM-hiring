@@ -502,33 +502,15 @@ export const twoPointerFilter = (candidates = [], predicate) => {
   if (!candidates || candidates.length === 0) return [];
   if (!predicate) return candidates;
 
-  const leftMatches = [];
-  const rightMatches = [];
-
-  let left = 0;
-  let right = candidates.length - 1;
-
-  while (left <= right) {
-    if (left === right) {
-      if (predicate(candidates[left])) {
-        leftMatches.push(candidates[left]);
-      }
-      break;
+  const len = candidates.length;
+  const matches = [];
+  for (let i = 0; i < len; i++) {
+    const item = candidates[i];
+    if (predicate(item)) {
+      matches.push(item);
     }
-
-    if (predicate(candidates[left])) {
-      leftMatches.push(candidates[left]);
-    }
-    if (predicate(candidates[right])) {
-      rightMatches.push(candidates[right]);
-    }
-
-    left++;
-    right--;
   }
-
-  // Combine left and reversed right matches to maintain original array order
-  return leftMatches.concat(rightMatches.reverse());
+  return matches;
 };
 
 /**

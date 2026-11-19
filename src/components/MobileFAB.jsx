@@ -3,7 +3,7 @@
 // Quick Action Speed Dial for Fast Mobile Operations
 // ====================================================================
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   Plus,
   RefreshCw,
@@ -15,7 +15,7 @@ import {
   FileText
 } from 'lucide-react';
 
-export default function MobileFAB({
+function MobileFAB({
   onRefresh,
   isRefreshing,
   onExportCsv,
@@ -109,3 +109,5 @@ export default function MobileFAB({
     </div>
   );
 }
+
+export default memo(MobileFAB);

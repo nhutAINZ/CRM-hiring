@@ -3,7 +3,7 @@
 // Compact Mobile-First Header + Desktop Tab Navigation Bar
 // ====================================================================
 
-import React from 'react';
+import React, { memo } from 'react';
 import {
   RefreshCw,
   Settings,
@@ -33,7 +33,7 @@ import {
   Scale
 } from 'lucide-react';
 
-export default function Header({
+function Header({
   lastUpdated,
   isRefreshing,
   onRefresh,
@@ -378,3 +378,5 @@ export default function Header({
     </header>
   );
 }
+
+export default memo(Header);

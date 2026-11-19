@@ -3,7 +3,7 @@
 // Sleek, Tactile Vertical Dock for 1-Hand Navigation & Component Selection
 // ====================================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import {
   Users,
   Briefcase,
@@ -30,7 +30,7 @@ import {
   Lock
 } from 'lucide-react';
 
-export default function MobileVerticalTaskbar({
+function MobileVerticalTaskbar({
   activeView,
   setActiveView,
   candidateCount = 0,
@@ -339,3 +339,5 @@ export default function MobileVerticalTaskbar({
     </div>
   );
 }
+
+export default memo(MobileVerticalTaskbar);

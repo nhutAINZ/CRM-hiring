@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   AlertTriangle,
   Clock,
@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { sanitizeUrl, isSafeUrl } from '../utils/dataNormalizer';
 
-export default function UrgentAlertSection({
+function UrgentAlertSection({
   urgentCandidates,
   onOpenEmail,
   onOpenDetail,
@@ -199,3 +199,5 @@ Link CV: ${c.cvUrl || 'N/A'}`;
     </div>
   );
 }
+
+export default memo(UrgentAlertSection);

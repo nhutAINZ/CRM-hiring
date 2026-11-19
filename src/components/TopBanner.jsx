@@ -3,10 +3,10 @@
 // Compact Dismissable Marquee Banner for Mobile & Desktop
 // ====================================================================
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Menu, Flame, Gift, ArrowRight, X } from 'lucide-react';
 
-export default function TopBanner({ collapsed, setCollapsed, onOpenRewards, onOpenMobileMenu }) {
+function TopBanner({ collapsed, setCollapsed, onOpenRewards, onOpenMobileMenu }) {
   const [isDismissed, setIsDismissed] = useState(false);
 
   if (isDismissed) return null;
@@ -60,3 +60,5 @@ export default function TopBanner({ collapsed, setCollapsed, onOpenRewards, onOp
     </div>
   );
 }
+
+export default memo(TopBanner);

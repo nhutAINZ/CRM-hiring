@@ -3,7 +3,7 @@
 // Fixed 5-Item iOS/Android Touch-First Navigation Bar
 // ====================================================================
 
-import React from 'react';
+import React, { memo } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -16,7 +16,7 @@ import {
   FileText
 } from 'lucide-react';
 
-export default function MobileBottomNav({
+function MobileBottomNav({
   activeView,
   setActiveView,
   candidateCount = 0,
@@ -131,3 +131,5 @@ export default function MobileBottomNav({
     </nav>
   );
 }
+
+export default memo(MobileBottomNav);

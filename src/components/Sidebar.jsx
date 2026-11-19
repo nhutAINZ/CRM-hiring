@@ -3,7 +3,7 @@
 // Desktop Sticky + Mobile Slide-Over Drawer with Backdrop
 // ====================================================================
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   Briefcase,
   Users,
@@ -37,7 +37,7 @@ import {
   Scale
 } from 'lucide-react';
 
-export default function Sidebar({
+function Sidebar({
   activeView,
   setActiveView,
   candidateCount,
@@ -606,3 +606,5 @@ export default function Sidebar({
     </>
   );
 }
+
+export default memo(Sidebar);

@@ -43,6 +43,14 @@ const cleanText = (str) => {
   return String(str).trim();
 };
 
+// In-memory response cache to eliminate redundant network round-trips
+const sheetCache = new Map();
+const CACHE_TTL_MS = 60000; // 60 seconds
+
+export const clearSheetCache = () => {
+  sheetCache.clear();
+};
+
 // Helper to construct GViz CSV URL
 export const getCsvUrl = (spreadsheetId, gid = '0') => {
   const safeId = encodeURIComponent(String(spreadsheetId || '').trim());
@@ -115,7 +123,15 @@ const extractField = (row, fieldKeywords, excludeKeywords = []) => {
 /**
  * Parse Sheet 1 Data
  */
-export const fetchSheet1Data = async (sheet1Id, sheet1Gid) => {
+export const fetchSheet1Data = async (sheet1Id, sheet1Gid, forceRefresh = false) => {
+  const cacheKey = `sheet1_${sheet1Id}_${sheet1Gid}`;
+  if (!forceRefresh) {
+    const cached = sheetCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+  }
+
   const url = getCsvUrl(sheet1Id, sheet1Gid);
   const response = await fetch(url, { cache: 'no-cache' });
   if (!response.ok) {
@@ -129,6 +145,7 @@ export const fetchSheet1Data = async (sheet1Id, sheet1Gid) => {
       skipEmptyLines: true,
       complete: (results) => {
         if (!results.data || results.data.length === 0) {
+          sheetCache.set(cacheKey, { timestamp: Date.now(), data: [] });
           resolve([]);
           return;
         }
@@ -190,8 +207,12 @@ export const fetchSheet1Data = async (sheet1Id, sheet1Gid) => {
               company = parts.slice(1).join('-').trim();
             }
 
+            const candidateKey = (name || 'anon').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16);
+            const timeKey = (timestamp || '').replace(/[^0-9]/g, '').slice(0, 12);
+            const id = `uv_${index + 1}_${candidateKey || 'c'}${timeKey ? '_' + timeKey : ''}`;
+
             return {
-              id: `uv_${index + 1}_${Date.now()}`,
+              id,
               rowIndex: index + 2, // 1-based, plus header row
               timestamp,
               name,
@@ -219,6 +240,7 @@ export const fetchSheet1Data = async (sheet1Id, sheet1Gid) => {
           })
           .filter(Boolean);
 
+        sheetCache.set(cacheKey, { timestamp: Date.now(), data: candidates });
         resolve(candidates);
       },
       error: (err) => {
@@ -231,7 +253,15 @@ export const fetchSheet1Data = async (sheet1Id, sheet1Gid) => {
 /**
  * Parse Sheet 2 Data (Client Sheet mapping)
  */
-export const fetchSheet2Data = async (sheet2Id, sheet2Gid = '0') => {
+export const fetchSheet2Data = async (sheet2Id, sheet2Gid = '0', forceRefresh = false) => {
+  const cacheKey = `sheet2_${sheet2Id}_${sheet2Gid}`;
+  if (!forceRefresh) {
+    const cached = sheetCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+  }
+
   try {
     const url = getCsvUrl(sheet2Id, sheet2Gid);
     const response = await fetch(url, { cache: 'no-cache' });
@@ -244,6 +274,7 @@ export const fetchSheet2Data = async (sheet2Id, sheet2Gid = '0') => {
         skipEmptyLines: true,
         complete: (results) => {
           if (!results.data) {
+            sheetCache.set(cacheKey, { timestamp: Date.now(), data: [] });
             resolve([]);
             return;
           }
@@ -257,6 +288,7 @@ export const fetchSheet2Data = async (sheet2Id, sheet2Gid = '0') => {
             status: extractField(row, ['tình trạng ứng viên', 'tình trạng']),
             rowIndex: idx + 2
           }));
+          sheetCache.set(cacheKey, { timestamp: Date.now(), data: items });
           resolve(items);
         },
         error: () => resolve([])
@@ -273,8 +305,17 @@ export const fetchSheet2Data = async (sheet2Id, sheet2Gid = '0') => {
  */
 export const fetchCtvSheetData = async (
   ctvSheetId = DEFAULT_CONFIG.ctvSheetId,
-  ctvSheetGid = DEFAULT_CONFIG.ctvSheetGid
+  ctvSheetGid = DEFAULT_CONFIG.ctvSheetGid,
+  forceRefresh = false
 ) => {
+  const cacheKey = `ctvSheet_${ctvSheetId}_${ctvSheetGid}`;
+  if (!forceRefresh) {
+    const cached = sheetCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+  }
+
   try {
     const url = getCsvUrl(ctvSheetId, ctvSheetGid);
     const response = await fetch(url, { cache: 'no-cache' });
@@ -287,6 +328,7 @@ export const fetchCtvSheetData = async (
         skipEmptyLines: true,
         complete: (results) => {
           if (!results.data) {
+            sheetCache.set(cacheKey, { timestamp: Date.now(), data: [] });
             resolve([]);
             return;
           }
@@ -303,6 +345,7 @@ export const fetchCtvSheetData = async (
             notes: extractField(row, ['góp ý', 'mong muốn']),
             rowIndex: idx + 2
           })).filter(item => item.name || item.ctvCode);
+          sheetCache.set(cacheKey, { timestamp: Date.now(), data: ctvList });
           resolve(ctvList);
         },
         error: () => resolve([])
@@ -319,8 +362,17 @@ export const fetchCtvSheetData = async (
  */
 export const fetchJobSheetData = async (
   jobSheetId = DEFAULT_CONFIG.jobSheetId,
-  jobSheetGid = DEFAULT_CONFIG.jobSheetGid
+  jobSheetGid = DEFAULT_CONFIG.jobSheetGid,
+  forceRefresh = false
 ) => {
+  const cacheKey = `jobSheet_${jobSheetId}_${jobSheetGid}`;
+  if (!forceRefresh) {
+    const cached = sheetCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+  }
+
   try {
     const url = getCsvUrl(jobSheetId, jobSheetGid);
     const response = await fetch(url, { cache: 'no-cache' });
@@ -333,6 +385,7 @@ export const fetchJobSheetData = async (
         skipEmptyLines: true,
         complete: (results) => {
           if (!results.data || results.data.length === 0) {
+            sheetCache.set(cacheKey, { timestamp: Date.now(), data: [] });
             resolve([]);
             return;
           }
@@ -393,6 +446,7 @@ export const fetchJobSheetData = async (
             })
             .filter(Boolean);
 
+          sheetCache.set(cacheKey, { timestamp: Date.now(), data: jobs });
           resolve(jobs);
         },
         error: () => resolve([])
@@ -418,8 +472,17 @@ export const getIntergreatSheetViewUrl = (
  */
 export const fetchIntergreatSheetData = async (
   sheetId = DEFAULT_CONFIG.intergreatSheetId,
-  sheetGid = DEFAULT_CONFIG.intergreatSheetGid
+  sheetGid = DEFAULT_CONFIG.intergreatSheetGid,
+  forceRefresh = false
 ) => {
+  const cacheKey = `intergreat_${sheetId}_${sheetGid}`;
+  if (!forceRefresh) {
+    const cached = sheetCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+  }
+
   try {
     const url = getCsvUrl(sheetId, sheetGid);
     const response = await fetch(url, { cache: 'no-cache' });
@@ -432,6 +495,7 @@ export const fetchIntergreatSheetData = async (
         skipEmptyLines: true,
         complete: (results) => {
           if (!results.data || results.data.length === 0) {
+            sheetCache.set(cacheKey, { timestamp: Date.now(), data: [] });
             resolve([]);
             return;
           }
@@ -474,6 +538,7 @@ export const fetchIntergreatSheetData = async (
             })
             .filter(Boolean);
 
+          sheetCache.set(cacheKey, { timestamp: Date.now(), data: candidates });
           resolve(candidates);
         },
         error: () => resolve([])

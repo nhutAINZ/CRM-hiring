@@ -8,7 +8,12 @@
     <meta name="description" content="Hệ thống quản lý ứng viên, phân tích tuyển dụng và cổng cộng tác viên (CTV) thông minh kết nối Realtime Google Sheets. Giao diện xanh dương trắng tinh gọn, hỗ trợ Dark Mode & nộp CV trực tiếp." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    </noscript>
     <script>
       (function() {
         try {
@@ -26,19 +31,21 @@
   <body class="bg-slate-50 text-slate-900 dark:bg-[#090d16] dark:text-slate-100 antialiased selection:bg-blue-600 selection:text-white font-sans">
     <div id="root"></div>
     <script>
-      // Anti-Watermark / Floating Netlify Badge Removal Observer
+      // Anti-Watermark / Floating Netlify Badge Removal (Throttled & auto-disconnected after load)
       (function() {
+        var badgeSelectors = [
+          '#netlify-badge',
+          '.netlify-badge',
+          '[data-netlify-badge]',
+          'netlify-drawer',
+          'div[data-netlify-drawer]',
+          'iframe[src*="netlify"]',
+          'div[class*="netlify-feedback"]',
+          'a[href*="netlify.com"]'
+        ];
+        var isScheduled = false;
         function removeWatermarks() {
-          var badgeSelectors = [
-            '#netlify-badge',
-            '.netlify-badge',
-            '[data-netlify-badge]',
-            'netlify-drawer',
-            'div[data-netlify-drawer]',
-            'iframe[src*="netlify"]',
-            'div[class*="netlify-feedback"]',
-            'a[href*="netlify.com"]'
-          ];
+          isScheduled = false;
           badgeSelectors.forEach(function(sel) {
             document.querySelectorAll(sel).forEach(function(el) {
               var parent = el.closest('div[style*="position: fixed"], div[style*="position: absolute"]');
@@ -50,13 +57,21 @@
             });
           });
         }
+        function scheduleRemoval() {
+          if (!isScheduled) {
+            isScheduled = true;
+            (window.requestIdleCallback || window.requestAnimationFrame)(removeWatermarks);
+          }
+        }
         removeWatermarks();
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', removeWatermarks);
+          document.addEventListener('DOMContentLoaded', scheduleRemoval);
         }
-        window.addEventListener('load', removeWatermarks);
-        var obs = new MutationObserver(removeWatermarks);
-        obs.observe(document.documentElement, { childList: true, subtree: true });
+        window.addEventListener('load', scheduleRemoval);
+        var obs = new MutationObserver(scheduleRemoval);
+        obs.observe(document.body || document.documentElement, { childList: true, subtree: true });
+        // Disconnect observer after 8s to free main-thread resources permanently
+        setTimeout(function() { obs.disconnect(); }, 8000);
       })();
     </script>
     <script type="module" src="/src/main.jsx"></script>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import {
   Users,
   CheckCircle2,
@@ -130,7 +130,7 @@ function KpiCard({ label, value, subValue, subLabel, icon: Icon, color, glowColo
   );
 }
 
-export default function OverviewMetrics({ metrics, onSelectUrgent }) {
+function OverviewMetrics({ metrics, onSelectUrgent }) {
   const {
     total,
     cvPass,
@@ -296,3 +296,5 @@ export default function OverviewMetrics({ metrics, onSelectUrgent }) {
     </div>
   );
 }
+
+export default memo(OverviewMetrics);

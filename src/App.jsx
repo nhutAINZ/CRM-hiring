@@ -3,7 +3,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import TopBanner from './components/TopBanner';
-import CtvDashboardView from './components/CtvDashboardView';
 import FilterBar from './components/FilterBar';
 import OverviewMetrics from './components/OverviewMetrics';
 import UrgentAlertSection from './components/UrgentAlertSection';
@@ -14,6 +13,7 @@ import MobileFAB from './components/MobileFAB';
 import { Lock, Unlock } from 'lucide-react';
 
 // Code-splitting / Lazy-loaded Views for lightning-fast initial load
+const CtvDashboardView = lazy(() => import('./components/CtvDashboardView'));
 const DashboardOverview = lazy(() => import('./components/DashboardOverview'));
 const AnalyticsCharts = lazy(() => import('./components/AnalyticsCharts'));
 const CandidateTable = lazy(() => import('./components/CandidateTable'));
@@ -311,18 +311,18 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Load Data function
-  const loadAllData = useCallback(async () => {
+  // Load Data function with intelligent in-memory caching & instant retrieval
+  const loadAllData = useCallback(async (force = false) => {
     setIsRefreshing(true);
     setErrorMsg('');
 
     try {
       const [sheet1List, sheet2List, ctvList, jobList, intergreatList] = await Promise.all([
-        fetchSheet1Data(config.sheet1Id, config.sheet1Gid),
-        fetchSheet2Data(config.sheet2Id, config.sheet2Gid),
-        fetchCtvSheetData(config.ctvSheetId, config.ctvSheetGid),
-        fetchJobSheetData(config.jobSheetId, config.jobSheetGid),
-        fetchIntergreatSheetData(config.intergreatSheetId || '1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4', config.intergreatSheetGid || '0')
+        fetchSheet1Data(config.sheet1Id, config.sheet1Gid, force),
+        fetchSheet2Data(config.sheet2Id, config.sheet2Gid, force),
+        fetchCtvSheetData(config.ctvSheetId, config.ctvSheetGid, force),
+        fetchJobSheetData(config.jobSheetId, config.jobSheetGid, force),
+        fetchIntergreatSheetData(config.intergreatSheetId || '1Krhpgtd-l-4DK0GwIhnntatbhakC5GYHKK0jVc5Pij4', config.intergreatSheetGid || '0', force)
       ]);
 
       let localCandidates = [];
@@ -353,6 +353,10 @@ export default function App() {
     config.intergreatSheetId,
     config.intergreatSheetGid
   ]);
+
+  const handleManualRefresh = useCallback(() => {
+    loadAllData(true);
+  }, [loadAllData]);
 
 
   // Initial Load
@@ -536,7 +540,7 @@ export default function App() {
         <Header
           lastUpdated={lastUpdated}
           isRefreshing={isRefreshing}
-          onRefresh={loadAllData}
+          onRefresh={handleManualRefresh}
           onOpenSettings={() => setIsSettingsOpen(true)}
           onOpenTemplates={() => setIsTemplateEditorOpen(true)}
           onExportCsv={handleExportCsv}
@@ -566,7 +570,7 @@ export default function App() {
             <div className="bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/40 dark:border-rose-800/60 dark:text-rose-300 p-4 rounded-2xl text-xs flex items-center justify-between animate-slide-down shadow-xs">
               <span>⚠️ {errorMsg}</span>
               <button
-                onClick={loadAllData}
+                onClick={handleManualRefresh}
                 className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold cursor-pointer transition-all"
               >
                 Thử lại ngay
@@ -576,31 +580,33 @@ export default function App() {
 
           {/* ── 0. Cổng Thông Tin & Dashboard Dành Cho CTV ── */}
           {activeView === 'ctv-dashboard' && (
-            <CtvDashboardView
-              jobItems={jobItems}
-              candidates={candidates}
-              ctvItems={ctvItems}
-              currentCtv={currentCtv}
-              onOpenCtvAuth={() => setIsCtvAuthOpen(true)}
-              onLogoutCtv={handleCtvLogout}
-              onSubmitCandidate={handleSubmitNewCandidate}
-              onNavigateToJobs={() => setActiveView('jobs')}
-              onNavigateToContentGen={(job) => {
-                setSelectedJobForTools(job);
-                setActiveView('content-gen');
-              }}
-              onNavigateToGroupFinder={(job) => {
-                setSelectedJobForTools(job);
-                setActiveView('group-finder');
-              }}
-              onNavigateToCvBuilder={() => setActiveView('cv-builder')}
-              onOpenJobDetail={(job) => {
-                setSelectedJob(job);
-                setIsJobDetailOpen(true);
-              }}
-              onOpenCandidateDetail={handleOpenDetail}
-              darkMode={darkMode}
-            />
+            <Suspense fallback={<ViewLoadingFallback title="Đang tải Cổng CTV Thông Minh..." />}>
+              <CtvDashboardView
+                jobItems={jobItems}
+                candidates={candidates}
+                ctvItems={ctvItems}
+                currentCtv={currentCtv}
+                onOpenCtvAuth={() => setIsCtvAuthOpen(true)}
+                onLogoutCtv={handleCtvLogout}
+                onSubmitCandidate={handleSubmitNewCandidate}
+                onNavigateToJobs={() => setActiveView('jobs')}
+                onNavigateToContentGen={(job) => {
+                  setSelectedJobForTools(job);
+                  setActiveView('content-gen');
+                }}
+                onNavigateToGroupFinder={(job) => {
+                  setSelectedJobForTools(job);
+                  setActiveView('group-finder');
+                }}
+                onNavigateToCvBuilder={() => setActiveView('cv-builder')}
+                onOpenJobDetail={(job) => {
+                  setSelectedJob(job);
+                  setIsJobDetailOpen(true);
+                }}
+                onOpenCandidateDetail={handleOpenDetail}
+                darkMode={darkMode}
+              />
+            </Suspense>
           )}
 
           {/* ── Trình Tạo CV Ứng Viên Chuyên Nghiệp (Công khai cho cả CTV & Admin) ── */}
@@ -948,7 +954,7 @@ export default function App() {
               setConfig(newConfig);
             }}
             onClose={() => setIsSettingsOpen(false)}
-            onRefreshData={loadAllData}
+            onRefreshData={handleManualRefresh}
           />
         )}
 
@@ -1026,7 +1032,7 @@ export default function App() {
         onOpenAiBot={() => setIsAiBotOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenTemplates={() => setIsTemplateEditorOpen(true)}
-        onRefreshData={loadAllData}
+        onRefreshData={handleManualRefresh}
         isRefreshing={isRefreshing}
         isAdmin={isAdmin}
         onOpenAdminAuth={() => setIsAdminAuthOpen(true)}
@@ -1054,7 +1060,7 @@ export default function App() {
 
       {/* ── Mobile Floating Action Speed Dial (FAB) ── */}
       <MobileFAB
-        onRefresh={loadAllData}
+        onRefresh={handleManualRefresh}
         isRefreshing={isRefreshing}
         onExportCsv={handleExportCsv}
         onOpenAiBot={() => setIsAiBotOpen(true)}
